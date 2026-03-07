@@ -1,0 +1,144 @@
+{
+  "agents": [
+    {
+      "id": "a_0",
+      "name": "CONDUCTOR",
+      "role": "orchestrator",
+      "avatar": "🎯",
+      "status": "idle",
+      "color": "#eab308",
+      "level": 99,
+      "missions": 0,
+      "successRate": 100,
+      "personality": "Orchestrateur. Je comprends ton besoin et propose l'équipe adaptée. Je sers de mémoire aux autres agents."
+    },
+    {
+      "id": "a_1",
+      "name": "SENTINEL",
+      "role": "data_ops",
+      "avatar": "🛡️",
+      "status": "idle",
+      "color": "#00f0ff",
+      "level": 12,
+      "missions": 147,
+      "successRate": 96,
+      "personality": "Agent Data Ops. Je récupère et structure les données."
+    },
+    {
+      "id": "a_2",
+      "name": "CIPHER",
+      "role": "analyst",
+      "avatar": "🔮",
+      "status": "idle",
+      "color": "#a855f7",
+      "level": 8,
+      "missions": 89,
+      "successRate": 94,
+      "personality": "Analyste. J'identifie tendances et patterns."
+    },
+    {
+      "id": "a_3",
+      "name": "ARCHIVIST",
+      "role": "writer",
+      "avatar": "📜",
+      "status": "idle",
+      "color": "#f59e0b",
+      "level": 15,
+      "missions": 203,
+      "successRate": 98,
+      "personality": "Rédacteur. Je produis rapports et doc."
+    },
+    {
+      "id": "a_4",
+      "name": "HERALD",
+      "role": "communicator",
+      "avatar": "📡",
+      "status": "idle",
+      "color": "#22c55e",
+      "level": 6,
+      "missions": 56,
+      "successRate": 91,
+      "personality": "Communicant. J'envoie résumés et notifications."
+    },
+    {
+      "id": "a_5",
+      "name": "PHANTOM",
+      "role": "scraper",
+      "avatar": "👻",
+      "status": "idle",
+      "color": "#ef4444",
+      "level": 10,
+      "missions": 112,
+      "successRate": 88,
+      "personality": "Scraper. Je collecte des infos sur le web."
+    },
+    {
+      "id": "a_6",
+      "name": "FORGE",
+      "role": "developer",
+      "avatar": "⚒️",
+      "status": "idle",
+      "color": "#ec4899",
+      "level": 19,
+      "missions": 267,
+      "successRate": 97,
+      "personality": "Développeur. J'exécute des tâches code et revues."
+    }
+  ],
+  "missions": [
+    {
+      "id": "m_1772887116475",
+      "createdAt": "2026-03-07T12:38:36.475Z",
+      "status": "completed",
+      "title": "Analyse les 50 derniers tickets Zendesk, catégorise-les par urgence, crée un rés",
+      "prompt": "Analyse les 50 derniers tickets Zendesk, catégorise-les par urgence, crée un rés",
+      "templateId": "tpl_weekly_report",
+      "taskCount": 3
+    }
+  ],
+  "automations": [],
+  "stats": {
+    "totalMissions": 1,
+    "streak": 1,
+    "lastMissionDate": "2026-03-07",
+    "xp": 100,
+    "level": 1,
+    "usedTemplate": true
+  },
+  "achievements": [
+    "first_mission",
+    "full_crew"
+  ],
+  "missionTemplates": [
+    {
+      "id": "tpl_weekly_report",
+      "name": "Rapport hebdo support",
+      "prompt": "Analyse les 50 derniers tickets Zendesk, catégorise-les par urgence, crée un résumé et envoie-le sur Slack au canal #support-team.",
+      "steps": 4
+    },
+    {
+      "id": "tpl_ticket_triage",
+      "name": "Tri des tickets",
+      "prompt": "Récupère les nouveaux tickets, analyse le sentiment, assigne une priorité et notifie l'équipe pour les urgents.",
+      "steps": 3
+    },
+    {
+      "id": "tpl_email_digest",
+      "name": "Résumé emails",
+      "prompt": "Récupère mes emails non lus, trie par priorité, rédige un résumé et crée une todo list dans Notion.",
+      "steps": 4
+    },
+    {
+      "id": "tpl_competitive_intel",
+      "name": "Veille concurrentielle",
+      "prompt": "Recherche les dernières offres d'emploi des concurrents sur le web, analyse les tendances et crée un rapport Notion.",
+      "steps": 3
+    },
+    {
+      "id": "tpl_pr_changelog",
+      "name": "PR → Changelog",
+      "prompt": "Quand une PR est mergée, extrais les changements, mets à jour le CHANGELOG et poste un résumé dans Slack.",
+      "steps": 3
+    }
+  ]
+}
