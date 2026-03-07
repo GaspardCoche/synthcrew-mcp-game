@@ -20,11 +20,6 @@ function placeOnTerrain([x, , z]) {
   return [x, y, z];
 }
 
-function placeOnTerrain([x, , z]) {
-  const y = getTerrainHeightAt(x, z) + 0.15;
-  return [x, y, z];
-}
-
 export default function World({
   agents = [],
   onSelectAgent,
