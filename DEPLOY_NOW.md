@@ -74,13 +74,13 @@ Repère l’`id` du service **synthcrew** (ou le nom que tu lui as donné). Exem
 
 **Variable d’environnement (recommandé) :**
 ```bash
-export RENDER_SERVICE_ID=srv-abc123xyz
+export RENDER_SERVICE_ID=srv-d6m24qfgi27c73ds4vfg
 npm run deploy:render
 ```
 
 **Ou en une ligne :**
 ```bash
-RENDER_SERVICE_ID=srv-abc123xyz npm run deploy:render
+RENDER_SERVICE_ID=srv-d6m24qfgi27c73ds4vfg npm run deploy:render
 ```
 
 La commande déclenche un déploiement et attend la fin (`--wait`). En cas d’échec, le code de sortie est non nul.
@@ -141,4 +141,4 @@ Ensuite : pousse tes changements sur la branche connectée ; soit l’auto-deplo
 - **Build échoue sur Render** : voir les **Logs** du service ; s’assurer que `npm run build` produit bien le dossier `dist/`.
 - **CLI : "not logged in"** : exécuter `render login` et réautoriser si le token a expiré.
 
-Plus de détails : **docs/DEPLOY_RENDER.md**.
+**Architecture Render** : un seul service sert API (`/api/*`), WebSocket (`/ws`), et le frontend SPA. CORS autorise toutes les origines en prod ; définir `CORS_ORIGIN` pour restreindre.

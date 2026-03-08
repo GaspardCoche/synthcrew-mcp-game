@@ -5,11 +5,11 @@ export default defineConfig({
   plugins: [react()],
   define: {
     __BUILD_ID__: JSON.stringify(
-      process.env.CF_PAGES_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || `dev-${Date.now()}`
+      process.env.RENDER_GIT_COMMIT || process.env.CF_PAGES_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || `dev-${Date.now()}`
     ),
   },
   build: {
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks: {

@@ -3,14 +3,17 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "dev:server": "node server/index.js",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js",
-    "start:safe": "node server/tryPort.js",
+    "start": "node server/tryPort.js",
+    "start:direct": "node server/index.js",
     "render:validate": "render blueprints validate",
     "deploy:render": "render deploys create ${RENDER_SERVICE_ID} --wait --output text"
   },
