@@ -4,22 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Color Variables (5-color palette) ─────────────────────── */
+/* ── Minimal palette (light, readable) ─────────────────────── */
 :root {
   --primary: #ff6b35;
-  --accent: #00f5ff;
-  --success: #00ff88;
-  --warning: #ffd93d;
-  --error: #ff2d55;
-  --bg-deep: #050810;
-  --bg-panel: #080c15;
-  --bg-raised: #0d1424;
-  --text-dim: #4b5563;
-  --text-muted: #6b7280;
-  --text-secondary: #9ca3af;
-  --text-primary: #e2e8f0;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-active: rgba(0, 245, 255, 0.2);
+  --accent: #9ca3af;
+  --success: #22c55e;
+  --error: #ef4444;
+  --bg-deep: #0f1419;
+  --bg-panel: #151b23;
+  --bg-raised: #1c232e;
+  --text-dim: #6b7280;
+  --text-muted: #9ca3af;
+  --text-primary: #e5e7eb;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(255, 107, 53, 0.2);
 }
 
 * {
@@ -36,218 +34,43 @@ body {
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────── */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 245, 255, 0.1) transparent;
-}
-*::-webkit-scrollbar { width: 3px; height: 3px; }
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent; }
+*::-webkit-scrollbar { width: 4px; height: 4px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgba(0, 245, 255, 0.12); border-radius: 2px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(0, 245, 255, 0.22); }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-/* ── Scanline Effect ────────────────────────────────────────── */
-.scanlines {
-  position: relative;
-}
-.scanlines::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.04) 2px,
-    rgba(0, 0, 0, 0.04) 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-.scanlines::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(transparent 50%, rgba(0, 245, 255, 0.008) 50%);
-  background-size: 100% 4px;
-  animation: scanline-move 12s linear infinite;
-  pointer-events: none;
-  z-index: 1;
-}
+/* ── Glow (minimal, used sparingly) ─────────────────────────── */
+.glow-primary { color: var(--primary); }
+.glow-cyan, .glow-teal { color: var(--text-muted); }
+.glow-orange { color: var(--primary); }
+.glow-green { color: var(--success); }
 
-/* ── Glitch Text Effect ─────────────────────────────────────── */
-.glitch {
-  position: relative;
-}
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-.glitch::before {
-  animation: glitch-top 3.5s infinite linear;
-  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
-  color: var(--accent);
-  opacity: 0;
-}
-.glitch::after {
-  animation: glitch-bottom 4.2s infinite linear;
-  clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-  color: var(--primary);
-  opacity: 0;
-}
-
-/* ── Neon Glow Classes ──────────────────────────────────────── */
-.glow-cyan {
-  color: var(--accent);
-  text-shadow: 0 0 10px rgba(0, 245, 255, 0.6), 0 0 30px rgba(0, 245, 255, 0.2);
-}
-.glow-orange {
-  color: var(--primary);
-  text-shadow: 0 0 10px rgba(255, 107, 53, 0.6), 0 0 30px rgba(255, 107, 53, 0.2);
-}
-.glow-purple {
-  color: var(--accent);
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168, 85, 247, 0.2);
-}
-.glow-green {
-  color: var(--success);
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 30px rgba(0, 255, 136, 0.2);
-}
-.glow-primary {
-  color: #ff6b35;
-  text-shadow: 0 0 12px rgba(255,107,53,0.5);
-}
-.glow-teal {
-  color: #4ecdc4;
-  text-shadow: 0 0 12px rgba(78,205,196,0.5);
-}
-.glow-amber {
-  color: #ffd93d;
-  text-shadow: 0 0 12px rgba(255,217,61,0.4);
-}
-.glow-gold {
-  color: #ffd93d;
-  text-shadow: 0 0 12px rgba(255,217,61,0.4);
-}
-
-/* ── Cyberpunk Panels ───────────────────────────────────────── */
-.cyber-panel {
-  background: linear-gradient(160deg, rgba(13, 20, 36, 0.98), rgba(8, 12, 21, 0.99));
+/* ── Panels (minimal, flat) ─────────────────────────────────── */
+.cyber-panel,
+.cyber-panel-orange,
+.cyber-panel-purple {
+  background: var(--bg-raised);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-}
-.cyber-panel::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0.4;
-}
-
-.cyber-panel-orange {
-  background: linear-gradient(160deg, rgba(20, 10, 5, 0.98), rgba(8, 12, 21, 0.99));
-  border: 1px solid rgba(255, 107, 53, 0.12);
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-}
-.cyber-panel-orange::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
-  opacity: 0.5;
-}
-
-.cyber-panel-purple {
-  background: linear-gradient(160deg, rgba(15, 8, 28, 0.98), rgba(8, 12, 21, 0.99));
-  border: 1px solid rgba(168, 85, 247, 0.12);
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-}
-.cyber-panel-purple::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0.5;
-}
-
-/* ── Animated Border Gradient ───────────────────────────────── */
-.border-animate {
-  position: relative;
-}
-.border-animate::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(var(--angle, 0deg), var(--accent), var(--accent), var(--primary), var(--accent));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: border-spin 4s linear infinite;
-  pointer-events: none;
 }
 
 /* ── Terminal Text ──────────────────────────────────────────── */
-.term-text {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  color: var(--success);
-  line-height: 1.6;
-}
-.term-text-dim {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10px;
-  color: #4b5563;
-}
-.term-prompt::before {
-  content: "> ";
-  color: var(--accent);
-  opacity: 0.7;
-}
+.term-text { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--text-primary); }
+.term-text-dim { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--text-dim); }
+.term-prompt::before { content: "> "; color: var(--primary); opacity: 0.8; }
 
 /* ── Agent Card ─────────────────────────────────────────────── */
 .agent-card {
   position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: all 0.25s ease;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
-.agent-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  background: linear-gradient(135deg, rgba(0, 245, 255, 0.03), transparent);
-  pointer-events: none;
-}
 .agent-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.02) !important;
 }
-.agent-card:hover::after { opacity: 1; }
 
 /* ── RPG Agent Card ─────────────────────────────────────────── */
 .rpg-agent-card {
@@ -418,6 +241,13 @@ body {
   color: #e2e8f0;
   background: rgba(0, 245, 255, 0.06);
 }
+.synth-btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 245, 255, 0.35);
+}
+.synth-btn-ghost:active {
+  transform: scale(0.98);
+}
 .synth-btn-primary {
   font-family: "JetBrains Mono", monospace;
   padding: 4px 12px;
@@ -434,6 +264,13 @@ body {
   background: rgba(255, 107, 53, 0.18);
   border-color: rgba(255, 107, 53, 0.6);
   box-shadow: 0 0 12px rgba(255, 107, 53, 0.15);
+}
+.synth-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.5);
+}
+.synth-btn-primary:active {
+  transform: scale(0.98);
 }
 
 /* ── SynthCrew Legacy Classes ───────────────────────────────── */
