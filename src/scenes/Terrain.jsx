@@ -149,7 +149,14 @@ export default function Terrain() {
   const texture  = useMemo(createGroundTexture, []);
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} geometry={geometry} receiveShadow>
-      <meshStandardMaterial map={texture} color="#2a2840" roughness={0.85} metalness={0.1} envMapIntensity={0.8} />
+      <meshStandardMaterial
+        map={texture}
+        color="#2a2840"
+        roughness={0.85}
+        metalness={0.1}
+        envMapIntensity={0.8}
+        side={THREE.DoubleSide}
+      />
     </mesh>
   );
 }
