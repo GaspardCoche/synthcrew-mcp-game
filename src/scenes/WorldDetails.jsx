@@ -24,14 +24,20 @@ function PathSegment({ from, to, color, steps = 14 }) {
     const z1 = from[2] + (to[2] - from[2]) * t1;
     const mx = (x0 + x1) / 2;
     const mz = (z0 + z1) / 2;
-    const y = getTerrainHeightAt(mx, mz) + 0.08;
+    const y = getTerrainHeightAt(mx, mz) + 0.06;
     const len = Math.hypot(x1 - x0, z1 - z0) || 1;
     const angle = Math.atan2(z1 - z0, x1 - x0);
     segments.push(
-      <mesh key={i} position={[mx, y, mz]} rotation={[0, -angle, 0]} receiveShadow>
-        <boxGeometry args={[len + 0.5, 0.04, 0.8]} />
-        <meshStandardMaterial color="#0a0a12" emissive={color} emissiveIntensity={0.08} roughness={0.9} metalness={0.05} />
-      </mesh>
+      <group key={i}>
+        <mesh position={[mx, y, mz]} rotation={[0, -angle, 0]} receiveShadow>
+          <boxGeometry args={[len + 0.5, 0.06, 1.2]} />
+          <meshStandardMaterial color="#141822" emissive={color} emissiveIntensity={0.2} roughness={0.7} metalness={0.15} />
+        </mesh>
+        <mesh position={[mx, y + 0.04, mz]} rotation={[0, -angle, 0]}>
+          <boxGeometry args={[len + 0.3, 0.02, 0.15]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} transparent opacity={0.5} />
+        </mesh>
+      </group>
     );
   }
   return <group>{segments}</group>;
@@ -43,14 +49,14 @@ function PathPylon({ pos, color }) {
   return (
     <group position={[x, y, z]}>
       <mesh castShadow>
-        <cylinderGeometry args={[0.04, 0.06, 1.2, 6]} />
-        <meshStandardMaterial color="#0f0e14" roughness={0.8} />
+        <cylinderGeometry args={[0.06, 0.08, 1.6, 8]} />
+        <meshStandardMaterial color="#1a1828" emissive={color} emissiveIntensity={0.15} roughness={0.6} metalness={0.3} />
       </mesh>
-      <mesh position={[0, 0.7, 0]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.2} />
+      <mesh position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.12, 10, 10]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.5} roughness={0.15} />
       </mesh>
-      <pointLight position={[0, 0.7, 0]} color={color} intensity={0.15} distance={6} decay={2} />
+      <pointLight position={[0, 0.9, 0]} color={color} intensity={0.5} distance={8} decay={2} />
     </group>
   );
 }
@@ -60,14 +66,15 @@ function SignPost({ pos, color }) {
   const y = getTerrainHeightAt(x, z);
   return (
     <group position={[x, y, z]}>
-      <mesh castShadow position={[0, 0.6, 0]}>
-        <cylinderGeometry args={[0.03, 0.04, 1.2, 6]} />
-        <meshStandardMaterial color="#1a1820" roughness={0.7} />
+      <mesh castShadow position={[0, 0.8, 0]}>
+        <cylinderGeometry args={[0.05, 0.07, 1.6, 8]} />
+        <meshStandardMaterial color="#1a1828" emissive={color} emissiveIntensity={0.1} roughness={0.6} metalness={0.3} />
       </mesh>
-      <mesh position={[0, 1.4, 0.25]} rotation={[0, 0, Math.PI / 2]}>
-        <boxGeometry args={[0.5, 0.02, 0.25]} />
-        <meshStandardMaterial color="#0d0d12" emissive={color} emissiveIntensity={0.25} roughness={0.8} />
+      <mesh position={[0, 1.8, 0.3]} rotation={[0, 0, Math.PI / 2]}>
+        <boxGeometry args={[0.6, 0.03, 0.3]} />
+        <meshStandardMaterial color="#141822" emissive={color} emissiveIntensity={0.4} roughness={0.5} />
       </mesh>
+      <pointLight position={[0, 1.8, 0.3]} color={color} intensity={0.3} distance={5} decay={2} />
     </group>
   );
 }
@@ -88,7 +95,7 @@ function EnergyBeam({ from, to, color }) {
   const mx = (from[0] + to[0]) / 2;
   const mz = (from[2] + to[2]) / 2;
   const midY = Math.max(getTerrainHeightAt(mx, mz), getTerrainHeightAt(from[0], from[2]), getTerrainHeightAt(to[0], to[2]));
-  const beamHeight = midY + 4;
+  const beamHeight = midY + 3;
   const dx = to[0] - from[0];
   const dz = to[2] - from[2];
   const dist = Math.hypot(dx, dz);
@@ -96,18 +103,24 @@ function EnergyBeam({ from, to, color }) {
 
   useThrottledFrame((state) => {
     if (!ref.current) return;
-    ref.current.material.opacity = 0.06 + Math.sin(state.clock.elapsedTime * 1.5) * 0.03;
+    ref.current.material.opacity = 0.12 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
   }, 15);
 
   return (
-    <mesh
-      ref={ref}
-      position={[mx, beamHeight, mz]}
-      rotation={[0, -angle, 0]}
-    >
-      <boxGeometry args={[dist, 0.02, 0.15]} />
-      <meshBasicMaterial color={color} transparent opacity={0.08} />
-    </mesh>
+    <group>
+      <mesh
+        ref={ref}
+        position={[mx, beamHeight, mz]}
+        rotation={[0, -angle, 0]}
+      >
+        <boxGeometry args={[dist, 0.04, 0.25]} />
+        <meshBasicMaterial color={color} transparent opacity={0.15} />
+      </mesh>
+      <mesh position={[mx, beamHeight, mz]} rotation={[0, -angle, 0]}>
+        <boxGeometry args={[dist, 0.15, 0.6]} />
+        <meshBasicMaterial color={color} transparent opacity={0.03} />
+      </mesh>
+    </group>
   );
 }
 
@@ -118,20 +131,21 @@ function LockedZoneMarker({ pos, color }) {
 
   useThrottledFrame((state) => {
     if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.3;
-    ref.current.position.y = y + 1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.3;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.4;
+    ref.current.position.y = y + 2.0 + Math.sin(state.clock.elapsedTime * 0.8) * 0.4;
   }, 15);
 
   return (
     <group position={[x, y, z]}>
       <mesh ref={ref}>
-        <octahedronGeometry args={[0.3, 0]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.3} transparent opacity={0.25} wireframe />
+        <octahedronGeometry args={[0.5, 0]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} transparent opacity={0.35} wireframe />
       </mesh>
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.8, 1.2, 6]} />
-        <meshBasicMaterial color={color} transparent opacity={0.08} />
+        <ringGeometry args={[1.0, 1.8, 6]} />
+        <meshBasicMaterial color={color} transparent opacity={0.12} />
       </mesh>
+      <pointLight position={[0, 2.0, 0]} color={color} intensity={0.4} distance={8} decay={2} />
     </group>
   );
 }

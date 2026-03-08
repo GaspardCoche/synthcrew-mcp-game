@@ -188,44 +188,47 @@ app.post("/api/agents/:id/chat", async (c) => {
   const agent = getAgent(id) || all.find((a) => a.name === id || a.id === id || a.id === `a_${id}`);
   if (!agent) return c.json({ error: "Agent not found" }, 404);
 
-  const { message } = await c.req.json();
+  const { message, profileContext } = await c.req.json();
   if (!message?.trim()) return c.json({ error: "Message requis" }, 400);
+
+  const ctx = profileContext || "";
+  const short = message.slice(0, 40);
 
   const ROLE_RESPONSES = {
     orchestrator: [
-      (m) => `J'ai analysé ta demande. Voici mon plan : je vais décomposer "${m.slice(0, 40)}..." en sous-tâches et assigner les meilleurs agents.`,
-      () => "Je coordonne l'équipe. Les agents compétents ont été notifiés.",
-      (m) => `Mission reçue. Je recommande de commencer par une phase d'analyse avant d'exécuter "${m.slice(0, 40)}...".`,
+      (m) => `J'ai analysé ta demande "${short}...". Je décompose en sous-tâches et j'assigne les meilleurs agents de l'équipe.`,
+      () => "Plan d'action structuré. J'ai identifié les dépendances et assigné les agents compétents.",
+      (m) => `Compris. Pour "${short}...", je recommande une phase d'analyse avant l'exécution. Je coordonne l'équipe.`,
     ],
     data_ops: [
-      (m) => `Je lance la collecte de données pour "${m.slice(0, 40)}...". Pipeline ETL en préparation.`,
-      () => "Données récupérées et structurées. Le dataset est prêt pour l'analyse.",
-      (m) => `Je vais extraire les métriques pertinentes de "${m.slice(0, 40)}..." via les sources disponibles.`,
+      (m) => `Pipeline en préparation pour "${short}...". Je configure les sources et lance la collecte.`,
+      () => "Données récupérées, nettoyées et structurées. Le dataset est prêt pour l'analyse.",
+      (m) => `J'extrais les métriques de "${short}..." via les connecteurs disponibles.`,
     ],
     analyst: [
-      (m) => `Analyse en cours de "${m.slice(0, 40)}...". Je détecte déjà plusieurs patterns intéressants.`,
-      () => "Rapport d'analyse généré. Les insights clés sont identifiés avec les tendances.",
-      (m) => `J'ai trouvé 3 tendances majeures en lien avec "${m.slice(0, 40)}...". Veux-tu le rapport complet ?`,
+      (m) => `Analyse lancée sur "${short}...". Patterns et anomalies en cours d'identification.`,
+      () => "Rapport généré avec insights clés, tendances détectées et recommandations.",
+      (m) => `3 tendances majeures identifiées sur "${short}...". Je prépare le rapport détaillé.`,
     ],
     writer: [
-      (m) => `Je rédige le contenu pour "${m.slice(0, 40)}...". Le plan de rédaction est structuré.`,
-      () => "Document rédigé et structuré. Prêt pour la review.",
-      (m) => `Synthèse en cours pour "${m.slice(0, 40)}...". Format adapté à la cible.`,
+      (m) => `Rédaction en cours pour "${short}...". Structure et plan validés.`,
+      () => "Document finalisé, relu et structuré. Prêt pour validation.",
+      (m) => `Synthèse de "${short}..." en cours. Format adapté au contexte.`,
     ],
     communicator: [
-      (m) => `Message préparé concernant "${m.slice(0, 40)}...". Prêt à envoyer aux destinataires.`,
-      () => "Notification envoyée à l'équipe. Confirmation de réception en attente.",
-      (m) => `Je prépare la communication pour "${m.slice(0, 40)}...". Canal et format optimisés.`,
+      (m) => `Communication préparée sur "${short}...". Canal et format optimisés.`,
+      () => "Notification envoyée sur les canaux configurés. En attente de confirmation.",
+      (m) => `Brief rédigé pour "${short}...". Prêt à diffuser.`,
     ],
     scraper: [
-      (m) => `Scan web lancé pour "${m.slice(0, 40)}...". Extraction des données en cours.`,
-      () => "Données web collectées et nettoyées. Sources vérifiées.",
-      (m) => `Je crawle les sources pertinentes pour "${m.slice(0, 40)}...". Résultats structurés bientôt disponibles.`,
+      (m) => `Scan lancé pour "${short}...". Extraction et structuration en cours.`,
+      () => "Collecte terminée. Données nettoyées et sources vérifiées.",
+      (m) => `Crawl en cours sur les sources pertinentes pour "${short}...".`,
     ],
     developer: [
-      (m) => `Je travaille sur "${m.slice(0, 40)}...". Code review et implémentation en cours.`,
-      () => "Code poussé, tests passés. PR prête pour review.",
-      (m) => `Analyse technique de "${m.slice(0, 40)}...". Je prépare la solution optimale.`,
+      (m) => `En cours sur "${short}...". Review et implémentation lancées.`,
+      () => "Code validé, tests passés. PR prête pour review.",
+      (m) => `Analyse technique de "${short}...". Solution en préparation.`,
     ],
   };
 
@@ -241,7 +244,8 @@ app.post("/api/agents/:id/chat", async (c) => {
     try {
       const { default: Anthropic } = await import("@anthropic-ai/sdk");
       const client = new Anthropic({ apiKey: CLAUDE_KEY });
-      const systemPrompt = `Tu es ${agent.name}, un agent IA avec le rôle "${agent.role}". ${agent.personality || ""} Réponds de manière concise, utile et en restant dans ton rôle. 2-3 phrases max.`;
+      const profilePart = ctx ? `\n\nContexte utilisateur : ${ctx}` : "";
+      const systemPrompt = `Tu es ${agent.name}, un agent IA spécialisé avec le rôle "${agent.role}" dans l'outil SynthCrew. ${agent.personality || ""}${profilePart}\n\nRéponds de manière concise, utile et personnalisée. Adapte ton langage au niveau de l'utilisateur. Propose des actions concrètes en lien avec son projet. 2-3 phrases max.`;
       const completion = await client.messages.create({
         model: "claude-sonnet-4-20250514",
         max_tokens: 300,

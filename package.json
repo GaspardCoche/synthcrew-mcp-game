@@ -12,8 +12,8 @@
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/tryPort.js",
-    "start:direct": "node server/index.js",
+    "start": "node server/index.js",
+    "start:safe": "node server/tryPort.js",
     "render:validate": "render blueprints validate",
     "deploy:render": "render deploys create $RENDER_SERVICE_ID --wait --confirm --output text"
   },

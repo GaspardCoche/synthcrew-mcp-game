@@ -159,6 +159,7 @@ export default function AppImmersive() {
   useEffect(() => {
     const handler = (e) => {
       if (showOnboarding) return;
+      const noMod = !e.ctrlKey && !e.metaKey && !e.altKey;
 
       // ` = Toggle CLI
       if (e.key === "`" || (e.ctrlKey && e.key === "`")) {
@@ -166,12 +167,32 @@ export default function AppImmersive() {
         setShowCLI((v) => !v);
         if (!showCLI && pointerLocked) document.exitPointerLock?.();
       }
-      // M = Quick mission launch
-      if (e.key === "m" && !showCLI && !selectedAgent && !e.ctrlKey && !e.metaKey) {
+      // ? ou H = Aide raccourcis
+      if (noMod && (e.key === "?" || e.key === "h" || e.key === "H")) {
+        e.preventDefault();
+        setShowControlsHelp((v) => !v);
+      }
+      // D = Dashboard (ouvrir dans nouvel contexte ou naviguer)
+      if (noMod && e.key === "d") {
+        e.preventDefault();
+        window.location.hash = "#/classic";
+      }
+      // A = Agents picker (si pas en pointer lock)
+      if (noMod && e.key === "a" && !pointerLocked) {
+        e.preventDefault();
+        setShowAgentPicker((v) => !v);
+      }
+      // M = Mission rapide
+      if (noMod && e.key === "m" && !showCLI && !selectedAgent) {
         if (!pointerLocked) {
           e.preventDefault();
           setShowQuickLaunch((v) => !v);
         }
+      }
+      // C = Carte 2D
+      if (noMod && e.key === "c") {
+        e.preventDefault();
+        setViewMode((m) => (m === "3d" ? "2d" : "3d"));
       }
     };
     window.addEventListener("keydown", handler);
@@ -195,6 +216,7 @@ export default function AppImmersive() {
             <div className="flex items-center gap-3">
               <div>
                 <h1 className="synth-title-text text-xs font-black tracking-widest leading-none">SYNTHCREW</h1>
+                <p className="text-[9px] text-gray-500 font-mono mt-0.5">Outil d&apos;orchestration d&apos;agents IA</p>
                 <BuildId className="mt-0.5" />
               </div>
             </div>
@@ -204,7 +226,7 @@ export default function AppImmersive() {
                 type="button"
                 onClick={() => setShowAgentPicker(!showAgentPicker)}
                 className={`synth-btn-ghost text-[9px] ${showAgentPicker ? "!border-cyan-400/40 !text-cyan-400" : ""}`}
-                title="Parler à un agent"
+                title="Parler à un agent (A)"
               >
                 <svg viewBox="0 0 20 20" className="w-3 h-3" fill="currentColor">
                   <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
@@ -216,6 +238,7 @@ export default function AppImmersive() {
                 type="button"
                 onClick={() => setShowCLI((v) => !v)}
                 className={`synth-btn-ghost text-[9px] ${showCLI ? "!border-cyan-400/40 !text-cyan-400 !bg-cyan-400/8" : ""}`}
+                title="Terminal (`)"
               >
                 Terminal
               </button>
@@ -223,6 +246,7 @@ export default function AppImmersive() {
                 type="button"
                 onClick={() => setShowQuickLaunch(true)}
                 className="synth-btn-primary text-[9px]"
+                title="Lancer une mission (M)"
               >
                 + Mission
               </button>
@@ -230,10 +254,21 @@ export default function AppImmersive() {
                 type="button"
                 onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))}
                 className="synth-btn-ghost text-[9px]"
+                title="Carte 2D (C)"
               >
                 {viewMode === "3d" ? "Carte" : "3D"}
               </button>
-              <a href="#/classic" className="synth-btn-ghost text-[9px]">Dashboard</a>
+              <a href="#/classic" className="synth-btn-primary text-[9px] border-synth-primary/50" title="Dashboard (D)">
+                Dashboard
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowControlsHelp(true)}
+                className="synth-btn-ghost text-[9px] px-2"
+                title="Aide raccourcis (?)"
+              >
+                ?
+              </button>
               <button
                 type="button"
                 onClick={() => setShowSettings(true)}
@@ -269,7 +304,7 @@ export default function AppImmersive() {
 
         {/* ── Guide bubble (only when idle, not locked, no overlay) ── */}
         {showGuideBubble && !pointerLocked && !showCLI && !hasOverlay && viewMode === "3d" && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-fade-in pointer-events-none">
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 animate-fade-in pointer-events-none max-w-[90vw]">
             <div className="synth-panel px-4 py-2.5 max-w-xs text-center">
               <p className="text-[10px] text-gray-300 font-mono">
                 Clique sur un <span className="text-synth-primary font-bold">agent</span> ou utilise le bouton <span className="text-cyan-400 font-bold">Agents</span> en haut.

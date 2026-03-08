@@ -25,7 +25,7 @@ export default function AgentQuickPicker({ onSelect, onClose }) {
             <button
               key={agent.id}
               onClick={() => { onSelect(agent); onClose(); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-white/5 transition-colors text-left"
+              className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-white/8 focus:bg-white/8 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 rounded transition-colors text-left"
             >
               <span className="text-base">{agent.avatar || "🤖"}</span>
               <div className="flex-1 min-w-0">

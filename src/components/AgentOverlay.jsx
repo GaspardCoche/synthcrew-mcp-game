@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import AgentAvatar from "./AgentAvatar";
 import { useWorldStore } from "../store/worldStore";
 import { useStore } from "../store/useStore";
+import { useProfileStore } from "../store/profileStore";
 import { AGENT_ROLE_LABELS, AGENT_ROLE_DESCRIPTIONS } from "../lib/constants";
 
 const STATUS_LABELS = {
@@ -23,6 +24,8 @@ export default function AgentOverlay({ agent, onClose }) {
   const health = useWorldStore((s) => s.getAgentHealth(agent?.name));
   const sick = useWorldStore((s) => s.isAgentSick(agent?.name));
   const mcps = useStore((s) => s.mcps);
+  const profile = useProfileStore((s) => s.getProfile());
+  const getContextString = useProfileStore((s) => s.getContextString);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,7 +55,7 @@ export default function AgentOverlay({ agent, onClose }) {
       const res = await fetch(`/api/agents/${agent.id}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, profileContext: getContextString() }),
       });
       const data = await res.json();
       if (data.error) {
@@ -104,7 +107,12 @@ export default function AgentOverlay({ agent, onClose }) {
     }
   };
 
-  const suggestions = getSuggestions(agent.role);
+  const suggestions = getSuggestions(agent.role, profile);
+  const quickActions = getQuickActions(agent.role, profile);
+
+  const greeting = profile.username
+    ? `Salut ${profile.username} ! Parle à ${agent.name} ou lance une action :`
+    : `Parle à ${agent.name} ou lance une mission :`;
 
   return (
     <div
@@ -116,7 +124,7 @@ export default function AgentOverlay({ agent, onClose }) {
         style={{ borderColor: `${color}20` }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Compact header */}
+        {/* Header */}
         <div className="px-4 py-3 border-b border-white/5 flex-shrink-0" style={{ background: `linear-gradient(135deg, ${color}06, transparent)` }}>
           <div className="flex items-center gap-3">
             <AgentAvatar agent={agent} size="lg" />
@@ -136,7 +144,6 @@ export default function AgentOverlay({ agent, onClose }) {
             </button>
           </div>
 
-          {/* Toggleable stats */}
           <button
             onClick={() => setShowStats(!showStats)}
             className="w-full mt-2 flex items-center gap-2 text-[8px] text-gray-600 hover:text-gray-400 font-mono transition-colors"
@@ -167,17 +174,17 @@ export default function AgentOverlay({ agent, onClose }) {
           )}
         </div>
 
-        {/* Chat — fills remaining space */}
+        {/* Chat */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0">
           {chatMessages.length === 0 && (
             <div className="py-4">
-              <p className="text-[10px] text-gray-600 mb-3">Parle à {agent.name} ou lance une mission :</p>
+              <p className="text-[10px] text-gray-600 mb-3">{greeting}</p>
               <div className="grid grid-cols-1 gap-1.5">
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
                     onClick={() => setChatInput(s)}
-                    className="text-left text-[10px] text-gray-500 hover:text-gray-300 px-3 py-2 rounded-lg border border-white/5 hover:border-white/15 hover:bg-white/3 transition-all font-mono"
+                    className="text-left text-[10px] text-gray-500 hover:text-gray-300 focus:text-gray-300 px-3 py-2 rounded-lg border border-white/5 hover:border-white/15 hover:bg-white/3 focus:border-white/15 focus:bg-white/3 focus:outline-none transition-all font-mono"
                   >
                     {s}
                   </button>
@@ -186,11 +193,11 @@ export default function AgentOverlay({ agent, onClose }) {
               <div className="mt-3 pt-3 border-t border-white/5">
                 <p className="text-[9px] text-gray-600 mb-2 font-mono">Actions rapides :</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {getQuickActions(agent.role).map((action, i) => (
+                  {quickActions.map((action, i) => (
                     <button
                       key={i}
                       onClick={() => handleMission(action.prompt)}
-                      className="text-[9px] font-mono px-2.5 py-1.5 rounded-lg border transition-all"
+                      className="text-[9px] font-mono px-2.5 py-1.5 rounded-lg border transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
                       style={{ borderColor: `${color}25`, color, background: `${color}08` }}
                     >
                       {action.label}
@@ -268,28 +275,129 @@ export default function AgentOverlay({ agent, onClose }) {
   );
 }
 
-function getSuggestions(role) {
-  const map = {
-    orchestrator: ["Propose un plan pour cette semaine", "Quel agent assigner pour du scraping ?", "Coordonne un brief complet"],
-    data_ops: ["Récupère les dernières données", "Lance un pipeline ETL", "Vérifie l'intégrité des données"],
-    analyst: ["Analyse les tendances récentes", "Identifie les patterns clés", "Génère un rapport d'insights"],
-    writer: ["Rédige un résumé de la semaine", "Crée une doc technique", "Synthétise les résultats"],
-    communicator: ["Envoie un résumé à l'équipe", "Prépare un email de brief", "Notifie les membres"],
-    scraper: ["Surveille ce site pour des changements", "Extrais les données de ce site", "Veille concurrentielle"],
-    developer: ["Review le dernier commit", "Lance les tests", "Déploie la dernière version"],
+// ─────────────────────────────────────────────────────────────────
+// Profile-aware suggestions
+// ─────────────────────────────────────────────────────────────────
+function getSuggestions(role, profile) {
+  const pt = profile.projectType;
+  const goals = profile.goals || [];
+  const name = profile.projectName;
+  const level = profile.experienceLevel;
+
+  const projectLabel = name ? `"${name}"` : "mon projet";
+
+  const BASE = {
+    orchestrator: [
+      `Propose un plan de travail pour ${projectLabel}`,
+      "Quel agent assigner pour ma prochaine tâche ?",
+      "Fais un état des lieux de l'équipe",
+    ],
+    data_ops: [
+      `Quelles données collecter pour ${projectLabel} ?`,
+      "Lance un pipeline de collecte",
+      "Vérifie l'intégrité des données",
+    ],
+    analyst: [
+      `Analyse les métriques clés de ${projectLabel}`,
+      "Identifie les tendances principales",
+      "Génère un rapport d'insights",
+    ],
+    writer: [
+      `Rédige une présentation de ${projectLabel}`,
+      "Crée une documentation technique",
+      "Synthétise les derniers résultats",
+    ],
+    communicator: [
+      `Prépare un résumé de ${projectLabel} pour l'équipe`,
+      "Rédige un email de mise à jour",
+      "Notifie les membres de l'avancement",
+    ],
+    scraper: [
+      `Fais une veille concurrentielle pour ${projectLabel}`,
+      "Surveille les changements sur un site cible",
+      "Extrais des données d'une page web",
+    ],
+    developer: [
+      `Review le code de ${projectLabel}`,
+      "Lance les tests du projet",
+      "Propose des améliorations techniques",
+    ],
   };
-  return map[role] || ["Que peux-tu faire ?", "Lance une mission"];
+
+  const suggestions = [...(BASE[role] || [`Que peux-tu faire pour ${projectLabel} ?`, "Lance une mission"])];
+
+  if (pt === "saas" && role === "analyst") suggestions.push("Analyse le taux de conversion et le churn");
+  if (pt === "saas" && role === "developer") suggestions.push("Vérifie les performances de l'API");
+  if (pt === "ecommerce" && role === "data_ops") suggestions.push("Collecte les données produits et prix");
+  if (pt === "ecommerce" && role === "analyst") suggestions.push("Analyse le panier moyen et les tendances d'achat");
+  if (pt === "ecommerce" && role === "scraper") suggestions.push("Surveille les prix des concurrents");
+  if (pt === "content" && role === "writer") suggestions.push("Rédige un article optimisé SEO");
+  if (pt === "content" && role === "analyst") suggestions.push("Analyse les performances éditoriales");
+  if (pt === "data" && role === "data_ops") suggestions.push("Connecte-toi aux sources de données et lance l'ETL");
+  if (pt === "data" && role === "analyst") suggestions.push("Génère un dashboard d'indicateurs clés");
+  if (pt === "opensource" && role === "developer") suggestions.push("Analyse les issues et PRs ouvertes");
+  if (pt === "opensource" && role === "communicator") suggestions.push("Rédige un changelog pour la prochaine release");
+  if (pt === "agency" && role === "orchestrator") suggestions.push("Planifie les livrables pour mes clients");
+  if (pt === "agency" && role === "writer") suggestions.push("Rédige une proposition commerciale");
+
+  if (goals.includes("automate") && role === "orchestrator") suggestions.push("Automatise un workflow récurrent");
+  if (goals.includes("monitor") && role === "scraper") suggestions.push("Mets en place une veille automatique quotidienne");
+  if (goals.includes("analyze") && role === "analyst") suggestions.push("Crée un tableau de bord de suivi");
+
+  if (level === "beginner") {
+    suggestions.push(`Explique-moi comment tu peux m'aider sur ${projectLabel}`);
+  }
+
+  return suggestions.slice(0, 5);
 }
 
-function getQuickActions(role) {
-  const map = {
-    orchestrator: [{ label: "Brief", prompt: "Fais un brief de l'état actuel de l'équipe" }, { label: "Planifier", prompt: "Propose un plan de mission pour la semaine" }],
-    data_ops: [{ label: "Pipeline", prompt: "Lance le pipeline de collecte de données" }, { label: "Export", prompt: "Exporte les données récentes" }],
-    analyst: [{ label: "Rapport", prompt: "Génère un rapport d'analyse" }, { label: "Tendances", prompt: "Analyse les tendances récentes" }],
-    writer: [{ label: "Synthèse", prompt: "Rédige une synthèse des activités" }, { label: "Doc", prompt: "Crée une documentation" }],
-    communicator: [{ label: "Notifier", prompt: "Envoie un résumé à l'équipe" }, { label: "Brief", prompt: "Prépare un brief email" }],
-    scraper: [{ label: "Veille", prompt: "Lance une veille concurrentielle" }, { label: "Scan", prompt: "Scan les sources web" }],
-    developer: [{ label: "Review", prompt: "Review le code récent" }, { label: "Tests", prompt: "Lance la suite de tests" }],
+// ─────────────────────────────────────────────────────────────────
+// Profile-aware quick actions
+// ─────────────────────────────────────────────────────────────────
+function getQuickActions(role, profile) {
+  const pt = profile.projectType;
+  const name = profile.projectName;
+  const projectLabel = name ? `"${name}"` : "mon projet";
+
+  const BASE = {
+    orchestrator: [
+      { label: "Brief", prompt: `Fais un brief de l'état de ${projectLabel} et de l'équipe` },
+      { label: "Planifier", prompt: `Propose un plan d'action concret pour ${projectLabel}` },
+    ],
+    data_ops: [
+      { label: "Pipeline", prompt: `Lance la collecte de données pour ${projectLabel}` },
+      { label: "Export", prompt: `Exporte les données récentes de ${projectLabel}` },
+    ],
+    analyst: [
+      { label: "Rapport", prompt: `Génère un rapport d'analyse pour ${projectLabel}` },
+      { label: "Tendances", prompt: `Identifie les tendances clés de ${projectLabel}` },
+    ],
+    writer: [
+      { label: "Synthèse", prompt: `Rédige une synthèse de l'avancement de ${projectLabel}` },
+      { label: "Doc", prompt: `Crée une documentation pour ${projectLabel}` },
+    ],
+    communicator: [
+      { label: "Notifier", prompt: `Envoie un résumé de ${projectLabel} à l'équipe` },
+      { label: "Brief", prompt: `Prépare un brief email sur ${projectLabel}` },
+    ],
+    scraper: [
+      { label: "Veille", prompt: `Lance une veille pour ${projectLabel}` },
+      { label: "Scan", prompt: `Scan les sources web liées à ${projectLabel}` },
+    ],
+    developer: [
+      { label: "Review", prompt: `Review le code récent de ${projectLabel}` },
+      { label: "Tests", prompt: `Lance la suite de tests de ${projectLabel}` },
+    ],
   };
-  return map[role] || [{ label: "Mission", prompt: "Lance une mission" }];
+
+  const actions = [...(BASE[role] || [{ label: "Mission", prompt: `Lance une mission pour ${projectLabel}` }])];
+
+  if (pt === "saas" && role === "analyst") actions.push({ label: "KPIs", prompt: "Analyse les KPIs SaaS : MRR, churn, conversion" });
+  if (pt === "ecommerce" && role === "scraper") actions.push({ label: "Prix", prompt: "Surveille et compare les prix concurrents" });
+  if (pt === "content" && role === "writer") actions.push({ label: "SEO", prompt: "Rédige du contenu optimisé pour le référencement" });
+  if (pt === "data" && role === "data_ops") actions.push({ label: "ETL", prompt: "Configure et lance le pipeline ETL complet" });
+  if (pt === "opensource" && role === "developer") actions.push({ label: "Issues", prompt: "Trie et priorise les issues GitHub" });
+  if (pt === "agency" && role === "writer") actions.push({ label: "Propale", prompt: "Rédige une proposition commerciale client" });
+
+  return actions.slice(0, 4);
 }

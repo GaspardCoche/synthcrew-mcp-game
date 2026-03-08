@@ -54,34 +54,36 @@ export default function World({
   }, [agents]);
 
   const recentErrors = useWorldStore((s) => s.recentErrorsCount);
-  const fogColor = recentErrors > 0 ? "#140a0c" : "#0c0a12";
+  const fogColor = recentErrors > 0 ? "#1a0e10" : "#101420";
 
   return (
     <>
       <color attach="background" args={[fogColor]} />
-      <fogExp2 attach="fog" args={[fogColor, 0.003]} />
+      <fogExp2 attach="fog" args={[fogColor, 0.0025]} />
 
       <SkyBox />
-      <Environment preset="night" environmentIntensity={0.6} environmentRotation={[0, Math.PI / 4, 0]} />
+      <Environment preset="night" environmentIntensity={0.8} environmentRotation={[0, Math.PI / 4, 0]} />
 
-      <ambientLight intensity={0.55} color="#2a2540" />
+      <ambientLight intensity={0.7} color="#3a3560" />
+      <hemisphereLight args={["#4060a0", "#1a1828", 0.4]} />
       <directionalLight
-        position={[80, 100, 50]}
-        intensity={1.4}
-        color="#fff5e6"
+        position={[60, 120, 40]}
+        intensity={1.8}
+        color="#fff0e0"
         castShadow
         shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={150}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
+        shadow-camera-far={160}
+        shadow-camera-left={-70}
+        shadow-camera-right={70}
+        shadow-camera-top={70}
+        shadow-camera-bottom={-70}
         shadow-bias={-0.0002}
       />
-      <directionalLight position={[-40, 50, -20]} intensity={0.35} color="#a0c8ff" />
-      <directionalLight position={[20, 30, 40]} intensity={0.25} color="#e8f0ff" />
+      <directionalLight position={[-50, 60, -30]} intensity={0.5} color="#8ab4ff" />
+      <directionalLight position={[30, 40, 50]} intensity={0.3} color="#c0d8ff" />
 
-      <Sparkles count={80} scale={[100, 30, 100]} color="#6ee7e0" size={1.2} opacity={0.2} />
+      <Sparkles count={100} scale={[120, 25, 120]} color="#80d8f0" size={1.5} opacity={0.25} />
+      <Sparkles count={40} scale={[80, 10, 80]} color="#ff8855" size={0.8} opacity={0.15} />
 
       <Terrain />
       <Structures />

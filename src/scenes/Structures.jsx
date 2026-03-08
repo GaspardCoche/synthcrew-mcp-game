@@ -5,7 +5,6 @@
  */
 import { Suspense, useRef, useMemo } from "react";
 import { useGLTF, Text, Billboard } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
@@ -78,11 +77,11 @@ function Pylon({ pos, color, damage = 0 }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function ZoneFloor({ cx, cz, radius, color, name, locked }) {
   const ref = useRef();
-  const y = getTerrainHeightAt(cx, cz) + 0.03;
+  const y = getTerrainHeightAt(cx, cz) + 0.04;
 
   useThrottledFrame(({ clock }) => {
     if (ref.current) {
-      ref.current.material.emissiveIntensity = locked ? 0.04 : 0.08 + 0.04 * Math.sin(clock.elapsedTime * 1.5);
+      ref.current.material.emissiveIntensity = locked ? 0.06 : 0.14 + 0.06 * Math.sin(clock.elapsedTime * 1.5);
     }
   }, 15);
 
@@ -90,21 +89,23 @@ function ZoneFloor({ cx, cz, radius, color, name, locked }) {
     <group>
       <mesh ref={ref} position={[cx, y, cz]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[radius, 48]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.08} transparent opacity={locked ? 0.15 : 0.35} roughness={0.6} metalness={0.2} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.14} transparent opacity={locked ? 0.2 : 0.4} roughness={0.5} metalness={0.25} />
       </mesh>
-      {/* Outer ring */}
       <mesh position={[cx, y + 0.01, cz]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[radius - 0.12, radius, 48]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={locked ? 0.1 : 0.4} transparent opacity={locked ? 0.2 : 0.7} />
+        <ringGeometry args={[radius - 0.15, radius, 48]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={locked ? 0.15 : 0.6} transparent opacity={locked ? 0.3 : 0.8} />
       </mesh>
-      {/* Floating label */}
-      <Billboard position={[cx, y + 6.5, cz]}>
+      <mesh position={[cx, y + 0.02, cz]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[radius * 0.5 - 0.05, radius * 0.5 + 0.05, 48]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.2} transparent opacity={locked ? 0.08 : 0.2} />
+      </mesh>
+      <Billboard position={[cx, y + 5.0, cz]}>
         <Text
-          fontSize={0.55}
-          color={locked ? "#555566" : color}
+          fontSize={0.65}
+          color={locked ? "#666677" : color}
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.02}
+          outlineWidth={0.025}
           outlineColor="#000000"
           font={undefined}
         >
@@ -156,17 +157,6 @@ function GltfModel({ path, pos, scale = 1, rotY = 0 }) {
       castShadow receiveShadow
     />
   );
-}
-
-function RotatingPlanet({ path, pos, scale = 6 }) {
-  const ref = useRef();
-  const { scene } = useGLTF(path);
-  useFrame((s) => {
-    if (!ref.current) return;
-    ref.current.rotation.y = s.clock.elapsedTime * 0.025;
-    ref.current.position.y = pos[1] + Math.sin(s.clock.elapsedTime * 0.15) * 1.2;
-  });
-  return <primitive ref={ref} object={scene.clone()} position={pos} scale={[scale, scale, scale]} />;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -815,19 +805,24 @@ function WorldDecoration() {
         <GltfModel path="/models/environment/Tree_Blob_1.gltf"     pos={[55, 0, -32]}  scale={1.1} rotY={0.3} />
         <GltfModel path="/models/environment/Building_L.gltf"      pos={[-55, 0, -12]} scale={0.55} rotY={Math.PI * 0.25} />
         <GltfModel path="/models/environment/Building_L.gltf"      pos={[52, 0, -48]}  scale={0.5} rotY={Math.PI * 0.75} />
+        <GltfModel path="/models/environment/Building_L.gltf"      pos={[-10, 0, -38]} scale={0.4} rotY={Math.PI * 0.5} />
         <GltfModel path="/models/environment/Base_Large.gltf"      pos={[0, 0, -82]}   scale={0.65} rotY={0} />
         <GltfModel path="/models/environment/Base_Large.gltf"      pos={[-60, 0, -55]} scale={0.55} rotY={1.0} />
+        <GltfModel path="/models/environment/Base_Large.gltf"      pos={[60, 0, -15]}  scale={0.5} rotY={2.2} />
         <GltfModel path="/models/environment/Rock_Large_2.gltf"    pos={[-20, 0, -20]} scale={1.2} rotY={0.3} />
         <GltfModel path="/models/environment/Rock_Large_1.gltf"    pos={[14, 0, -20]}  scale={1.0} rotY={1.1} />
         <GltfModel path="/models/environment/Rock_Large_2.gltf"    pos={[5, 0, -38]}   scale={1.3} rotY={2.4} />
         <GltfModel path="/models/environment/Rock_Large_1.gltf"    pos={[-50, 0, -46]} scale={1.4} rotY={0.7} />
         <GltfModel path="/models/environment/Rock_Large_2.gltf"    pos={[56, 0, -42]}  scale={1.1} rotY={1.5} />
-        <RotatingPlanet path="/models/environment/Planet_2.gltf"   pos={[50, 22, -90]} scale={10} />
+        <GltfModel path="/models/environment/Rock_Large_1.gltf"    pos={[-35, 0, -70]} scale={1.2} rotY={1.8} />
+        <GltfModel path="/models/environment/Rock_Large_2.gltf"    pos={[40, 0, -65]}  scale={1.0} rotY={0.5} />
+        <GltfModel path="/models/environment/Planet_2.gltf"        pos={[-30, 0, -80]} scale={0.8} rotY={0.4} />
       </Suspense>
       {[
         [-14, -4, 0.8, "#ff6b35"], [12, -4, 0.7, "#4ecdc4"], [-2, -18, 1.0, "#6c5ce7"], [20, -4, 0.9, "#22c55e"],
         [-22, -34, 1.1, "#4ecdc4"], [0, -50, 0.9, "#6c5ce7"], [42, -8, 0.8, "#22c55e"], [-40, -18, 1.0, "#4ecdc4"],
-        [35, -22, 0.7, "#6c5ce7"], [-8, -76, 1.2, "#ec4899"], [26, -72, 0.9, "#ef4444"], [-50, -70, 1.0, "#4ecdc4"],
+        [35, -22, 0.7, "#6c5ce7"], [-8, -76, 1.2, "#ec4899"],
+        [-10, -22, 0.6, "#ff6b35"], [10, -28, 0.7, "#22c55e"], [-25, -10, 0.5, "#f59e0b"], [30, -10, 0.6, "#ef4444"],
       ].map(([px, pz, s, c], i) => (
         <Crystal key={i} pos={[px, 0, pz]} scale={s} color={c} rotY={i * 0.7} />
       ))}
