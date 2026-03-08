@@ -14,6 +14,8 @@ import DataFlowParticles from "./DataFlowParticles";
 import CityDistricts from "./CityDistricts";
 import SpecialEffects from "./SpecialEffects";
 import GroundDetails from "./GroundDetails";
+import SkyBox from "./SkyBox";
+import ZoneShaderEffects from "./ZoneShaderEffects";
 
 const AGENT_COLORS = {
   NEXUS: "#ff6b35",
@@ -133,6 +135,8 @@ export default function World({
       <CityDistricts />
       <GroundDetails />
       <SpecialEffects />
+      <ZoneShaderEffects />
+      <SkyBox />
     </>
   );
 }

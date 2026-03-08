@@ -3,7 +3,7 @@
  * LightningBolt, HologramProjector, EnergyField, MissionBeam,
  * ZoneActivationEffect, AgentSpawnEffect.
  */
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
@@ -28,18 +28,29 @@ function buildLightningPoints(start, end, segments = 12, jitter = 0.8) {
 }
 
 export function LightningBolt({ start, end, color = "#88eeff", visible = true }) {
-  const ref = useRef();
+  const lineRef = useRef();
+  const matRef = useRef();
   const geoRef = useRef();
-  const [opacity, setOpacity] = useState(0);
+
+  const geometry = useMemo(() => {
+    const pts = buildLightningPoints(
+      new THREE.Vector3(...start),
+      new THREE.Vector3(...end),
+      14, 0.9
+    );
+    const curve = new THREE.CatmullRomCurve3(pts);
+    return new THREE.BufferGeometry().setFromPoints(curve.getPoints(40));
+  }, [start, end]);
+
+  useEffect(() => {
+    geoRef.current = geometry;
+  }, [geometry]);
 
   useFrame(({ clock }) => {
-    if (!ref.current || !visible) return;
+    if (!matRef.current || !visible) return;
     const t = clock.elapsedTime;
-    // Flicker every ~0.15s
     const active = Math.sin(t * 42) > 0.6 || Math.sin(t * 17 + 1) > 0.75;
-    const o = active ? 0.6 + Math.random() * 0.4 : 0;
-    setOpacity(o);
-    // Rebuild jittery geometry occasionally
+    matRef.current.opacity = active ? 0.6 + Math.random() * 0.4 : 0;
     if (active && geoRef.current) {
       const pts = buildLightningPoints(
         new THREE.Vector3(...start),
@@ -56,25 +67,10 @@ export function LightningBolt({ start, end, color = "#88eeff", visible = true })
     }
   });
 
-  const geometry = useMemo(() => {
-    const pts = buildLightningPoints(
-      new THREE.Vector3(...start),
-      new THREE.Vector3(...end),
-      14, 0.9
-    );
-    const curve = new THREE.CatmullRomCurve3(pts);
-    const g = new THREE.BufferGeometry().setFromPoints(curve.getPoints(40));
-    return g;
-  }, [start, end]);
-
-  useEffect(() => {
-    geoRef.current = geometry;
-  }, [geometry]);
-
   if (!visible) return null;
   return (
-    <line ref={ref} geometry={geometry}>
-      <lineBasicMaterial color={color} transparent opacity={opacity} linewidth={1} />
+    <line ref={lineRef} geometry={geometry}>
+      <lineBasicMaterial ref={matRef} color={color} transparent opacity={0} linewidth={1} />
     </line>
   );
 }

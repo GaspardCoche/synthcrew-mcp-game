@@ -1,4 +1,4 @@
-import { useRef, useState, Suspense, useMemo } from "react";
+import { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Text, Billboard, Html } from "@react-three/drei";
 import { getTerrainHeightAt } from "./Terrain";

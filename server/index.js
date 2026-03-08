@@ -56,6 +56,7 @@ import {
 // ─── Mission engine ────────────────────────────────────────────────────────────
 import { executeTool, getConfiguredServices, getAvailableTools } from "./lib/tools.js";
 import { cliTaskSchema } from "./lib/schemas.js";
+import { executeMissionWithClaude, ANTHROPIC_API_KEY as CLAUDE_KEY } from "./lib/claudeEngine.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = join(__dirname, "..", "dist");
@@ -751,10 +752,42 @@ setInterval(async () => {
   if (!pending) return;
   _workerRunning = true;
   try {
-    await runMission(pending);
+    const useClaude = CLAUDE_KEY && pending.source === "cli";
+    if (useClaude) {
+      updateMissionStatus(pending.id, "running", { startedAt: new Date().toISOString() });
+      broadcast({ type: "mission_log", payload: { event: "mission_started", mission: getMission(pending.id) } });
+      await executeMissionWithClaude(
+        pending.prompt || pending.title,
+        pending.id,
+        broadcast,
+        (agentName, status) => {
+          const agent = getAgents().find((a) => a.name === agentName);
+          if (agent) {
+            updateAgent(agent.id, { status });
+            if (status === "active") setAgentActive(agentName);
+            else setAgentIdle(agentName);
+            broadcast({ type: "agents", payload: getAgents() });
+          }
+        },
+        (result) => {
+          updateMissionStatus(pending.id, result.success ? "completed" : "failed", {
+            completedAt: new Date().toISOString(),
+            summary: result.summary || result.error,
+          });
+          broadcast({ type: "missions", payload: getMissions() });
+          broadcast({ type: "stats", payload: computeStats() });
+          const newAchs = checkAndUnlockAchievements();
+          for (const ach of newAchs) {
+            broadcast({ type: "achievement", payload: ach });
+            emitWorldEvent("achievement_unlocked", { achievement: ach });
+          }
+        }
+      );
+    } else {
+      await runMission(pending);
+    }
   } catch (err) {
     console.error("[SynthCrew] Mission worker error:", err);
-    // Mark as failed if still running
     try {
       const m = getMission(pending.id);
       if (m && m.status === "running") {

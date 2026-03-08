@@ -3,7 +3,7 @@
  * Small rocks (instanced), hexagonal floor tiles (instanced), data cables,
  * small bushes & grass tufts (instanced), footprint paths between zones.
  */
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useCallback } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
@@ -20,8 +20,6 @@ function seededRand(seed) {
 // SmallRocks — instanced scattered rocks
 // ─────────────────────────────────────────────────────────────────────────────
 function SmallRocks({ count = 180, spread = 80 }) {
-  const meshRef = useRef();
-
   const { geometry, positions } = useMemo(() => {
     const geo = new THREE.DodecahedronGeometry(0.18, 0);
     const poss = [];
@@ -31,7 +29,6 @@ function SmallRocks({ count = 180, spread = 80 }) {
       const seed = attempt * 3.7;
       const x = (seededRand(seed)     - 0.5) * spread * 2;
       const z = (seededRand(seed + 1) - 0.5) * spread * 2;
-      // Avoid agent zone centres
       const zoneCentres = [[0,-8],[-35,-28],[32,-35],[-28,-52],[42,-18],[18,-58],[-15,-62]];
       const tooClose = zoneCentres.some(([zx, zz]) => Math.hypot(x - zx, z - zz) < 9);
       if (tooClose) continue;
@@ -43,8 +40,8 @@ function SmallRocks({ count = 180, spread = 80 }) {
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  useMemo(() => {
-    if (!meshRef.current) return;
+  const initInstances = useCallback((el) => {
+    if (!el) return;
     positions.forEach(({ x, z, seed }, i) => {
       const y = getTerrainHeightAt(x, z);
       const s = 0.4 + seededRand(seed + 5) * 1.2;
@@ -56,13 +53,13 @@ function SmallRocks({ count = 180, spread = 80 }) {
       );
       dummy.scale.set(s, s * (0.7 + seededRand(seed + 9) * 0.6), s);
       dummy.updateMatrix();
-      meshRef.current.setMatrixAt(i, dummy.matrix);
+      el.setMatrixAt(i, dummy.matrix);
     });
-    meshRef.current.instanceMatrix.needsUpdate = true;
+    el.instanceMatrix.needsUpdate = true;
   }, [positions, dummy]);
 
   return (
-    <instancedMesh ref={meshRef} args={[geometry, null, count]} castShadow receiveShadow>
+    <instancedMesh ref={initInstances} args={[geometry, null, count]} castShadow receiveShadow>
       <meshStandardMaterial color="#1a1624" roughness={0.9} metalness={0.05} />
     </instancedMesh>
   );
@@ -216,7 +213,6 @@ function DataCables() {
 // GrassTufts — instanced small grass blades
 // ─────────────────────────────────────────────────────────────────────────────
 function GrassTufts({ count = 300, spread = 90 }) {
-  const meshRef = useRef();
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const positions = useMemo(() => {
@@ -237,7 +233,6 @@ function GrassTufts({ count = 300, spread = 90 }) {
   }, [count, spread]);
 
   const geometry = useMemo(() => {
-    // Simple crossed planes for a tuft
     const geo = new THREE.BufferGeometry();
     const verts = new Float32Array([
       -0.1, 0, 0,  0.1, 0, 0,  0, 0.3, 0,
@@ -250,8 +245,8 @@ function GrassTufts({ count = 300, spread = 90 }) {
     return geo;
   }, []);
 
-  useMemo(() => {
-    if (!meshRef.current) return;
+  const initInstances = useCallback((el) => {
+    if (!el) return;
     positions.forEach(({ x, z, seed }, i) => {
       const y = getTerrainHeightAt(x, z);
       const s = 0.5 + seededRand(seed + 10) * 1.0;
@@ -259,13 +254,13 @@ function GrassTufts({ count = 300, spread = 90 }) {
       dummy.rotation.y = seededRand(seed + 11) * Math.PI * 2;
       dummy.scale.set(s, s, s);
       dummy.updateMatrix();
-      meshRef.current.setMatrixAt(i, dummy.matrix);
+      el.setMatrixAt(i, dummy.matrix);
     });
-    meshRef.current.instanceMatrix.needsUpdate = true;
+    el.instanceMatrix.needsUpdate = true;
   }, [positions, dummy]);
 
   return (
-    <instancedMesh ref={meshRef} args={[geometry, null, count]}>
+    <instancedMesh ref={initInstances} args={[geometry, null, count]}>
       <meshStandardMaterial color="#1a2a1a" emissive="#0a1a0a" emissiveIntensity={0.1} side={THREE.DoubleSide} />
     </instancedMesh>
   );
@@ -320,9 +315,7 @@ function FootpathNetwork() {
 // SmallBushes — instanced dark decorative bush blobs
 // ─────────────────────────────────────────────────────────────────────────────
 function SmallBushes({ count = 120 }) {
-  const meshRef = useRef();
   const dummy = useMemo(() => new THREE.Object3D(), []);
-
   const geo = useMemo(() => new THREE.IcosahedronGeometry(0.28, 0), []);
 
   const positions = useMemo(() => {
@@ -342,8 +335,8 @@ function SmallBushes({ count = 120 }) {
     return poss;
   }, [count]);
 
-  useMemo(() => {
-    if (!meshRef.current) return;
+  const initInstances = useCallback((el) => {
+    if (!el) return;
     positions.forEach(({ x, z, seed }, i) => {
       const y = getTerrainHeightAt(x, z);
       const s = 0.5 + seededRand(seed + 20) * 1.5;
@@ -351,13 +344,13 @@ function SmallBushes({ count = 120 }) {
       dummy.rotation.y = seededRand(seed + 21) * Math.PI * 2;
       dummy.scale.set(s, s * (0.6 + seededRand(seed + 22) * 0.8), s);
       dummy.updateMatrix();
-      meshRef.current.setMatrixAt(i, dummy.matrix);
+      el.setMatrixAt(i, dummy.matrix);
     });
-    meshRef.current.instanceMatrix.needsUpdate = true;
+    el.instanceMatrix.needsUpdate = true;
   }, [positions, dummy]);
 
   return (
-    <instancedMesh ref={meshRef} args={[geo, null, count]} castShadow receiveShadow>
+    <instancedMesh ref={initInstances} args={[geo, null, count]} castShadow receiveShadow>
       <meshStandardMaterial color="#0f1a10" roughness={0.95} metalness={0.0} />
     </instancedMesh>
   );

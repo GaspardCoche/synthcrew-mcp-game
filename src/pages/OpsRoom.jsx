@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useStore } from "../store/useStore";
 import { planMission, runMission, executeMissionOnServer } from "../lib/missionRunner";
-import { getMissionTemplates } from "../lib/api";
 import { AGENT_ROLE_LABELS } from "../lib/constants";
 import { useWebSocket } from "../lib/useWebSocket";
 import AgentAvatar from "../components/AgentAvatar";

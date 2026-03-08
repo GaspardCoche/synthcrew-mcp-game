@@ -3,8 +3,8 @@
  * Layers: parallax stars, nebula sprites, distant planet, aurora borealis,
  * occasional shooting stars.
  */
-import { useRef, useMemo, useState, useEffect } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,7 +20,6 @@ function rand(seed) {
 // ─────────────────────────────────────────────────────────────────────────────
 function StarLayer({ count = 800, radius = 180, size = 1.2, color = "#ffffff", speed = 0.00015, seed = 0 }) {
   const ref = useRef();
-  const { camera } = useThree();
 
   const { positions, geometry } = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -214,9 +213,9 @@ function AuroraLayer({ position, rotation, colorA, colorB, width = 300, height =
 // ShootingStar — occasional animated meteor streak
 // ─────────────────────────────────────────────────────────────────────────────
 function ShootingStar() {
-  const ref = useRef();
+  const groupRef = useRef();
+  const sphereRef = useRef();
   const trailRef = useRef();
-  // State: waiting, flying, done
   const stateRef = useRef({ phase: "wait", timer: 0, start: new THREE.Vector3(), dir: new THREE.Vector3(), progress: 0 });
 
   useFrame((_, delta) => {
@@ -242,14 +241,17 @@ function ShootingStar() {
     } else if (s.phase === "fly") {
       s.progress += delta * 80;
       const pos = s.start.clone().addScaledVector(s.dir, s.progress);
-      if (ref.current) {
-        ref.current.position.copy(pos);
-        ref.current.material.opacity = Math.max(0, 0.9 - s.progress / 60);
+      if (groupRef.current) {
+        groupRef.current.position.copy(pos);
       }
+      const alpha = Math.max(0, 0.9 - s.progress / 60);
+      if (sphereRef.current) sphereRef.current.material.opacity = alpha;
+      if (trailRef.current) trailRef.current.material.opacity = alpha * 0.6;
       if (s.progress > 70 || pos.y < -20) {
         s.phase = "wait";
         s.timer = 0;
-        if (ref.current) ref.current.material.opacity = 0;
+        if (sphereRef.current) sphereRef.current.material.opacity = 0;
+        if (trailRef.current) trailRef.current.material.opacity = 0;
       }
     }
   });
@@ -260,12 +262,12 @@ function ShootingStar() {
   }, []);
 
   return (
-    <group ref={ref} position={[0, 200, 0]}>
-      <mesh>
+    <group ref={groupRef} position={[0, 200, 0]}>
+      <mesh ref={sphereRef}>
         <sphereGeometry args={[0.18, 8, 8]} />
         <meshStandardMaterial color="#ffffff" emissive="#aaddff" emissiveIntensity={3} transparent opacity={0} />
       </mesh>
-      <line geometry={trailGeo}>
+      <line ref={trailRef} geometry={trailGeo}>
         <lineBasicMaterial color="#aaddff" transparent opacity={0} />
       </line>
     </group>

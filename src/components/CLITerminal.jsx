@@ -99,7 +99,9 @@ export default function CLITerminal({ open, onClose }) {
   // Connect WebSocket for streaming
   useEffect(() => {
     if (!open) return;
-    const ws = new WebSocket(`ws://${window.location.hostname}:3001/ws`);
+    const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const host = import.meta.env.PROD ? window.location.host : `${window.location.hostname}:3001`;
+    const ws = new WebSocket(`${proto}//${host}/ws`);
     wsRef.current = ws;
     ws.onmessage = (e) => {
       try {
