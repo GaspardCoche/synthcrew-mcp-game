@@ -9,7 +9,7 @@ services:
     plan: free
     branch: main
 
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm install --include=dev && npm rebuild better-sqlite3 && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
 
