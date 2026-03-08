@@ -12,7 +12,7 @@ export default function AgentAvatar({ agent, size = "md", className = "" }) {
     .join("")
     .toUpperCase()
     .slice(0, 2) || "?";
-  const color = agent?.color || "#00f0ff";
+  const color = agent?.color || "#4ecdc4";
   const sizeClass = size === "sm" ? "w-8 h-8 text-xs" : size === "lg" ? "w-14 h-14 text-lg" : "w-10 h-10 text-sm";
 
   return (

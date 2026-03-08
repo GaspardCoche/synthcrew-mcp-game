@@ -5,8 +5,8 @@ import { useWorldStore } from "../store/worldStore";
 
 const HUB = [0, 0, -8];
 const ZONES = [
-  { key: "data", center: [-35, 0, -28], color: "#00f0ff" },
-  { key: "analysis", center: [32, 0, -35], color: "#a855f7" },
+  { key: "data", center: [-35, 0, -28], color: "#4ecdc4" },
+  { key: "analysis", center: [32, 0, -35], color: "#6c5ce7" },
   { key: "archive", center: [-28, 0, -52], color: "#f59e0b" },
   { key: "comms", center: [42, 0, -18], color: "#22c55e" },
   { key: "phantom", center: [18, 0, -58], color: "#ef4444" },

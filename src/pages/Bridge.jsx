@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../store/useStore";
-import { STATUS_CONFIG } from "../lib/constants";
+import { AGENT_ROLE_LABELS, STATUS_CONFIG } from "../lib/constants";
 import AgentAvatar from "../components/AgentAvatar";
 
 function AgentCard({ agent, selected, onClick, mcps }) {
@@ -33,11 +33,11 @@ function AgentCard({ agent, selected, onClick, mcps }) {
       <div className="flex items-center gap-2.5 mb-2">
         <AgentAvatar agent={agent} size="sm" />
         <div>
-          <div className="font-jetbrains text-sm font-bold tracking-wide" style={{ color: agent.color }}>
+          <div className="font-mono text-sm font-bold tracking-wide" style={{ color: agent.color }}>
             {agent.name}
           </div>
-          <div className="font-jetbrains text-xs text-gray-400">
-            {agent.role} · LVL {agent.level}
+          <div className="text-xs text-gray-400">
+            {AGENT_ROLE_LABELS[agent.role] || agent.role} · Nv.{agent.level}
           </div>
         </div>
       </div>
@@ -45,22 +45,22 @@ function AgentCard({ agent, selected, onClick, mcps }) {
         {mcpNames.map((name) => (
           <span
             key={name}
-            className="font-jetbrains text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5"
+            className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-white/5"
           >
             {name}
           </span>
         ))}
       </div>
       <div className="flex justify-between items-center">
-        <span className="font-jetbrains text-[10px] text-gray-500">
+        <span className="font-mono text-[10px] text-gray-500">
           {agent.missions} missions · {agent.successRate}%
         </span>
-        <div className="w-12 h-1 bg-white/5 rounded overflow-hidden">
+        <div className="w-14 h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full rounded transition-all duration-1000"
+            className="h-full rounded-full transition-all duration-1000"
             style={{
               width: `${agent.xp}%`,
-              background: `linear-gradient(90deg, ${agent.color}99, ${agent.color})`,
+              background: `linear-gradient(90deg, ${agent.color}80, ${agent.color})`,
             }}
           />
         </div>
@@ -84,51 +84,59 @@ export default function Bridge() {
   const connectedMcps = mcps.filter((m) => m.connected).length;
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap');
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
-
-      <div className="flex gap-4 font-jetbrains text-xs text-gray-500 mb-4">
-        <span className="text-synth-cyan">⚡ {activeCount} actifs</span>
-        <span>◈ {totalMissions} missions</span>
-        <span className="text-synth-green">● OK</span>
-        <span className="ml-auto text-synth-copper tracking-wider">{time.toLocaleTimeString("fr-FR", { hour12: false })}</span>
+    <div className="space-y-6 max-w-6xl">
+      {/* Status bar */}
+      <div className="flex items-center gap-4 text-xs text-gray-500">
+        <span className="text-synth-teal font-semibold">{activeCount} actifs</span>
+        <span className="w-px h-3 bg-white/10" />
+        <span>{totalMissions} missions</span>
+        <span className="w-px h-3 bg-white/10" />
+        <span className="text-synth-emerald">Système OK</span>
+        <span className="ml-auto text-synth-primary tracking-wider font-mono">{time.toLocaleTimeString("fr-FR", { hour12: false })}</span>
       </div>
 
+      {/* CTA Mission */}
       <Link
         to="/classic/ops"
-        className="synth-panel block mb-6 p-4 flex items-center gap-3 hover:border-synth-copper/30 transition-colors"
+        className="block rounded-xl border border-synth-primary/20 bg-gradient-to-r from-synth-primary/8 to-transparent p-4 hover:border-synth-primary/30 transition-all group"
       >
-        <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">MISSION ›</span>
-        <span className="flex-1 font-jetbrains text-sm text-gray-400">Lancer une mission depuis l&apos;Atelier...</span>
-        <span className="font-orbitron text-xs font-bold bg-gradient-to-r from-synth-copper to-synth-cyan text-synth-bg-deep px-4 py-2 rounded-lg">ATELIER →</span>
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-synth-primary/15 flex items-center justify-center text-synth-primary text-lg group-hover:scale-105 transition-transform">
+            ▶
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-200">Lancer une nouvelle mission</p>
+            <p className="text-[11px] text-gray-500">NEXUS décompose ta demande et coordonne l'équipe</p>
+          </div>
+          <span className="text-xs font-bold bg-gradient-to-r from-synth-primary to-synth-teal text-white px-4 py-2 rounded-lg">
+            MISSIONS
+          </span>
+        </div>
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="space-y-5">
-          <div className="synth-panel overflow-hidden">
+          {/* Active mission DAG */}
+          <div className="rounded-xl border border-white/8 bg-white/2 overflow-hidden">
             <div className="px-4 py-3 border-b border-white/5 flex justify-between items-center">
               <div>
-                <div className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">MISSION ACTIVE</div>
-                <div className="font-jetbrains text-[10px] text-gray-500 mt-0.5">
+                <div className="text-[10px] font-bold text-synth-teal tracking-wide font-mono">MISSION ACTIVE</div>
+                <div className="text-[10px] text-gray-500 mt-0.5">
                   {currentMissionDag?.title || "Aucune mission en cours"}
                 </div>
               </div>
               {currentMissionDag && (
-                <span className="font-jetbrains text-[10px] px-2 py-1 rounded bg-synth-copper-bg border border-synth-copper/30 text-synth-copper">
+                <span className="text-[10px] px-2 py-1 rounded bg-synth-primary/10 border border-synth-primary/30 text-synth-primary font-mono">
                   {currentMissionDag.tasks.filter((t) => t.status === "done").length}/{currentMissionDag.tasks.length}
                 </span>
               )}
             </div>
             {!currentMissionDag && (
               <div className="p-6 text-center">
-                <p className="font-jetbrains text-sm text-gray-500 mb-3">Aucune mission en cours</p>
-                <p className="font-jetbrains text-[11px] text-gray-600 mb-4">Lance une mission depuis l’Atelier ou envoie-en une via la CLI.</p>
-                <Link to="/classic/ops" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-synth-copper-bg border border-synth-copper/40 text-synth-copper inline-block mr-2">Atelier</Link>
-                <Link to="/classic/integrations" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white inline-block">Connecter la CLI</Link>
+                <p className="text-sm text-gray-500 mb-3">Aucune mission en cours</p>
+                <p className="text-[11px] text-gray-600 mb-4">Décris ce que tu veux accomplir et NEXUS s'en occupe.</p>
+                <Link to="/classic/ops" className="text-xs px-4 py-2 rounded-lg bg-synth-primary/10 border border-synth-primary/30 text-synth-primary inline-block mr-2 font-mono">Missions</Link>
+                <Link to="/classic/integrations" className="text-xs px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white inline-block font-mono">CLI</Link>
               </div>
             )}
             {currentMissionDag && (
@@ -139,51 +147,20 @@ export default function Bridge() {
                     const to = currentMissionDag.tasks.find((t) => t.id === conn.to);
                     if (!from || !to) return null;
                     return (
-                      <line
-                        key={`${conn.from}-${conn.to}`}
-                        x1={from.x + 10}
-                        y1={from.y + 5}
-                        x2={to.x}
-                        y2={to.y + 5}
-                        stroke="rgba(255,255,255,0.15)"
-                        strokeWidth="0.5"
-                        strokeDasharray={to.status === "queued" ? "2,2" : "none"}
-                      />
+                      <line key={`${conn.from}-${conn.to}`} x1={from.x + 10} y1={from.y + 5} x2={to.x} y2={to.y + 5} stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
                     );
                   })}
                   {currentMissionDag.tasks.map((task) => {
-                    const colors = { done: "#22c55e", active: "#00f0ff", queued: "#f59e0b80" };
+                    const colors = { done: "#00b894", active: "#4ecdc4", queued: "#ffd93d80" };
                     const c = colors[task.status] || colors.queued;
                     return (
                       <g key={task.id}>
-                        <rect
-                          x={task.x}
-                          y={task.y}
-                          width={20}
-                          height={10}
-                          rx={2}
-                          fill={`${c}20`}
-                          stroke={c}
-                          strokeWidth="0.3"
-                        />
-                        {task.status === "done" && (
-                          <text x={task.x + 10} y={task.y + 6.5} textAnchor="middle" fill="#22c55e" fontSize="3.5" fontFamily="monospace">
-                            ✓
-                          </text>
-                        )}
+                        <rect x={task.x} y={task.y} width={20} height={10} rx={2} fill={`${c}20`} stroke={c} strokeWidth="0.3" />
+                        {task.status === "done" && <text x={task.x + 10} y={task.y + 6.5} textAnchor="middle" fill="#00b894" fontSize="3.5" fontFamily="monospace">✓</text>}
                         {task.status === "active" && (
-                          <circle cx={task.x + 10} cy={task.y + 5} r="1.5" fill="#00f0ff" opacity="0.8">
-                            <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite" />
-                          </circle>
+                          <circle cx={task.x + 10} cy={task.y + 5} r="1.5" fill="#4ecdc4"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite" /></circle>
                         )}
-                        {task.status === "queued" && (
-                          <text x={task.x + 10} y={task.y + 6.5} textAnchor="middle" fill="#f59e0b" fontSize="3" fontFamily="monospace">
-                            ⏳
-                          </text>
-                        )}
-                        <text x={task.x + 10} y={task.y + 16} textAnchor="middle" fill={c} fontSize="2.2" fontFamily="monospace">
-                          {task.label?.slice(0, 12)}
-                        </text>
+                        <text x={task.x + 10} y={task.y + 16} textAnchor="middle" fill={c} fontSize="2.2" fontFamily="monospace">{task.label?.slice(0, 12)}</text>
                       </g>
                     );
                   })}
@@ -192,31 +169,28 @@ export default function Bridge() {
             )}
           </div>
 
-          <div className="synth-panel overflow-hidden h-72 flex flex-col">
+          {/* Live feed */}
+          <div className="rounded-xl border border-white/8 bg-white/2 overflow-hidden h-72 flex flex-col">
             <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-synth-green animate-pulse" />
-              <span className="font-orbitron text-xs font-bold text-synth-green tracking-wide">LIVE FEED</span>
+              <div className="w-2 h-2 rounded-full bg-synth-emerald animate-pulse" />
+              <span className="text-[10px] font-bold text-synth-emerald tracking-wide font-mono">LIVE FEED</span>
             </div>
-            <div className="flex-1 overflow-y-auto p-3 font-jetbrains text-[11px]">
+            <div className="flex-1 overflow-y-auto p-3 font-mono text-[11px]">
               {missionLog.length === 0 && (
-                <div className="text-gray-500 text-center py-8">En attente de la prochaine mission...</div>
+                <div className="text-gray-600 text-center py-8">En attente...</div>
               )}
               {missionLog.map((log, i) => {
                 const agent = agents.find((a) => a.name === log.agent);
-                const typeColors = { tool_call: "#f59e0b", output: "#22c55e", thinking: "#a855f7" };
+                const typeColors = { tool_call: "#ffd93d", output: "#00b894", thinking: "#6c5ce7" };
                 const tc = typeColors[log.type] || "#9ca3af";
                 return (
                   <div key={i} className="py-1.5 border-b border-white/5 animate-fade-in">
                     <div className="flex gap-2 items-start">
-                      <span className="text-gray-500 shrink-0">{log.time}</span>
-                      <span className="font-semibold shrink-0 min-w-[70px]" style={{ color: agent?.color || "#fff" }}>
-                        {log.agent}
-                      </span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded border shrink-0" style={{ background: `${tc}15`, color: tc, borderColor: `${tc}30` }}>
-                        {log.type}
-                      </span>
+                      <span className="text-gray-600 shrink-0">{log.time}</span>
+                      <span className="font-semibold shrink-0" style={{ color: agent?.color || "#dfe6e9" }}>{log.agent}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded border shrink-0" style={{ background: `${tc}15`, color: tc, borderColor: `${tc}30` }}>{log.type}</span>
                     </div>
-                    <div className="text-gray-300 mt-0.5 pl-0">{log.action}</div>
+                    <div className="text-gray-300 mt-0.5">{log.action}</div>
                   </div>
                 );
               })}
@@ -224,14 +198,15 @@ export default function Bridge() {
           </div>
         </div>
 
+        {/* Agents */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">
+            <span className="text-[10px] font-bold text-synth-primary tracking-wide font-mono">
               ÉQUIPAGE ({agents.length}/{getPlanLimit("agents")})
             </span>
             <Link
               to="/classic/quarters"
-              className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg bg-synth-copper-bg border border-synth-copper/40 text-synth-copper"
+              className="text-[10px] px-3 py-1.5 rounded-lg bg-synth-primary/10 border border-synth-primary/30 text-synth-primary font-mono"
             >
               + Recruter
             </Link>
@@ -250,20 +225,21 @@ export default function Bridge() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "MISSIONS / 24H", value: String(missions?.length ?? 0), color: "text-synth-cyan", sub: "ce mois" },
-          { label: "TAUX SUCCÈS", value: "95%", color: "text-synth-green", sub: "moyenne" },
-          { label: "MCPs CONNECTÉS", value: String(connectedMcps), color: "text-synth-copper", sub: "tools actifs" },
-          { label: "PLAN", value: "Explorer", color: "text-gray-400", sub: "3 agents max" },
+          { label: "MISSIONS / 24H", value: String(missions?.length ?? 0), color: "text-synth-teal", sub: "ce mois" },
+          { label: "TAUX SUCCÈS", value: `${Math.round(agents.reduce((s, a) => s + (a.successRate || 0), 0) / Math.max(agents.length, 1))}%`, color: "text-synth-emerald", sub: "moyenne" },
+          { label: "MCPs CONNECTÉS", value: String(connectedMcps), color: "text-synth-primary", sub: `${mcps.reduce((s, m) => s + (m.connected ? m.tools?.length || 0 : 0), 0)} tools` },
+          { label: "PLAN", value: "Explorer", color: "text-gray-400", sub: `${getPlanLimit("agents")} agents max` },
         ].map((stat) => (
-          <div key={stat.label} className="synth-panel-neutral p-4">
-            <div className="font-jetbrains text-[9px] text-gray-500 tracking-wide mb-1">{stat.label}</div>
+          <div key={stat.label} className="rounded-xl border border-white/6 bg-white/2 p-4">
+            <div className="font-mono text-[9px] text-gray-500 tracking-wide mb-1">{stat.label}</div>
             <div className={`font-orbitron text-xl font-black ${stat.color}`}>{stat.value}</div>
-            <div className="font-jetbrains text-[10px] text-gray-600 mt-1">{stat.sub}</div>
+            <div className="font-mono text-[10px] text-gray-600 mt-1">{stat.sub}</div>
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }

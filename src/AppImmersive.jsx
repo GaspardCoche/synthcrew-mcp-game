@@ -23,6 +23,7 @@ import SettingsModal from "./components/SettingsModal";
 import VueCarte from "./components/VueCarte";
 import Crosshair from "./components/Crosshair";
 import Minimap from "./components/Minimap";
+import AmbientAudio from "./components/AmbientAudio";
 import { hasDoneOnboarding } from "./lib/onboarding";
 import { BuildId } from "./components/BuildId";
 
@@ -109,10 +110,10 @@ export default function AppImmersive() {
         <BuildId className="sm:inline mt-1" />
       </div>
       <div className="absolute top-[165px] right-4 z-20 flex flex-col gap-1.5 items-end pointer-events-auto">
-        <a href="#/classic" className="font-jetbrains text-[9px] text-gray-500 hover:text-synth-copper transition-colors px-2 py-1 rounded border border-transparent hover:border-synth-copper/20">
-          Dashboard →
+        <a href="#/classic" className="font-jetbrains text-[9px] text-gray-500 hover:text-synth-primary transition-colors px-2 py-1 rounded border border-transparent hover:border-synth-primary/20">
+          Pont
         </a>
-        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-synth-copper/30 text-synth-copper hover:bg-synth-copper/10 transition-colors">
+        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-synth-primary/30 text-synth-primary hover:bg-synth-primary/10 transition-colors">
           Mission
         </button>
         <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-white/15 text-gray-500 hover:text-white transition-colors">
@@ -136,7 +137,7 @@ export default function AppImmersive() {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-fade-in pointer-events-none">
           <div className="synth-panel px-4 py-3 max-w-xs text-center">
             <p className="text-xs text-gray-200">
-              Clique sur <span className="font-semibold text-synth-copper">NOVA</span> (orbe) ou un agent · ou ouvre la <span className="font-semibold text-synth-copper">Vue carte</span>.
+              Clique sur <span className="font-semibold text-synth-primary">NOVA</span> (orbe) ou un agent · ou ouvre la <span className="font-semibold text-synth-primary">Vue carte</span>.
             </p>
           </div>
         </div>
@@ -176,15 +177,15 @@ export default function AppImmersive() {
       {!pointerLocked && viewMode === "3d" && !showOnboarding && (
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
           <div className="synth-panel px-6 py-4 font-jetbrains text-sm text-gray-300 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg border border-synth-copper/30 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-4 h-4 text-synth-copper" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-8 h-8 rounded-lg border border-synth-primary/30 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 text-synth-primary" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
               </svg>
             </div>
             <div>
               <p className="text-xs text-gray-400">Clique pour entrer</p>
-              <p className="text-[10px] text-gray-600"><span className="text-synth-copper">WASD</span> déplacer · <span className="text-synth-copper">Souris</span> regarder · <span className="text-synth-copper">Échap</span> libérer</p>
+              <p className="text-[10px] text-gray-600"><span className="text-synth-primary">WASD</span> déplacer · <span className="text-synth-primary">Souris</span> regarder · <span className="text-synth-primary">Échap</span> libérer</p>
             </div>
           </div>
         </div>
@@ -212,6 +213,7 @@ export default function AppImmersive() {
         />
       )}
       </KeyboardControls>
+      <AmbientAudio />
     </div>
   );
 }

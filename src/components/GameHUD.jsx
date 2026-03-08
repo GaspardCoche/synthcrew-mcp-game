@@ -2,22 +2,22 @@ import { usePlayerStore } from "../store/playerStore";
 import { useWorldStore } from "../store/worldStore";
 
 const NOVA_TARGET = { x: 3, z: -4 };
-const AGENT_ORDER = ["SENTINEL", "CIPHER", "ARCHIVIST", "HERALD", "PHANTOM", "FORGE"];
+const AGENT_ORDER = ["DATAFLOW", "PRISME", "SCRIBE", "SIGNAL", "SPIDER", "CODEFORGE"];
 const AGENT_LABELS = {
-  SENTINEL: "Sentinel",
-  CIPHER: "Cipher",
-  ARCHIVIST: "Archivist",
-  HERALD: "Herald",
-  PHANTOM: "Phantom",
-  FORGE: "Forge",
+  DATAFLOW: "Dataflow · Data Ops",
+  PRISME: "Prisme · Analyste",
+  SCRIBE: "Scribe · Rédacteur",
+  SIGNAL: "Signal · Comm",
+  SPIDER: "Spider · Scraper",
+  CODEFORGE: "Codeforge · Dev",
 };
 const AGENT_COLORS = {
-  SENTINEL: "#00f0ff",
-  CIPHER: "#a855f7",
-  ARCHIVIST: "#f59e0b",
-  HERALD: "#22c55e",
-  PHANTOM: "#ef4444",
-  FORGE: "#ec4899",
+  DATAFLOW: "#6c5ce7",
+  PRISME: "#74b9ff",
+  SCRIBE: "#ffd93d",
+  SIGNAL: "#00b894",
+  SPIDER: "#ff6b6b",
+  CODEFORGE: "#fd79a8",
 };
 
 const ZONE_COUNT = 7;
@@ -31,9 +31,9 @@ function Compass({ playerX, playerZ }) {
   const dist = Math.hypot(dx, dz);
   return (
     <div className="flex flex-col items-center gap-0.5">
-      <div className="w-14 h-14 rounded-full border border-synth-copper/40 bg-black/50 flex items-center justify-center relative">
+      <div className="w-14 h-14 rounded-full border border-synth-primary/40 bg-black/50 flex items-center justify-center relative">
         <div
-          className="absolute w-0.5 h-5 bg-gradient-to-t from-synth-copper to-synth-cyan rounded-full origin-bottom"
+          className="absolute w-0.5 h-5 bg-gradient-to-t from-synth-primary to-synth-teal rounded-full origin-bottom"
           style={{
             top: "6px", left: "50%",
             transform: `translateX(-50%) rotate(${deg}deg)`,
@@ -93,7 +93,7 @@ function ZoneProgress({ totalMissions }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <span className="text-[8px] text-gray-500 font-mono uppercase tracking-wider">Zones</span>
-        <span className="text-[9px] text-synth-copper font-mono font-bold">{unlockedCount}/{ZONE_COUNT}</span>
+        <span className="text-[9px] text-synth-primary font-mono font-bold">{unlockedCount}/{ZONE_COUNT}</span>
       </div>
       <div className="flex gap-0.5">
         {MISSIONS_TO_UNLOCK.map((req, i) => (
@@ -101,7 +101,7 @@ function ZoneProgress({ totalMissions }) {
             key={i}
             className="flex-1 h-1 rounded-full transition-all duration-500"
             style={{
-              backgroundColor: totalMissions >= req ? "#c9a227" : "rgba(255,255,255,0.06)",
+              backgroundColor: totalMissions >= req ? "#ff6b35" : "rgba(255,255,255,0.06)",
               opacity: totalMissions >= req ? 0.8 : 0.4,
             }}
           />

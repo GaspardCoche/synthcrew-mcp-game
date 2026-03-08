@@ -10,8 +10,8 @@ export default function AchievementToast({ achievement, onDismiss }) {
   useEffect(() => {
     if (!achievement) return;
     const burst = () => {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 }, colors: ["#eab308", "#f59e0b", "#22c55e", "#00f0ff"] });
-      setTimeout(() => confetti({ particleCount: 40, spread: 100, origin: { y: 0.8 }, colors: ["#a855f7", "#ec4899"] }), 150);
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 }, colors: ["#ff6b35", "#f59e0b", "#22c55e", "#4ecdc4"] });
+      setTimeout(() => confetti({ particleCount: 40, spread: 100, origin: { y: 0.8 }, colors: ["#6c5ce7", "#ec4899"] }), 150);
     };
     burst();
   }, [achievement]);

@@ -100,7 +100,7 @@ function RotatingPlanet({ path, pos, scale = 6 }) {
   return <primitive ref={ref} object={scene.clone()} position={pos} scale={[scale, scale, scale]} />;
 }
 
-// ── ZONE 0 : Hub central (CONDUCTOR) ────────────────────────────────────────
+// ── ZONE 0 : Hub central (NEXUS) ────────────────────────────────────────
 function ZoneHub() {
   const level = useWorldStore((s) => s.getZoneLevel("hub"));
   const damage = useWorldStore((s) => s.getZoneDamage("hub"));
@@ -111,20 +111,20 @@ function ZoneHub() {
       <Box pos={[0, 0, -8]} size={[3.5, 0.8, 3.5]} color="#1a1530" emissive="#241e48" emissiveIntensity={0.25} damage={damage} />
       {[[-3.5,-4.5],[-3.5,-11.5],[3.5,-4.5],[3.5,-11.5]].map(([px, pz], i) => (
         <group key={i} position={[px, getTerrainHeightAt(px, pz), pz]}>
-          <Cylinder pos={[px, 0, pz]} r={0.18} h={3.2} color="#1a1530" emissive="#eab308" emissiveIntensity={0.35} damage={damage} />
+          <Cylinder pos={[px, 0, pz]} r={0.18} h={3.2} color="#1a1530" emissive="#ff6b35" emissiveIntensity={0.35} damage={damage} />
           <mesh position={[px, getTerrainHeightAt(px, pz) + 3.5, pz]}>
             <sphereGeometry args={[0.22, 12, 12]} />
-            <meshStandardMaterial color="#eab308" emissive="#eab308" emissiveIntensity={1.5 * (1 - damage)} />
+            <meshStandardMaterial color="#ff6b35" emissive="#ff6b35" emissiveIntensity={1.5 * (1 - damage)} />
           </mesh>
-          <pointLight position={[px, getTerrainHeightAt(px, pz) + 3.5, pz]} color="#eab308" intensity={0.8 * (1 - damage * 0.8)} distance={12} decay={2} />
+          <pointLight position={[px, getTerrainHeightAt(px, pz) + 3.5, pz]} color="#ff6b35" intensity={0.8 * (1 - damage * 0.8)} distance={12} decay={2} />
         </group>
       ))}
-      {[[-6,-8],[6,-8],[0,-2],[0,-14]].map(([px, pz], i) => <Pylon key={i} pos={[px, 0, pz]} color="#eab308" damage={damage} />)}
+      {[[-6,-8],[6,-8],[0,-2],[0,-14]].map(([px, pz], i) => <Pylon key={i} pos={[px, 0, pz]} color="#ff6b35" damage={damage} />)}
     </group>
   );
 }
 
-// ── ZONE 1 : Citadelle Data (SENTINEL, cyan) ─────────────────────────────────
+// ── ZONE 1 : Citadelle Data (DATAFLOW, cyan) ─────────────────────────────────
 function ZoneData() {
   const level = useWorldStore((s) => s.getZoneLevel("data"));
   const damage = useWorldStore((s) => s.getZoneDamage("data"));
@@ -132,28 +132,28 @@ function ZoneData() {
   const x0 = -35, z0 = -28;
   return (
     <group>
-      <Box pos={[x0, 0, z0]}       size={[7, 1.2, 6]}    color="#0d1a1f" emissive="#00f0ff" emissiveIntensity={0.12} damage={damage} />
+      <Box pos={[x0, 0, z0]}       size={[7, 1.2, 6]}    color="#0d1a1f" emissive="#4ecdc4" emissiveIntensity={0.12} damage={damage} />
       <Box pos={[x0-3, 0, z0-3]}   size={[2, 3.5, 1.8]}  color="#0d1418" emissive="#00a8b5" emissiveIntensity={0.2} damage={damage} />
       <Box pos={[x0+3, 0, z0-3]}   size={[2, 2.8, 1.8]}  color="#0d1418" emissive="#00a8b5" emissiveIntensity={0.2} damage={damage} />
-      <Box pos={[x0, 0, z0+3]}     size={[5, 1.8, 1.2]}  color="#0d1418" emissive="#00f0ff" emissiveIntensity={0.15} damage={damage} />
+      <Box pos={[x0, 0, z0+3]}     size={[5, 1.8, 1.2]}  color="#0d1418" emissive="#4ecdc4" emissiveIntensity={0.15} damage={damage} />
       {[[-39,-22],[-37,-24],[-35,-22],[-33,-24],[-31,-22]].map(([px,pz],i) => (
-        <Box key={i} pos={[px,0,pz]} size={[1.2,2,0.5]} color="#0a1015" emissive="#00f0ff" emissiveIntensity={0.3+i*0.05} damage={damage} />
+        <Box key={i} pos={[px,0,pz]} size={[1.2,2,0.5]} color="#0a1015" emissive="#4ecdc4" emissiveIntensity={0.3+i*0.05} damage={damage} />
       ))}
-      <Cylinder pos={[x0-7, 0, z0-6]} r={0.6} h={5.5} color="#0d1418" emissive="#00f0ff" emissiveIntensity={0.25} damage={damage} />
+      <Cylinder pos={[x0-7, 0, z0-6]} r={0.6} h={5.5} color="#0d1418" emissive="#4ecdc4" emissiveIntensity={0.25} damage={damage} />
       <mesh position={[x0-7, getTerrainHeightAt(x0-7,z0-6)+5.8, z0-6]}>
         <sphereGeometry args={[0.4,16,16]} />
-        <meshStandardMaterial color="#00f0ff" emissive="#00f0ff" emissiveIntensity={2 * (1 - damage)} />
+        <meshStandardMaterial color="#4ecdc4" emissive="#4ecdc4" emissiveIntensity={2 * (1 - damage)} />
       </mesh>
-      <pointLight position={[x0-7, getTerrainHeightAt(x0-7,z0-6)+5.8, z0-6]} color="#00f0ff" intensity={2 * (1 - damage * 0.8)} distance={20} decay={2} />
+      <pointLight position={[x0-7, getTerrainHeightAt(x0-7,z0-6)+5.8, z0-6]} color="#4ecdc4" intensity={2 * (1 - damage * 0.8)} distance={20} decay={2} />
       {[[-30,-20,1.2],[-32,-18,0.9],[-38,-19,1.0],[-40,-21,1.4]].map(([px,pz,s],i) => (
-        <Crystal key={i} pos={[px,0,pz]} scale={s} color="#00f0ff" rotY={i*0.7} damage={damage} />
+        <Crystal key={i} pos={[px,0,pz]} scale={s} color="#4ecdc4" rotY={i*0.7} damage={damage} />
       ))}
-      {[[-33,-26],[-37,-30],[-30,-32],[-42,-28]].map(([px,pz],i) => <Pylon key={i} pos={[px,0,pz]} color="#00f0ff" damage={damage} />)}
+      {[[-33,-26],[-37,-30],[-30,-32],[-42,-28]].map(([px,pz],i) => <Pylon key={i} pos={[px,0,pz]} color="#4ecdc4" damage={damage} />)}
     </group>
   );
 }
 
-// ── ZONE 2 : Spire d'Analyse (CIPHER, purple) ───────────────────────────────
+// ── ZONE 2 : Spire d'Analyse (PRISME, purple) ───────────────────────────────
 function ZoneAnalysis() {
   const level = useWorldStore((s) => s.getZoneLevel("analysis"));
   const damage = useWorldStore((s) => s.getZoneDamage("analysis"));
@@ -161,24 +161,24 @@ function ZoneAnalysis() {
   const x0 = 32, z0 = -35;
   return (
     <group>
-      <Box pos={[x0, 0, z0]}     size={[6, 0.5, 6]}   color="#14101e" emissive="#a855f7" emissiveIntensity={0.14} damage={damage} />
-      <Cylinder pos={[x0, 0, z0]} r={1.2} h={6.5}     color="#14101e" emissive="#a855f7" emissiveIntensity={0.2} damage={damage} />
+      <Box pos={[x0, 0, z0]}     size={[6, 0.5, 6]}   color="#14101e" emissive="#6c5ce7" emissiveIntensity={0.14} damage={damage} />
+      <Cylinder pos={[x0, 0, z0]} r={1.2} h={6.5}     color="#14101e" emissive="#6c5ce7" emissiveIntensity={0.2} damage={damage} />
       <mesh position={[x0, getTerrainHeightAt(x0,z0)+7, z0]}>
         <octahedronGeometry args={[0.6, 0]} />
-        <meshStandardMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={2 * (1 - damage)} transparent opacity={0.9} />
+        <meshStandardMaterial color="#6c5ce7" emissive="#6c5ce7" emissiveIntensity={2 * (1 - damage)} transparent opacity={0.9} />
       </mesh>
-      <pointLight position={[x0, getTerrainHeightAt(x0,z0)+7, z0]} color="#a855f7" intensity={3 * (1 - damage * 0.8)} distance={25} decay={2} />
+      <pointLight position={[x0, getTerrainHeightAt(x0,z0)+7, z0]} color="#6c5ce7" intensity={3 * (1 - damage * 0.8)} distance={25} decay={2} />
       {[[28,-30,1.3],[30,-28,0.8],[34,-28,1.1],[38,-30,1.4],[36,-33,0.9],[26,-34,1.0],[38,-40,1.2],[28,-40,0.9]].map(([px,pz,s],i) => (
-        <Crystal key={i} pos={[px,0,pz]} scale={s} color={i%2===0?"#a855f7":"#7c3aed"} rotY={i*0.55} damage={damage} />
+        <Crystal key={i} pos={[px,0,pz]} scale={s} color={i%2===0?"#6c5ce7":"#5b4bd4"} rotY={i*0.55} damage={damage} />
       ))}
-      <Box pos={[x0+6, 0, z0-5]} size={[2.5,2,2]}  color="#14101e" emissive="#a855f7" emissiveIntensity={0.3} damage={damage} />
-      <Box pos={[x0-6, 0, z0-5]} size={[1.8,2.8,1.5]} color="#14101e" emissive="#7c3aed" emissiveIntensity={0.25} damage={damage} />
-      {[[26,-30],[38,-28],[30,-42],[36,-42]].map(([px,pz],i) => <Pylon key={i} pos={[px,0,pz]} color="#a855f7" damage={damage} />)}
+      <Box pos={[x0+6, 0, z0-5]} size={[2.5,2,2]}  color="#14101e" emissive="#6c5ce7" emissiveIntensity={0.3} damage={damage} />
+      <Box pos={[x0-6, 0, z0-5]} size={[1.8,2.8,1.5]} color="#14101e" emissive="#5b4bd4" emissiveIntensity={0.25} damage={damage} />
+      {[[26,-30],[38,-28],[30,-42],[36,-42]].map(([px,pz],i) => <Pylon key={i} pos={[px,0,pz]} color="#6c5ce7" damage={damage} />)}
     </group>
   );
 }
 
-// ── ZONE 3 : Archive (ARCHIVIST, amber) ─────────────────────────────────────
+// ── ZONE 3 : Archive (SCRIBE, amber) ─────────────────────────────────────
 function ZoneArchive() {
   const level = useWorldStore((s) => s.getZoneLevel("archive"));
   const damage = useWorldStore((s) => s.getZoneDamage("archive"));
@@ -203,7 +203,7 @@ function ZoneArchive() {
   );
 }
 
-// ── ZONE 4 : Tour Comms (HERALD, green) ─────────────────────────────────────
+// ── ZONE 4 : Tour Comms (SIGNAL, green) ─────────────────────────────────────
 function ZoneComms() {
   const level = useWorldStore((s) => s.getZoneLevel("comms"));
   const damage = useWorldStore((s) => s.getZoneDamage("comms"));
@@ -229,7 +229,7 @@ function ZoneComms() {
   );
 }
 
-// ── ZONE 5 : Base Fantôme (PHANTOM, red) ─────────────────────────────────────
+// ── ZONE 5 : Base Fantôme (SPIDER, red) ─────────────────────────────────────
 function ZonePhantom() {
   const level = useWorldStore((s) => s.getZoneLevel("phantom"));
   const damage = useWorldStore((s) => s.getZoneDamage("phantom"));
@@ -254,7 +254,7 @@ function ZonePhantom() {
   );
 }
 
-// ── ZONE 6 : Atelier Forge (FORGE, pink) ────────────────────────────────────
+// ── ZONE 6 : Atelier Forge (CODEFORGE, pink) ────────────────────────────────────
 function ZoneForge() {
   const level = useWorldStore((s) => s.getZoneLevel("forge"));
   const damage = useWorldStore((s) => s.getZoneDamage("forge"));
@@ -311,9 +311,9 @@ function WorldDecoration() {
       </Suspense>
       {/* Cristaux décoratifs isolés */}
       {[
-        [-14,-4,0.8,"#eab308"],[12,-4,0.7,"#00f0ff"],[-2,-18,1.0,"#a855f7"],[20,-4,0.9,"#22c55e"],
-        [-22,-34,1.1,"#00f0ff"],[0,-50,0.9,"#a855f7"],[42,-8,0.8,"#22c55e"],[-40,-18,1.0,"#00f0ff"],
-        [35,-22,0.7,"#a855f7"],[-8,-76,1.2,"#ec4899"],[26,-72,0.9,"#ef4444"],[-50,-70,1.0,"#00f0ff"],
+        [-14,-4,0.8,"#ff6b35"],[12,-4,0.7,"#4ecdc4"],[-2,-18,1.0,"#6c5ce7"],[20,-4,0.9,"#22c55e"],
+        [-22,-34,1.1,"#4ecdc4"],[0,-50,0.9,"#6c5ce7"],[42,-8,0.8,"#22c55e"],[-40,-18,1.0,"#4ecdc4"],
+        [35,-22,0.7,"#6c5ce7"],[-8,-76,1.2,"#ec4899"],[26,-72,0.9,"#ef4444"],[-50,-70,1.0,"#4ecdc4"],
       ].map(([px,pz,s,c],i) => <Crystal key={i} pos={[px,0,pz]} scale={s} color={c} rotY={i*0.7} />)}
     </group>
   );

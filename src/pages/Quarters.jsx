@@ -14,7 +14,7 @@ const CLASSES = [
     role: "orchestrator",
     label: "Orchestrateur",
     icon: "🎯",
-    color: "#eab308",
+    color: "#ff6b35",
     tagline: "Comprend, planifie, délègue",
     desc: "Il analyse le besoin, pose les bonnes questions et compose l'équipe idéale. La mémoire vivante de ta crew.",
     defaultPersonality: "Tu es l'orchestrateur. Tu analyses les demandes, identifies les agents nécessaires et coordonnes leur travail. Tu poses des questions précises avant d'agir.",
@@ -34,7 +34,7 @@ const CLASSES = [
     role: "analyst",
     label: "Analyste",
     icon: "🔮",
-    color: "#a855f7",
+    color: "#6c5ce7",
     tagline: "Données, tendances, patterns",
     desc: "Fouille les bases de données, identifie des patterns et produit des insights actionnables.",
     defaultPersonality: "Tu es un analyste de données. Tu interroges des bases, identifies des tendances et résumes des insights de manière claire et structurée.",
@@ -54,7 +54,7 @@ const CLASSES = [
     role: "data_ops",
     label: "Data Ops",
     icon: "🛡️",
-    color: "#00f0ff",
+    color: "#4ecdc4",
     tagline: "Collecte, structure, nettoie",
     desc: "Récupère des données depuis des APIs, les structure et les rend exploitables pour les autres agents.",
     defaultPersonality: "Tu es un agent Data Ops. Tu récupères, nettoies et structures des données de manière fiable pour les autres membres de l'équipe.",
@@ -92,10 +92,10 @@ const CLASSES = [
   },
 ];
 
-const COLORS = ["#00f0ff", "#a855f7", "#f59e0b", "#22c55e", "#ef4444", "#ec4899", "#eab308", "#84cc16", "#8b9dc3"];
+const COLORS = ["#4ecdc4", "#6c5ce7", "#f59e0b", "#22c55e", "#ef4444", "#ec4899", "#ff6b35", "#84cc16", "#8b9dc3"];
 
 const STATUS_LABELS = {
-  active:   { label: "EN MISSION", color: "#00f0ff" },
+  active:   { label: "EN MISSION", color: "#4ecdc4" },
   idle:     { label: "EN VEILLE",  color: "#6b7280" },
   queued:   { label: "EN ATTENTE", color: "#f59e0b" },
   sleeping: { label: "SOMMEIL",    color: "#374151" },
@@ -183,7 +183,7 @@ function AgentCard({ agent, mcps, onEdit, onRemove }) {
         <button
           onClick={() => onEdit(agent)}
           className="text-[10px] px-2 py-1 rounded border transition-colors"
-          style={{ borderColor: "rgba(0,240,255,0.2)", color: "#00f0ff" }}
+          style={{ borderColor: "rgba(78,205,196,0.2)", color: "#4ecdc4" }}
         >
           Modifier
         </button>
@@ -240,7 +240,7 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
         style={{
           background: "linear-gradient(135deg, #0d0f18, #06070c)",
           border: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: "0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,240,255,0.06)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(78,205,196,0.06)",
         }}
       >
         {/* Wizard header */}
@@ -249,7 +249,7 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
             <h3
               className="font-orbitron text-sm font-black tracking-widest"
               style={{
-                background: "linear-gradient(90deg, #00f0ff, #a855f7)",
+                background: "linear-gradient(90deg, #4ecdc4, #6c5ce7)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -269,21 +269,21 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
                   <div
                     className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold transition-all"
                     style={{
-                      background: i === step ? "#00f0ff" : i < step ? "rgba(0,240,255,0.2)" : "rgba(255,255,255,0.06)",
-                      color: i === step ? "#06070c" : i < step ? "#00f0ff" : "#6b7280",
+                      background: i === step ? "#4ecdc4" : i < step ? "rgba(78,205,196,0.2)" : "rgba(255,255,255,0.06)",
+                      color: i === step ? "#06070c" : i < step ? "#4ecdc4" : "#6b7280",
                     }}
                   >
                     {i < step ? "✓" : i + 1}
                   </div>
                   <span
                     className="text-[10px] font-bold tracking-wider"
-                    style={{ color: i === step ? "#00f0ff" : i < step ? "#9ca3af" : "#4b5563" }}
+                    style={{ color: i === step ? "#4ecdc4" : i < step ? "#9ca3af" : "#4b5563" }}
                   >
                     {s}
                   </span>
                 </button>
                 {i < WIZARD_STEPS.length - 1 && (
-                  <div className="w-8 h-px" style={{ background: i < step ? "rgba(0,240,255,0.3)" : "rgba(255,255,255,0.06)" }} />
+                  <div className="w-8 h-px" style={{ background: i < step ? "rgba(78,205,196,0.3)" : "rgba(255,255,255,0.06)" }} />
                 )}
               </div>
             ))}
@@ -348,10 +348,10 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
                   className="w-full rounded-lg px-3 py-2 text-sm font-bold tracking-wider focus:outline-none transition-all"
                   style={{
                     background: "rgba(255,255,255,0.04)",
-                    border: form.name ? `1px solid ${selectedClass?.color || "#00f0ff"}40` : "1px solid rgba(255,255,255,0.08)",
+                    border: form.name ? `1px solid ${selectedClass?.color || "#4ecdc4"}40` : "1px solid rgba(255,255,255,0.08)",
                     color: selectedClass?.color || "#e5e7eb",
                   }}
-                  placeholder="EX: SENTINEL"
+                  placeholder="EX: DATAFLOW"
                   autoFocus
                 />
               </div>
@@ -426,13 +426,13 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
                       }
                       className="flex items-center gap-2 p-3 rounded-xl border text-left transition-all"
                       style={{
-                        background: isSelected ? "rgba(0,240,255,0.06)" : "rgba(255,255,255,0.02)",
-                        borderColor: isSelected ? "rgba(0,240,255,0.25)" : isSuggested ? "rgba(212,165,116,0.2)" : "rgba(255,255,255,0.06)",
+                        background: isSelected ? "rgba(78,205,196,0.06)" : "rgba(255,255,255,0.02)",
+                        borderColor: isSelected ? "rgba(78,205,196,0.25)" : isSuggested ? "rgba(212,165,116,0.2)" : "rgba(255,255,255,0.06)",
                       }}
                     >
                       <span className="text-lg">{m.icon}</span>
                       <div className="min-w-0">
-                        <div className="text-xs font-bold" style={{ color: isSelected ? "#00f0ff" : "#9ca3af" }}>
+                        <div className="text-xs font-bold" style={{ color: isSelected ? "#4ecdc4" : "#9ca3af" }}>
                           {m.name}
                         </div>
                         <div className="text-[9px] text-gray-600">{m.category}</div>
@@ -469,9 +469,9 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
                 disabled={step === 1 && !form.name.trim()}
                 className="font-orbitron text-xs font-bold px-5 py-2 rounded-xl transition-all disabled:opacity-40"
                 style={{
-                  background: "linear-gradient(135deg, rgba(0,240,255,0.15), rgba(168,85,247,0.15))",
-                  border: "1px solid rgba(0,240,255,0.25)",
-                  color: "#00f0ff",
+                  background: "linear-gradient(135deg, rgba(78,205,196,0.15), rgba(108,92,231,0.15))",
+                  border: "1px solid rgba(78,205,196,0.25)",
+                  color: "#4ecdc4",
                 }}
               >
                 Suivant →
@@ -482,10 +482,10 @@ function WizardModal({ editing, onClose, onSubmit, mcps }) {
                 disabled={!form.name.trim()}
                 className="font-orbitron text-xs font-bold px-5 py-2 rounded-xl transition-all disabled:opacity-40"
                 style={{
-                  background: "linear-gradient(135deg, rgba(0,240,255,0.2), rgba(168,85,247,0.2))",
-                  border: "1px solid rgba(0,240,255,0.3)",
-                  color: "#00f0ff",
-                  boxShadow: "0 0 16px rgba(0,240,255,0.1)",
+                  background: "linear-gradient(135deg, rgba(78,205,196,0.2), rgba(108,92,231,0.2))",
+                  border: "1px solid rgba(78,205,196,0.3)",
+                  color: "#4ecdc4",
+                  boxShadow: "0 0 16px rgba(78,205,196,0.1)",
                 }}
               >
                 {editing ? "Enregistrer" : "◆ Recruter"}
@@ -546,9 +546,9 @@ export default function Quarters() {
           disabled={atLimit}
           className="font-orbitron text-[10px] font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-40"
           style={{
-            background: "linear-gradient(135deg, rgba(168,85,247,0.15), rgba(0,240,255,0.08))",
-            border: "1px solid rgba(168,85,247,0.25)",
-            color: "#a855f7",
+            background: "linear-gradient(135deg, rgba(108,92,231,0.15), rgba(78,205,196,0.08))",
+            border: "1px solid rgba(108,92,231,0.25)",
+            color: "#6c5ce7",
           }}
         >
           + Recruter

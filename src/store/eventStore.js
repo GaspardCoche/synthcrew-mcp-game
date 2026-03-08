@@ -15,12 +15,12 @@ export const EVENT_TYPES = {
 };
 
 const EVENT_CONFIG = {
-  mission_started:   { icon: "▶", color: "#00f0ff", label: "Mission lancée",   priority: "high" },
+  mission_started:   { icon: "▶", color: "#4ecdc4", label: "Mission lancée",   priority: "high" },
   mission_completed: { icon: "✓", color: "#22c55e", label: "Mission terminée", priority: "high" },
   mission_failed:    { icon: "✗", color: "#ef4444", label: "Mission échouée",  priority: "high" },
-  agent_status:      { icon: "◎", color: "#a855f7", label: "Statut agent",     priority: "low"  },
+  agent_status:      { icon: "◎", color: "#6c5ce7", label: "Statut agent",     priority: "low"  },
   tool_called:       { icon: "⚡", color: "#f59e0b", label: "Outil appelé",    priority: "low"  },
-  achievement:       { icon: "◆", color: "#eab308", label: "Succès",           priority: "high" },
+  achievement:       { icon: "◆", color: "#ff6b35", label: "Succès",           priority: "high" },
   system:            { icon: "◈", color: "#6b7280", label: "Système",          priority: "low"  },
   connection:        { icon: "◉", color: "#22c55e", label: "Connexion",        priority: "medium"},
 };

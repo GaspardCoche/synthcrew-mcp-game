@@ -5,9 +5,9 @@ const MAP_SIZE = 140;
 const WORLD_RANGE = 80;
 
 const ZONES = [
-  { key: "hub",      x: 0,   z: -8,  color: "#eab308", label: "Hub" },
-  { key: "data",     x: -35, z: -28, color: "#00f0ff", label: "Data" },
-  { key: "analysis", x: 32,  z: -35, color: "#a855f7", label: "Analyse" },
+  { key: "hub",      x: 0,   z: -8,  color: "#ff6b35", label: "Hub" },
+  { key: "data",     x: -35, z: -28, color: "#4ecdc4", label: "Data" },
+  { key: "analysis", x: 32,  z: -35, color: "#6c5ce7", label: "Analyse" },
   { key: "archive",  x: -28, z: -52, color: "#f59e0b", label: "Archive" },
   { key: "comms",    x: 42,  z: -18, color: "#22c55e", label: "Comms" },
   { key: "phantom",  x: 18,  z: -58, color: "#ef4444", label: "Phantom" },
@@ -33,7 +33,7 @@ export default function Minimap() {
       >
         <div className="absolute inset-0 opacity-20"
           style={{
-            backgroundImage: "radial-gradient(circle at 50% 50%, rgba(0,240,255,0.15) 0%, transparent 70%)",
+            backgroundImage: "radial-gradient(circle at 50% 50%, rgba(78,205,196,0.15) 0%, transparent 70%)",
           }}
         />
         <svg width={MAP_SIZE} height={MAP_SIZE} className="absolute inset-0">

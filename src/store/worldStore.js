@@ -9,13 +9,13 @@ import { persist } from "zustand/middleware";
 
 const ZONE_IDS = ["hub", "data", "analysis", "archive", "comms", "phantom", "forge"];
 const AGENT_ZONE_MAP = {
-  CONDUCTOR: "hub",
-  SENTINEL: "data",
-  CIPHER: "analysis",
-  ARCHIVIST: "archive",
-  HERALD: "comms",
-  PHANTOM: "phantom",
-  FORGE: "forge",
+  NEXUS: "hub",
+  DATAFLOW: "data",
+  PRISME: "analysis",
+  SCRIBE: "archive",
+  SIGNAL: "comms",
+  SPIDER: "phantom",
+  CODEFORGE: "forge",
 };
 
 const MISSIONS_TO_UNLOCK = {

@@ -5,13 +5,13 @@
 import { getTerrainHeightAt } from "../scenes/Terrain";
 
 export const AGENT_ZONES = {
-  CONDUCTOR: { x: 0,    z: -8,   patrolRadius: 6   },
-  SENTINEL:  { x: -35,  z: -26,  patrolRadius: 7   },
-  CIPHER:    { x: 30,   z: -34,  patrolRadius: 6   },
-  ARCHIVIST: { x: -28,  z: -50,  patrolRadius: 6   },
-  HERALD:    { x: 42,   z: -18,  patrolRadius: 6   },
-  PHANTOM:   { x: 18,   z: -56,  patrolRadius: 5   },
-  FORGE:     { x: -15,  z: -62,  patrolRadius: 6   },
+  NEXUS:     { x: 0,    z: -8,   patrolRadius: 6   },
+  DATAFLOW:  { x: -35,  z: -26,  patrolRadius: 7   },
+  PRISME:    { x: 30,   z: -34,  patrolRadius: 6   },
+  SCRIBE:    { x: -28,  z: -50,  patrolRadius: 6   },
+  SIGNAL:    { x: 42,   z: -18,  patrolRadius: 6   },
+  SPIDER:    { x: 18,   z: -56,  patrolRadius: 5   },
+  CODEFORGE: { x: -15,  z: -62,  patrolRadius: 6   },
 };
 
 const FALLBACK_ZONES = Object.values(AGENT_ZONES);

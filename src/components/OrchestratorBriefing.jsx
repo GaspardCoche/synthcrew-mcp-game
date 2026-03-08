@@ -132,7 +132,7 @@ export default function OrchestratorBriefing({ onComplete, onSkip }) {
       <div className="flex items-center gap-3">
         <span className="text-3xl">🎯</span>
         <div>
-          <h3 className="font-orbitron text-sm font-bold text-synth-cyan">Brief CONDUCTOR</h3>
+          <h3 className="font-orbitron text-sm font-bold text-synth-cyan">Brief NEXUS</h3>
           <p className="font-jetbrains text-xs text-gray-500">L'orchestrateur pose quelques questions pour proposer l'équipe la plus pertinente.</p>
         </div>
       </div>

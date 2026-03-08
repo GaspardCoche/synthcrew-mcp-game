@@ -31,7 +31,7 @@ export default function AgentOverlay({ agent, onClose }) {
 
   if (!agent) return null;
 
-  const color = agent.color || "#00f0ff";
+  const color = agent.color || "#4ecdc4";
   const statusInfo = STATUS_LABELS[agent.status] || STATUS_LABELS.idle;
   const healthPct = Math.round((health ?? 1) * 100);
 

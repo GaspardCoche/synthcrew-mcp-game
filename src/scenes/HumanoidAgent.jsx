@@ -10,23 +10,23 @@ import { useWorldStore } from "../store/worldStore";
 import { agentCollidersRef } from "../lib/agentColliders";
 
 const AGENT_MODELS = {
-  CONDUCTOR:  "/models/agents/Mech_FinnTheFrog.gltf",
-  SENTINEL:   "/models/agents/George.gltf",
-  CIPHER:     "/models/agents/Leela.gltf",
-  ARCHIVIST:  "/models/agents/Stan.gltf",
-  HERALD:     "/models/agents/Mike.gltf",
-  PHANTOM:    "/models/agents/Mech_RaeTheRedPanda.gltf",
-  FORGE:      "/models/agents/Mech_BarbaraTheBee.gltf",
+  NEXUS:     "/models/agents/Mech_FinnTheFrog.gltf",
+  DATAFLOW:  "/models/agents/George.gltf",
+  PRISME:    "/models/agents/Leela.gltf",
+  SCRIBE:    "/models/agents/Stan.gltf",
+  SIGNAL:    "/models/agents/Mike.gltf",
+  SPIDER:    "/models/agents/Mech_RaeTheRedPanda.gltf",
+  CODEFORGE: "/models/agents/Mech_BarbaraTheBee.gltf",
 };
 
 const AGENT_COLORS = {
-  CONDUCTOR: "#eab308",
-  SENTINEL:  "#00f0ff",
-  CIPHER:    "#a855f7",
-  ARCHIVIST: "#f59e0b",
-  HERALD:    "#22c55e",
-  PHANTOM:   "#ef4444",
-  FORGE:     "#ec4899",
+  NEXUS:     "#ff6b35",
+  DATAFLOW:  "#6c5ce7",
+  PRISME:    "#74b9ff",
+  SCRIBE:    "#ffd93d",
+  SIGNAL:    "#00b894",
+  SPIDER:    "#ff6b6b",
+  CODEFORGE: "#fd79a8",
 };
 
 // Paramètres de patrouille selon le statut (sick = ralenti même si active/error)
@@ -146,12 +146,13 @@ function StatusBadge({ status, color }) {
 }
 
 const AGENT_GREETINGS = {
-  SENTINEL:  "Je surveille les flux de données. Besoin d'une analyse ?",
-  CIPHER:    "Patterns détectés. Je peux déchiffrer tes données.",
-  ARCHIVIST: "Toute la mémoire du système est ici. Que cherches-tu ?",
-  HERALD:    "Canaux de communication ouverts. Prêt à transmettre.",
-  PHANTOM:   "En mode furtif. Je gère les opérations sensibles.",
-  FORGE:     "L'atelier est prêt. On construit quelque chose ?",
+  NEXUS:     "Centre de commande opérationnel. Je coordonne l'équipe.",
+  DATAFLOW:  "Flux de données stables. Besoin d'un pipeline ?",
+  PRISME:    "Analyse multi-angle activée. Que veux-tu comprendre ?",
+  SCRIBE:    "Prêt à documenter. Rapport, synthèse ou wiki ?",
+  SIGNAL:    "Canaux ouverts. Slack, mail ou notification ?",
+  SPIDER:    "En veille sur le web. Quelle info cherches-tu ?",
+  CODEFORGE: "Atelier code actif. PR, deploy ou review ?",
 };
 
 function ProximityBubble({ agentName, color }) {

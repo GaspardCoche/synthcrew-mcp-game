@@ -48,18 +48,18 @@ export default function ProgressionHUD({ onAchievement }) {
           />
           <defs>
             <linearGradient id="xp-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#c9a227" />
-              <stop offset="100%" stopColor="#00e5cc" />
+              <stop offset="0%" stopColor="#ff6b35" />
+              <stop offset="100%" stopColor="#4ecdc4" />
             </linearGradient>
           </defs>
         </svg>
-        <span className="text-sm font-bold text-synth-copper font-mono relative z-10">{stats.level ?? 1}</span>
+        <span className="text-sm font-bold text-synth-primary font-mono relative z-10">{stats.level ?? 1}</span>
       </div>
       <div>
         <div className="flex items-center gap-2">
           <p className="text-[9px] text-gray-400 font-mono">{stats.totalMissions ?? 0} missions</p>
           {(stats.streak ?? 0) > 0 && (
-            <span className="text-[9px] text-synth-copper font-mono font-bold flex items-center gap-0.5">
+            <span className="text-[9px] text-synth-primary font-mono font-bold flex items-center gap-0.5">
               <span className="text-xs">🔥</span>{stats.streak}
             </span>
           )}

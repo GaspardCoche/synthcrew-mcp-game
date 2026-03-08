@@ -71,7 +71,7 @@ export default function VueCarte({ onBackTo3D }) {
                 {recentLog.map((entry, i) => (
                   <li key={i} className="flex gap-2 items-start border-b border-white/5 pb-2 last:border-0">
                     <span className="text-gray-500 shrink-0">{entry.time}</span>
-                    <span className="font-semibold shrink-0" style={{ color: entry.agent === "SYSTÈME" ? "#00f0ff" : "#a855f7" }}>
+                    <span className="font-semibold shrink-0" style={{ color: entry.agent === "SYSTÈME" ? "#4ecdc4" : "#6c5ce7" }}>
                       {entry.agent}
                     </span>
                     <span className="text-gray-400">{entry.action}</span>

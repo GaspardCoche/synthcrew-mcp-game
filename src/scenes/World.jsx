@@ -9,15 +9,16 @@ import WorldIndicators from "./WorldIndicators";
 import { useWorldStore } from "../store/worldStore";
 import { getAgentHome, getAgentPatrolRadius } from "../lib/agentZones";
 import ClearAgentColliders from "./ClearAgentColliders";
+import NatureDecor from "./NatureDecor";
 
 const AGENT_COLORS = {
-  CONDUCTOR: "#eab308",
-  SENTINEL: "#00f0ff",
-  CIPHER: "#a855f7",
-  ARCHIVIST: "#f59e0b",
-  HERALD: "#22c55e",
-  PHANTOM: "#ef4444",
-  FORGE: "#ec4899",
+  NEXUS: "#ff6b35",
+  DATAFLOW: "#6c5ce7",
+  PRISME: "#74b9ff",
+  SCRIBE: "#ffd93d",
+  SIGNAL: "#00b894",
+  SPIDER: "#ff6b6b",
+  CODEFORGE: "#fd79a8",
 };
 
 export default function World({
@@ -29,7 +30,7 @@ export default function World({
 }) {
   const agentsWithPositions = useMemo(() => {
     if (agents.length === 0) {
-      const names = ["SENTINEL", "CIPHER", "ARCHIVIST", "HERALD", "PHANTOM", "FORGE"];
+      const names = ["DATAFLOW", "PRISME", "SCRIBE", "SIGNAL", "SPIDER", "CODEFORGE"];
       return names.map((name, i) => ({
         id: String(i + 1),
         name,
@@ -42,8 +43,8 @@ export default function World({
       const sameNameIndex = agents.slice(0, i).filter((b) => b.name === a.name).length;
       return {
         ...a,
-        position: getAgentHome(a.name ?? "CONDUCTOR", sameNameIndex),
-        patrolRadius: getAgentPatrolRadius(a.name ?? "CONDUCTOR"),
+        position: getAgentHome(a.name ?? "NEXUS", sameNameIndex),
+        patrolRadius: getAgentPatrolRadius(a.name ?? "NEXUS"),
       };
     });
   }, [agents]);
@@ -84,11 +85,11 @@ export default function World({
       />
       <directionalLight position={[-30, 20, -20]} intensity={0.15} color="#e0e7ff" />
       <pointLight position={[-15, 4, -10]} color="#f59e0b" intensity={0.08} distance={35} decay={2} />
-      <pointLight position={[18, 4, -8]} color="#00f0ff" intensity={0.06} distance={35} decay={2} />
-      <pointLight position={[0, 3, -15]} color="#a855f7" intensity={0.04} distance={40} decay={2} />
+      <pointLight position={[18, 4, -8]} color="#4ecdc4" intensity={0.06} distance={35} decay={2} />
+      <pointLight position={[0, 3, -15]} color="#6c5ce7" intensity={0.04} distance={40} decay={2} />
 
-      <Sparkles count={200} scale={[80, 20, 80]} color="#00f0ff" size={1} opacity={0.28} />
-      <Sparkles count={120} scale={[60, 15, 60]} color="#a855f7" size={0.7} opacity={0.2} />
+      <Sparkles count={200} scale={[80, 20, 80]} color="#4ecdc4" size={1} opacity={0.28} />
+      <Sparkles count={120} scale={[60, 15, 60]} color="#6c5ce7" size={0.7} opacity={0.2} />
       <Sparkles count={80} scale={[50, 12, 50]} color="#fbbf24" size={0.5} opacity={0.15} />
       <Sparkles count={150} scale={[90, 8, 90]} color="#6b7280" size={0.4} opacity={0.12} />
 
@@ -97,6 +98,7 @@ export default function World({
       <WorldDetails />
       <WorldIndicators />
       <ClearAgentColliders />
+      <NatureDecor />
 
       <GuideAgent onClick={onGuideClick} selected={guideSelected} />
 

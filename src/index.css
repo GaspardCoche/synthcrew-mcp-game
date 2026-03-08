@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,50 +10,50 @@
 
 body {
   margin: 0;
-  background: #080a10;
-  font-family: "JetBrains Mono", monospace;
+  background: #080c15;
+  font-family: "Exo 2", "JetBrains Mono", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #e2e6eb;
+  color: #dfe6e9;
 }
 
-/* ── SynthCrew identité : Colonie (cuivre + teal) ───────────────────────── */
+/* ── SynthCrew Identity : Orbital Station ────────────────────── */
 .synth-panel {
-  background: linear-gradient(160deg, rgba(12,14,22,0.97), rgba(8,10,16,0.99));
-  border: 1px solid rgba(201,162,39,0.12);
-  border-left: 3px solid rgba(201,162,39,0.5);
+  background: linear-gradient(160deg, rgba(12,16,32,0.97), rgba(8,12,21,0.99));
+  border: 1px solid rgba(255,107,53,0.12);
+  border-left: 3px solid rgba(255,107,53,0.5);
   border-radius: 0 10px 10px 0;
   box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 .synth-panel-neutral {
-  background: rgba(12,14,22,0.8);
+  background: rgba(12,16,32,0.8);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
 }
 .synth-header-bar {
-  background: linear-gradient(180deg, rgba(10,12,18,0.98), rgba(8,10,16,0.98));
-  border-bottom: 1px solid rgba(201,162,39,0.15);
-  box-shadow: 0 1px 0 rgba(201,162,39,0.06);
+  background: linear-gradient(180deg, rgba(10,14,23,0.98), rgba(8,12,21,0.98));
+  border-bottom: 1px solid rgba(255,107,53,0.15);
+  box-shadow: 0 1px 0 rgba(255,107,53,0.06);
 }
 .synth-nav-item {
   border-left: 3px solid transparent;
   border-radius: 0 8px 8px 0;
 }
 .synth-nav-item.active {
-  border-left-color: #c9a227;
-  background: rgba(201,162,39,0.06);
-  color: #c9a227;
+  border-left-color: #ff6b35;
+  background: rgba(255,107,53,0.06);
+  color: #ff6b35;
 }
 .synth-logo-accent {
-  background: linear-gradient(135deg, #c9a227, #00e5cc);
-  color: #080a10;
+  background: linear-gradient(135deg, #ff6b35, #4ecdc4);
+  color: #080c15;
   font-weight: 900;
 }
 .synth-title-text {
   font-family: "Orbitron", monospace;
   font-weight: 800;
   letter-spacing: 0.2em;
-  background: linear-gradient(90deg, #c9a227, #00e5cc, #c9a227);
+  background: linear-gradient(90deg, #ff6b35, #4ecdc4, #ff6b35);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -61,8 +61,8 @@ body {
 }
 .synth-grid-bg {
   background-image:
-    linear-gradient(rgba(201,162,39,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,162,39,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255,107,53,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,107,53,0.02) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -78,7 +78,7 @@ body {
 
 /* ── Quest Panel ────────────────────────────────── */
 .quest-panel {
-  background: linear-gradient(135deg, rgba(13,15,24,0.9), rgba(6,7,12,0.9));
+  background: linear-gradient(135deg, rgba(13,17,28,0.9), rgba(6,9,16,0.9));
   border: 1px solid rgba(212,165,116,0.15);
   border-radius: 12px;
   position: relative;
@@ -101,32 +101,40 @@ body {
 }
 
 /* ── Glow Text ──────────────────────────────────── */
+.glow-primary {
+  color: #ff6b35;
+  text-shadow: 0 0 12px rgba(255,107,53,0.5);
+}
+.glow-teal {
+  color: #4ecdc4;
+  text-shadow: 0 0 12px rgba(78,205,196,0.5);
+}
 .glow-cyan {
-  color: #00f0ff;
-  text-shadow: 0 0 12px rgba(0,240,255,0.5);
+  color: #4ecdc4;
+  text-shadow: 0 0 12px rgba(78,205,196,0.5);
 }
 .glow-purple {
-  color: #a855f7;
-  text-shadow: 0 0 12px rgba(168,85,247,0.5);
+  color: #6c5ce7;
+  text-shadow: 0 0 12px rgba(108,92,231,0.5);
 }
 .glow-amber {
-  color: #f59e0b;
-  text-shadow: 0 0 12px rgba(245,158,11,0.4);
+  color: #ffd93d;
+  text-shadow: 0 0 12px rgba(255,217,61,0.4);
 }
 .glow-gold {
-  color: #eab308;
-  text-shadow: 0 0 12px rgba(234,179,8,0.4);
+  color: #ffd93d;
+  text-shadow: 0 0 12px rgba(255,217,61,0.4);
 }
 
 /* ── Gradient Text ──────────────────────────────── */
 .gradient-text-synthcrew {
-  background: linear-gradient(90deg, #00f0ff, #a855f7);
+  background: linear-gradient(90deg, #ff6b35, #4ecdc4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .gradient-text-quest {
-  background: linear-gradient(90deg, #d4a574, #f59e0b);
+  background: linear-gradient(90deg, #d4a574, #ffd93d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -179,10 +187,10 @@ body {
   transition: background 0.15s;
 }
 .log-entry:hover { background: rgba(255,255,255,0.02); }
-.log-entry.tool_call  { border-color: #f59e0b; }
-.log-entry.output     { border-color: #22c55e; }
-.log-entry.thinking   { border-color: #a855f7; }
-.log-entry.error      { border-color: #ef4444; }
+.log-entry.tool_call  { border-color: #ffd93d; }
+.log-entry.output     { border-color: #00b894; }
+.log-entry.thinking   { border-color: #6c5ce7; }
+.log-entry.error      { border-color: #ff6b6b; }
 
 /* ── XP Bar ─────────────────────────────────────── */
 .xp-bar {
@@ -251,7 +259,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 50%, rgba(0,240,255,0.01) 50%);
+  background: linear-gradient(transparent 50%, rgba(78,205,196,0.01) 50%);
   background-size: 100% 4px;
   animation: scanline-move 8s linear infinite;
   pointer-events: none;
