@@ -55,9 +55,11 @@ export default function AgentOverlay({ agent, onClose }) {
       if (data.error) {
         setChatMessages((prev) => [...prev, { from: agent.name, text: `Erreur : ${data.error}`, error: true }]);
       } else {
+        const engineTag = data.engine === "claude" ? "[Claude]" : "[Simulation]";
         setChatMessages((prev) => [...prev, {
           from: agent.name,
-          text: data.result || data.message || "Mission lancée. Suivez la progression dans le terminal CLI.",
+          text: `${engineTag} ${data.message || "Mission lancée. Suivez la progression dans l'Ops Room."}`,
+          engine: data.engine,
         }]);
       }
     } catch {
@@ -175,9 +177,16 @@ export default function AgentOverlay({ agent, onClose }) {
                     : "border rounded-bl-sm text-gray-300"
               }`} style={msg.from !== "user" && !msg.error ? { borderColor: `${color}20`, background: `${color}06` } : {}}>
                 {msg.from !== "user" && (
-                  <p className="text-[8px] font-mono font-bold mb-1" style={{ color: msg.error ? "#ff6b6b" : color }}>
-                    {msg.from}
-                  </p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[8px] font-mono font-bold" style={{ color: msg.error ? "#ff6b6b" : color }}>
+                      {msg.from}
+                    </span>
+                    {msg.engine && (
+                      <span className={`text-[7px] font-mono px-1 py-0.5 rounded ${msg.engine === "claude" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"}`}>
+                        {msg.engine === "claude" ? "CLAUDE" : "SIM"}
+                      </span>
+                    )}
+                  </div>
                 )}
                 {msg.text}
               </div>

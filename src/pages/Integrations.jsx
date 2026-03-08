@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useStore } from "../store/useStore";
 
 function getApiBase() {
   if (typeof window === "undefined") return "";
@@ -12,6 +13,76 @@ function getCurlExample(base) {
   -d '{"prompt": "Ta mission ici", "source": "claude-cli", "autoRun": true}'`;
 }
 
+function ServiceStatusPanel() {
+  const [services, setServices] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/services")
+      .then((r) => r.json())
+      .then(setServices)
+      .catch(() => setServices(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-[10px] font-mono text-gray-600">Chargement des services...</div>;
+  if (!services) return <div className="text-[10px] font-mono text-red-400">Impossible de charger les services</div>;
+
+  const svcList = services.services || [];
+  const toolList = services.tools || [];
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {svcList.map((svc) => (
+          <div
+            key={svc.name || svc}
+            className="rounded-lg p-2.5"
+            style={{
+              background: svc.configured ? "rgba(0,255,136,0.04)" : "rgba(255,255,255,0.02)",
+              border: `1px solid ${svc.configured ? "rgba(0,255,136,0.15)" : "rgba(255,255,255,0.06)"}`,
+            }}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{
+                  background: svc.configured ? "#00ff88" : "#374151",
+                  boxShadow: svc.configured ? "0 0 4px #00ff88" : "none",
+                }}
+              />
+              <span className="text-[9px] font-mono font-bold" style={{ color: svc.configured ? "#00ff88" : "#374151" }}>
+                {(svc.name || svc).toUpperCase()}
+              </span>
+            </div>
+            <div className="text-[8px] font-mono" style={{ color: "#374151" }}>
+              {svc.configured ? "Configuré" : "Non configuré"}
+            </div>
+          </div>
+        ))}
+      </div>
+      {toolList.length > 0 && (
+        <div>
+          <div className="text-[8px] font-mono font-bold tracking-wider mb-1.5" style={{ color: "rgba(0,245,255,0.35)" }}>
+            OUTILS DISPONIBLES ({toolList.length})
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {toolList.map((t) => (
+              <span
+                key={t}
+                className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                style={{ background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.12)", color: "rgba(168,85,247,0.6)" }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Integrations() {
   const [copied, setCopied] = useState(null);
   const [testResult, setTestResult] = useState(null);
@@ -19,6 +90,7 @@ export default function Integrations() {
   const [cliPrompt, setCliPrompt] = useState("");
   const [cliResult, setCliResult] = useState(null);
   const [cliSending, setCliSending] = useState(false);
+  const mcps = useStore((s) => s.mcps);
   const base = getApiBase();
   const curlExample = getCurlExample(base);
 
@@ -124,6 +196,44 @@ export default function Integrations() {
             ) : (
               <>✗ Erreur — {testResult.error || `HTTP ${testResult.status}`}</>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* Services & MCP Status */}
+      <div className="rounded-xl border border-synth-border bg-synth-panel p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="font-jetbrains text-xs font-bold text-gray-400 tracking-wide">Services & Outils (MCP)</label>
+          <span className="text-[8px] font-mono text-gray-600">{mcps?.filter((m) => m.connected).length || 0} MCP actifs</span>
+        </div>
+        <ServiceStatusPanel />
+        {mcps && mcps.length > 0 && (
+          <div className="pt-3 space-y-2" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+            <div className="text-[8px] font-mono font-bold tracking-wider" style={{ color: "rgba(0,245,255,0.35)" }}>
+              MCP SERVERS ({mcps.length})
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {mcps.map((mcp) => (
+                <div
+                  key={mcp.id}
+                  className="rounded-lg p-2"
+                  style={{
+                    background: mcp.connected ? "rgba(0,245,255,0.04)" : "rgba(255,255,255,0.02)",
+                    border: `1px solid ${mcp.connected ? "rgba(0,245,255,0.15)" : "rgba(255,255,255,0.06)"}`,
+                  }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">{mcp.icon || "⬡"}</span>
+                    <span className="text-[9px] font-mono font-bold" style={{ color: mcp.connected ? "#00f5ff" : "#374151" }}>
+                      {mcp.name}
+                    </span>
+                  </div>
+                  <div className="text-[8px] font-mono mt-0.5" style={{ color: "#374151" }}>
+                    {mcp.tools?.length || 0} tools
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
