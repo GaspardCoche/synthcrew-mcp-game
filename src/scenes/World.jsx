@@ -30,10 +30,12 @@ export default function World({
 }) {
   const agentsWithPositions = useMemo(() => {
     if (agents.length === 0) {
-      const names = ["DATAFLOW", "PRISME", "SCRIBE", "SIGNAL", "SPIDER", "CODEFORGE"];
+      const names = ["NEXUS", "DATAFLOW", "PRISME", "SCRIBE", "SIGNAL", "SPIDER", "CODEFORGE"];
       return names.map((name, i) => ({
-        id: String(i + 1),
+        id: String(i),
         name,
+        role: ["orchestrator", "data_ops", "analyst", "writer", "communicator", "scraper", "developer"][i],
+        status: "idle",
         position: getAgentHome(name, 0),
         patrolRadius: getAgentPatrolRadius(name),
         color: AGENT_COLORS[name],
@@ -102,9 +104,9 @@ export default function World({
 
       <GuideAgent onClick={onGuideClick} selected={guideSelected} />
 
-      {agentsWithPositions.map((agent) => (
+      {agentsWithPositions.map((agent, i) => (
         <HumanoidAgent
-          key={agent.id || agent.name}
+          key={`${agent.id ?? agent.name}-${i}`}
           agent={agent}
           onClick={onSelectAgent}
           selected={selectedAgent?.id === agent.id || selectedAgent?.name === agent.name}
