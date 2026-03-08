@@ -1,6 +1,6 @@
 import { Suspense, useState, useEffect, useCallback, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, Vignette, ChromaticAberration } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
 import { KeyboardControls, Preload } from "@react-three/drei";
 import { buildKeyboardMap } from "./store/controlsStore";
@@ -168,17 +168,17 @@ export default function AppImmersive() {
       ) : (
       <Suspense fallback={<Loader />}>
         <Canvas
-          shadows="soft"
-          camera={{ position: [0, 2, 18], fov: 60, near: 0.1, far: 350 }}
+          shadows
+          camera={{ position: [0, 2, 18], fov: 60, near: 0.5, far: 200 }}
           gl={{
-            antialias: true,
+            antialias: false,
             alpha: false,
             powerPreference: "high-performance",
             stencil: false,
             depth: true,
           }}
-          performance={{ min: 0.5 }}
-          dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+          performance={{ min: 0.3 }}
+          dpr={[1, 1.5]}
         >
           <World
             agents={agents}
@@ -192,10 +192,9 @@ export default function AppImmersive() {
             onUnlock={() => setPointerLocked(false)}
             enabled={true}
           />
-          <EffectComposer>
-            <Bloom intensity={0.45} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur />
-            <Vignette offset={0.3} darkness={0.55} blendFunction={BlendFunction.NORMAL} />
-            <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0005, 0.0005]} />
+          <EffectComposer multisampling={0}>
+            <Bloom intensity={0.3} luminanceThreshold={0.3} luminanceSmoothing={0.9} mipmapBlur />
+            <Vignette offset={0.3} darkness={0.5} blendFunction={BlendFunction.NORMAL} />
           </EffectComposer>
           <Preload all />
         </Canvas>

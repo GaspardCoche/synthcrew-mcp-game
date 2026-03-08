@@ -16,7 +16,10 @@ export default defineConfig({
         chunkFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash][extname]",
         manualChunks: {
-          "three-vendor": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "postprocessing"],
+          "three-core": ["three"],
+          "three-r3f": ["@react-three/fiber", "@react-three/drei"],
+          "three-fx": ["@react-three/postprocessing", "postprocessing"],
+          "vendor": ["react", "react-dom", "zustand"],
         },
       },
     },

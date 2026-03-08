@@ -74,7 +74,7 @@ export default function World({
         intensity={0.9}
         color="#ffe8d0"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-far={200}
         shadow-camera-left={-80}
         shadow-camera-right={80}

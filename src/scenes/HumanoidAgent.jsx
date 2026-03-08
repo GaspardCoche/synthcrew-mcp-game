@@ -6,15 +6,16 @@ import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 import { agentCollidersRef } from "../lib/agentColliders";
 import { AGENT_ROLE_LABELS } from "../lib/constants";
+import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 
-const AGENT_MODELS = {
-  NEXUS:     "/models/agents/Mech_FinnTheFrog.gltf",
-  DATAFLOW:  "/models/agents/George.gltf",
-  PRISME:    "/models/agents/Leela.gltf",
-  SCRIBE:    "/models/agents/Stan.gltf",
-  SIGNAL:    "/models/agents/Mike.gltf",
-  SPIDER:    "/models/agents/Mech_RaeTheRedPanda.gltf",
-  CODEFORGE: "/models/agents/Mech_BarbaraTheBee.gltf",
+const AGENT_MODEL_CONFIG = {
+  NEXUS:     { path: "/models/agents/Mech_FinnTheFrog.gltf",   nativeH: 3.1, targetH: 1.7 },
+  DATAFLOW:  { path: "/models/agents/George.gltf",              nativeH: 6.5, targetH: 1.7 },
+  PRISME:    { path: "/models/agents/Leela.gltf",               nativeH: 5.3, targetH: 1.65 },
+  SCRIBE:    { path: "/models/agents/Stan.gltf",                nativeH: 6.5, targetH: 1.7 },
+  SIGNAL:    { path: "/models/agents/Mike.gltf",                nativeH: 5.3, targetH: 1.65 },
+  SPIDER:    { path: "/models/agents/Mech_RaeTheRedPanda.gltf", nativeH: 3.1, targetH: 1.7 },
+  CODEFORGE: { path: "/models/agents/Mech_BarbaraTheBee.gltf",  nativeH: 3.0, targetH: 1.7 },
 };
 
 const AGENT_COLORS = {
@@ -50,8 +51,8 @@ function FallbackAgent({ color, selected, sick }) {
   const mat = <meshStandardMaterial color={color} emissive={color} emissiveIntensity={(selected ? 0.7 : 0.3) * dim} roughness={sick ? 0.6 : 0.3} metalness={0.6} />;
   return (
     <group ref={ref} scale={[0.85, 0.85, 0.85]}>
-      <mesh position={[0, 1.4, 0]} castShadow><sphereGeometry args={[0.21, 16, 16]} />{mat}</mesh>
-      <mesh position={[0, 0.9, 0]} castShadow><capsuleGeometry args={[0.23, 0.55, 8, 16]} />{mat}</mesh>
+      <mesh position={[0, 1.4, 0]} castShadow><sphereGeometry args={[0.21, 12, 12]} />{mat}</mesh>
+      <mesh position={[0, 0.9, 0]} castShadow><capsuleGeometry args={[0.23, 0.55, 6, 12]} />{mat}</mesh>
       <mesh position={[-0.13, 0.33, 0]} castShadow><capsuleGeometry args={[0.08, 0.42, 4, 8]} />{mat}</mesh>
       <mesh position={[0.13, 0.33, 0]} castShadow><capsuleGeometry args={[0.08, 0.42, 4, 8]} />{mat}</mesh>
       <mesh position={[-0.4, 0.98, 0]} rotation={[0, 0, Math.PI / 2 + 0.12]} castShadow><capsuleGeometry args={[0.06, 0.33, 4, 8]} />{mat}</mesh>
@@ -60,23 +61,28 @@ function FallbackAgent({ color, selected, sick }) {
   );
 }
 
-function GltfAgent({ modelPath, color, selected, sick }) {
-  const { scene } = useGLTF(modelPath);
-  const clone = useMemo(() => scene.clone(), [scene]);
+function GltfAgent({ agentName, color, selected, sick }) {
+  const cfg = AGENT_MODEL_CONFIG[agentName];
+  if (!cfg) return <FallbackAgent color={color} selected={selected} sick={sick} />;
+
+  const { scene } = useGLTF(cfg.path);
+  const modelClone = useMemo(() => cloneSkeleton(scene), [scene]);
   const groupRef = useRef();
+  const modelScale = cfg.targetH / cfg.nativeH;
 
   useThrottledFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
-    const breathe = Math.sin(t * 1.5) * 0.0003;
-    groupRef.current.scale.set(0.013 + breathe, 0.013 + breathe * 0.5, 0.013 + breathe);
-    groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.02;
+    const breathe = Math.sin(t * 1.5) * 0.005 * modelScale;
+    const s = modelScale + breathe;
+    groupRef.current.scale.set(s, s, s);
+    groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.015;
   }, 20);
 
   return (
-    <group ref={groupRef} scale={[0.013, 0.013, 0.013]}>
-      <primitive object={clone} castShadow />
-      {selected && <pointLight position={[0, 50, 0]} color={color} intensity={3} distance={250} />}
+    <group ref={groupRef} scale={[modelScale, modelScale, modelScale]}>
+      <primitive object={modelClone} castShadow />
+      {selected && <pointLight position={[0, cfg.nativeH * 0.8, 0]} color={color} intensity={2} distance={8} />}
     </group>
   );
 }
@@ -90,34 +96,9 @@ function SickRing() {
   return (
     <group position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh ref={ref}>
-        <ringGeometry args={[0.5, 0.75, 32]} />
+        <ringGeometry args={[0.5, 0.75, 24]} />
         <meshBasicMaterial color="#ff6b6b" transparent opacity={0.5} />
       </mesh>
-    </group>
-  );
-}
-
-function SickParticles() {
-  const ref = useRef();
-  const offsets = useMemo(() => Array.from({ length: 5 }, () => [Math.random() * Math.PI * 2, Math.random() * 0.6 + 0.5]), []);
-  useThrottledFrame((state) => {
-    if (!ref.current) return;
-    const t = state.clock.elapsedTime;
-    ref.current.children.forEach((c, i) => {
-      const [phase, dist] = offsets[i];
-      c.position.y = 0.6 + Math.sin(t * 0.8 + phase) * 0.5;
-      c.position.x = Math.cos(t * 0.6 + phase) * dist;
-      c.position.z = Math.sin(t * 0.5 + phase * 1.3) * dist * 0.7;
-    });
-  });
-  return (
-    <group ref={ref}>
-      {offsets.map((_, i) => (
-        <mesh key={i}>
-          <sphereGeometry args={[0.045, 6, 6]} />
-          <meshBasicMaterial color="#ff6b6b" transparent opacity={0.6} />
-        </mesh>
-      ))}
     </group>
   );
 }
@@ -132,12 +113,8 @@ function SelectionRing({ color }) {
   return (
     <group position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh ref={ref}>
-        <ringGeometry args={[0.62, 0.82, 32]} />
+        <ringGeometry args={[0.62, 0.82, 24]} />
         <meshBasicMaterial color={color} transparent opacity={0.7} />
-      </mesh>
-      <mesh>
-        <ringGeometry args={[0.45, 0.52, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.3} />
       </mesh>
     </group>
   );
@@ -147,11 +124,11 @@ function AgentPlatform({ color, selected }) {
   return (
     <group position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh>
-        <circleGeometry args={[0.6, 32]} />
+        <circleGeometry args={[0.6, 24]} />
         <meshBasicMaterial color={color} transparent opacity={selected ? 0.15 : 0.06} />
       </mesh>
       <mesh>
-        <ringGeometry args={[0.55, 0.62, 32]} />
+        <ringGeometry args={[0.55, 0.62, 24]} />
         <meshBasicMaterial color={color} transparent opacity={selected ? 0.4 : 0.12} />
       </mesh>
     </group>
@@ -178,7 +155,6 @@ const AGENT_WORKING_PHRASES = {
   CODEFORGE: ["Review PR…", "Tests passés…", "Deploy en cours…", "Merge validé…"],
 };
 
-// Workstation positions — agent goes here when active
 const AGENT_WORKSTATIONS = {
   NEXUS:     [2,   0, -10],
   DATAFLOW:  [-37, 0, -28],
@@ -189,38 +165,33 @@ const AGENT_WORKSTATIONS = {
   CODEFORGE: [-17, 0, -64],
 };
 
-// Holographic workstation terminal
 function WorkstationTerminal({ color, active }) {
   const ref = useRef();
   const screenRef = useRef();
   useThrottledFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    if (ref.current) ref.current.rotation.y = Math.sin(t * 0.3) * 0.1;
+    ref.current.rotation.y = Math.sin(t * 0.3) * 0.1;
     if (screenRef.current) {
       screenRef.current.material.opacity = active ? 0.7 + Math.sin(t * 8) * 0.15 : 0.2;
     }
   }, 24);
   return (
     <group ref={ref} position={[0, 0, 0.8]}>
-      {/* Screen */}
       <mesh position={[0, 1.1, 0]} ref={screenRef}>
         <planeGeometry args={[0.6, 0.4]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} side={2} />
       </mesh>
-      {/* Frame */}
       <mesh position={[0, 1.1, -0.01]}>
         <planeGeometry args={[0.65, 0.45]} />
         <meshBasicMaterial color="#111" transparent opacity={0.9} side={2} />
       </mesh>
-      {/* Pillar */}
       <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.04, 0.06, 1.1, 8]} />
+        <cylinderGeometry args={[0.04, 0.06, 1.1, 6]} />
         <meshStandardMaterial color="#1a1a2e" metalness={0.8} roughness={0.2} />
       </mesh>
-      {/* Base */}
       <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.25, 0.3, 0.05, 12]} />
+        <cylinderGeometry args={[0.25, 0.3, 0.05, 8]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={active ? 0.4 : 0.1} metalness={0.6} roughness={0.3} />
       </mesh>
       {active && <pointLight position={[0, 1.1, 0.1]} color={color} intensity={0.4} distance={3} decay={2} />}
@@ -228,7 +199,6 @@ function WorkstationTerminal({ color, active }) {
   );
 }
 
-// Floating activity indicator (what the agent is doing right now)
 function ActivityBubble({ agentName, status, color }) {
   const phraseIdx = useRef(0);
   const [phrase, setPhrase] = useState("");
@@ -247,7 +217,7 @@ function ActivityBubble({ agentName, status, color }) {
   if (status !== "active" || !phrase) return null;
 
   return (
-    <Html position={[0, 4.2, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
+    <Html position={[0, 3.0, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
       <div
         className="px-2 py-1 rounded font-mono text-[9px] whitespace-nowrap animate-pulse"
         style={{
@@ -267,7 +237,7 @@ function ProximityBubble({ agentName, agentRole, color }) {
   const greeting = AGENT_GREETINGS[agentName] || "...";
   const roleLabel = AGENT_ROLE_LABELS[agentRole] || "";
   return (
-    <Html position={[0, 3.8, 0]} center distanceFactor={10} style={{ pointerEvents: "none" }}>
+    <Html position={[0, 2.8, 0]} center distanceFactor={10} style={{ pointerEvents: "none" }}>
       <div
         className="px-3 py-2 rounded-lg max-w-[200px] text-center animate-fade-in"
         style={{
@@ -287,9 +257,10 @@ function ProximityBubble({ agentName, agentRole, color }) {
 
 export default function HumanoidAgent({ agent, onClick, selected }) {
   const groupRef = useRef();
+  const isNearRef = useRef(false);
   const [isNear, setIsNear] = useState(false);
   const color = AGENT_COLORS[agent.name] || agent.color || "#888";
-  const modelPath = AGENT_MODELS[agent.name];
+  const modelCfg = AGENT_MODEL_CONFIG[agent.name];
   const home = agent.position || [0, 0, 0];
   const sick = useWorldStore((s) => s.isAgentSick(agent.name));
   const { camera } = useThree();
@@ -302,7 +273,6 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
   const isActive = agent.status === "active";
   const isQueued = agent.status === "queued";
 
-  // Workstation target when active
   const workstationBase = AGENT_WORKSTATIONS[agent.name];
   const workstationTarget = useMemo(() => {
     if (!workstationBase) return null;
@@ -320,24 +290,13 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
     if (!g) return;
     const t = state.clock.elapsedTime;
 
-    let tx, ty, tz;
-
     if (isActive && workstationTarget) {
-      // Move to workstation when active — smooth lerp
-      tx = workstationTarget[0];
-      tz = workstationTarget[2];
-      ty = workstationTarget[1];
-      // Working bob at workstation
-      ty += Math.sin(t * 4 + phase) * 0.03;
-      // Smooth approach
-      g.position.x += (tx - g.position.x) * 0.04;
+      const ty = workstationTarget[1] + Math.sin(t * 4 + phase) * 0.03;
+      g.position.x += (workstationTarget[0] - g.position.x) * 0.04;
       g.position.y += (ty - g.position.y) * 0.04;
-      g.position.z += (tz - g.position.z) * 0.04;
-      // Face the terminal
-      const targetAngle = Math.atan2(0, 1); // face forward
-      g.rotation.y += (targetAngle - g.rotation.y) * 0.05;
+      g.position.z += (workstationTarget[2] - g.position.z) * 0.04;
+      g.rotation.y += (0 - g.rotation.y) * 0.05;
     } else if (isQueued) {
-      // Move toward home but jitter nervously
       const nx = home[0] + Math.cos(t * cfg.speedX * 1.5 + phase) * cfg.radius * 0.4;
       const nz = home[2] + Math.sin(t * cfg.speedZ * 1.5 + phase * 0.7) * cfg.radius * 0.3;
       const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 3 + phase);
@@ -345,16 +304,13 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
       g.position.y += (ny - g.position.y) * 0.06;
       g.position.z += (nz - g.position.z) * 0.06;
     } else {
-      // Normal patrol
       const nx = home[0] + Math.cos(t * cfg.speedX + phase) * cfg.radius;
       const nz = home[2] + Math.sin(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65;
       const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 2.4 + phase);
-
       g.position.x = nx;
       g.position.y = ny;
       g.position.z = nz;
 
-      // Face direction of movement
       const vx = -Math.sin(t * cfg.speedX + phase) * cfg.radius * cfg.speedX;
       const vz = Math.cos(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65 * cfg.speedZ;
       if (Math.abs(vx) + Math.abs(vz) > 0.002) {
@@ -372,7 +328,10 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
     const dz = camera.position.z - currentZ;
     const dist = Math.sqrt(dx * dx + dz * dz);
     const near = dist < PROXIMITY_THRESHOLD;
-    if (near !== isNear) setIsNear(near);
+    if (near !== isNearRef.current) {
+      isNearRef.current = near;
+      setIsNear(near);
+    }
   });
 
   const handleClick = (e) => {
@@ -381,11 +340,7 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
   };
 
   return (
-    <group
-      ref={groupRef}
-      position={home}
-    >
-      {/* Invisible hit box for easier clicking */}
+    <group ref={groupRef} position={home}>
       <mesh
         visible={false}
         position={[0, HIT_BOX_HEIGHT / 2, 0]}
@@ -393,46 +348,46 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
         onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
         onPointerOut={() => { document.body.style.cursor = "default"; }}
       >
-        <cylinderGeometry args={[HIT_BOX_RADIUS, HIT_BOX_RADIUS, HIT_BOX_HEIGHT, 8]} />
+        <cylinderGeometry args={[HIT_BOX_RADIUS, HIT_BOX_RADIUS, HIT_BOX_HEIGHT, 6]} />
       </mesh>
 
       <AgentPlatform color={color} selected={selected} />
-
       {sick && <SickRing />}
-      {sick && <SickParticles />}
       {selected && <SelectionRing color={color} />}
 
-      {modelPath ? (
+      {modelCfg ? (
         <Suspense fallback={<FallbackAgent color={color} selected={selected} sick={sick} />}>
-          <GltfAgent modelPath={modelPath} color={color} selected={selected} sick={sick} />
+          <GltfAgent agentName={agent.name} color={color} selected={selected} sick={sick} />
         </Suspense>
       ) : (
         <FallbackAgent color={color} selected={selected} sick={sick} />
       )}
 
-      <pointLight color={sick ? "#ff6b6b" : isActive ? color : color} intensity={selected ? 1.4 : isActive ? 0.9 : sick ? 0.25 : 0.45} distance={isActive ? 8 : 5} decay={2} position={[0, 1.2, 0]} />
+      <pointLight
+        color={sick ? "#ff6b6b" : color}
+        intensity={selected ? 1.4 : isActive ? 0.9 : sick ? 0.25 : 0.45}
+        distance={isActive ? 8 : 5}
+        decay={2}
+        position={[0, 1.2, 0]}
+      />
 
-      <Billboard position={[0, 2.5, 0]}>
-        <Text fontSize={0.2} color={color} anchorX="center" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+      <Billboard position={[0, 2.2, 0]}>
+        <Text fontSize={0.18} color={color} anchorX="center" outlineWidth={0.015} outlineColor="#000000" fontWeight="bold">
           {agent.name}
         </Text>
       </Billboard>
 
-      <Billboard position={[0, 2.2, 0]}>
-        <Text fontSize={0.1} color={isActive ? "#4ade80" : "#9ca3af"} anchorX="center" outlineWidth={0.01} outlineColor="#000000">
+      <Billboard position={[0, 1.95, 0]}>
+        <Text fontSize={0.09} color={isActive ? "#4ade80" : "#9ca3af"} anchorX="center" outlineWidth={0.01} outlineColor="#000000">
           {isActive ? "● ACTIVE" : isQueued ? "◌ QUEUED" : (AGENT_ROLE_LABELS[agent.role] || "Agent")}
         </Text>
       </Billboard>
 
-      {/* Workstation terminal visible when active */}
       {isActive && <WorkstationTerminal color={color} active={isActive} />}
-
-      {/* Real-time activity bubble */}
       <ActivityBubble agentName={agent.name} status={agent.status} color={color} />
-
       {isNear && !selected && !isActive && <ProximityBubble agentName={agent.name} agentRole={agent.role} color={color} />}
     </group>
   );
 }
 
-Object.values(AGENT_MODELS).forEach((p) => useGLTF.preload(p));
+Object.values(AGENT_MODEL_CONFIG).forEach((cfg) => useGLTF.preload(cfg.path));
