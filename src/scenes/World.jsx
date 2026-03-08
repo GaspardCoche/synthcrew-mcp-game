@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Sparkles, Environment, Sky } from "@react-three/drei";
+import { Sparkles, Environment, Sky, Stars } from "@react-three/drei";
 import Terrain from "./Terrain";
 import Structures from "./Structures";
 import WorldDetails from "./WorldDetails";
@@ -66,9 +66,10 @@ export default function World({
         mieCoefficient={recentErrors > 0 ? 0.015 : 0.005}
         sunPosition={[80, 50, 60]}
       />
+      <Stars radius={200} depth={80} count={4000} factor={3} saturation={0.3} fade speed={0.8} />
       <Environment preset="sunset" environmentIntensity={0.5} environmentRotation={[0, Math.PI / 6, 0]} />
 
-      <ambientLight intensity={0.25} />
+      <ambientLight intensity={0.22} />
       <directionalLight
         position={[80, 70, 50]}
         intensity={1.1}

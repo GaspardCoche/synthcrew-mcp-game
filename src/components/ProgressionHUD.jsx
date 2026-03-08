@@ -35,22 +35,36 @@ export default function ProgressionHUD({ onAchievement }) {
 
   return (
     <div className="synth-panel px-3 py-2 flex items-center gap-3">
-      <div className="text-center">
-        <p className="text-[10px] text-gray-500 font-mono">NIV</p>
-        <p className="text-lg font-bold text-synth-copper font-mono">{stats.level ?? 1}</p>
-      </div>
-      <div className="w-24">
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-synth-copper to-synth-cyan rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
+      <div className="relative w-10 h-10 flex items-center justify-center">
+        <svg viewBox="0 0 36 36" className="w-10 h-10 absolute">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
+          <circle
+            cx="18" cy="18" r="15" fill="none"
+            stroke="url(#xp-grad)" strokeWidth="2.5"
+            strokeDasharray={`${progress * 0.94} 100`}
+            strokeLinecap="round"
+            transform="rotate(-90 18 18)"
+            className="transition-all duration-700"
           />
-        </div>
-        <p className="text-[9px] text-gray-500 mt-0.5 font-mono">{stats.totalMissions ?? 0} missions</p>
+          <defs>
+            <linearGradient id="xp-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#c9a227" />
+              <stop offset="100%" stopColor="#00e5cc" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span className="text-sm font-bold text-synth-copper font-mono relative z-10">{stats.level ?? 1}</span>
       </div>
-      <div className="flex items-center gap-1 text-synth-copper" title="Série de jours avec au moins une mission">
-        <span className="text-sm">🔥</span>
-        <span className="text-xs font-mono font-bold">{stats.streak ?? 0}</span>
+      <div>
+        <div className="flex items-center gap-2">
+          <p className="text-[9px] text-gray-400 font-mono">{stats.totalMissions ?? 0} missions</p>
+          {(stats.streak ?? 0) > 0 && (
+            <span className="text-[9px] text-synth-copper font-mono font-bold flex items-center gap-0.5">
+              <span className="text-xs">🔥</span>{stats.streak}
+            </span>
+          )}
+        </div>
+        <p className="text-[8px] text-gray-600 font-mono">{currentLevelXp}/{xpForLevel} XP</p>
       </div>
     </div>
   );

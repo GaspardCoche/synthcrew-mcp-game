@@ -21,6 +21,8 @@ import OnboardingOverlay from "./components/OnboardingOverlay";
 import ControlsHelp from "./components/ControlsHelp";
 import SettingsModal from "./components/SettingsModal";
 import VueCarte from "./components/VueCarte";
+import Crosshair from "./components/Crosshair";
+import Minimap from "./components/Minimap";
 import { hasDoneOnboarding } from "./lib/onboarding";
 import { BuildId } from "./components/BuildId";
 
@@ -106,23 +108,23 @@ export default function AppImmersive() {
         <p className="text-[10px] text-gray-600 font-jetbrains mt-0.5">WASD · Clique pour verrouiller · Échap pour libérer</p>
         <BuildId className="sm:inline mt-1" />
       </div>
-      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 items-end pointer-events-auto">
-        <a href="#/classic" className="font-jetbrains text-[10px] text-gray-500 hover:text-synth-copper transition-colors">
-          Tableau de bord →
+      <div className="absolute top-[165px] right-4 z-20 flex flex-col gap-1.5 items-end pointer-events-auto">
+        <a href="#/classic" className="font-jetbrains text-[9px] text-gray-500 hover:text-synth-copper transition-colors px-2 py-1 rounded border border-transparent hover:border-synth-copper/20">
+          Dashboard →
         </a>
-        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-synth-copper/40 text-synth-copper hover:bg-synth-copper-bg">
-          Lancer une mission
+        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-synth-copper/30 text-synth-copper hover:bg-synth-copper/10 transition-colors">
+          Mission
         </button>
-        <button type="button" onClick={() => setShowControlsHelp(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white">
-          Raccourcis
+        <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-white/15 text-gray-500 hover:text-white transition-colors">
+          {viewMode === "3d" ? "Carte" : "3D"}
         </button>
-        <button type="button" onClick={() => setShowSettings(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white" title="Réglages">
-          Réglages
-        </button>
-        <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-synth-copper/30 text-synth-copper hover:bg-synth-copper-bg">
-          {viewMode === "3d" ? "Vue carte" : "Vue 3D"}
+        <button type="button" onClick={() => setShowSettings(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-white/10 text-gray-600 hover:text-gray-400 transition-colors">
+          Cfg
         </button>
       </div>
+
+      <Crosshair visible={pointerLocked} />
+      {viewMode === "3d" && <Minimap />}
 
       <div className="absolute bottom-4 left-4 z-20 flex items-center gap-3 pointer-events-none">
         <ProgressionHUD onAchievement={setAchievementToast} />
@@ -162,19 +164,28 @@ export default function AppImmersive() {
             enabled={true}
           />
           <EffectComposer>
-            <Bloom intensity={0.35} luminanceThreshold={0.2} luminanceSmoothing={0.9} mipmapBlur />
-            <Vignette offset={0.35} darkness={0.45} blendFunction={BlendFunction.NORMAL} />
-            <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0004, 0.0004]} />
+            <Bloom intensity={0.45} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur />
+            <Vignette offset={0.3} darkness={0.55} blendFunction={BlendFunction.NORMAL} />
+            <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0005, 0.0005]} />
           </EffectComposer>
           <Preload all />
         </Canvas>
       </Suspense>
       )}
 
-      {!pointerLocked && viewMode === "3d" && (
+      {!pointerLocked && viewMode === "3d" && !showOnboarding && (
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="synth-panel px-6 py-4 font-jetbrains text-sm text-gray-200">
-            Clique sur la scène · <span className="text-synth-copper">WASD</span> pour avancer · Souris pour regarder
+          <div className="synth-panel px-6 py-4 font-jetbrains text-sm text-gray-300 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg border border-synth-copper/30 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 text-synth-copper" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Clique pour entrer</p>
+              <p className="text-[10px] text-gray-600"><span className="text-synth-copper">WASD</span> déplacer · <span className="text-synth-copper">Souris</span> regarder · <span className="text-synth-copper">Échap</span> libérer</p>
+            </div>
           </div>
         </div>
       )}

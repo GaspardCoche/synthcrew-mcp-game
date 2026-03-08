@@ -1,47 +1,72 @@
 export default function GuideOverlay({ onClose }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="max-w-md w-full rounded-2xl border border-amber-500/30 bg-[#0d0a18]/98 p-6 shadow-2xl"
+        className="max-w-md w-full rounded-xl border border-amber-500/20 bg-[#0a0818]/98 p-0 shadow-2xl overflow-hidden animate-fade-in"
         onClick={(e) => e.stopPropagation()}
-        style={{ borderLeftColor: "#fbbf24", borderLeftWidth: "4px" }}
       >
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-amber-500/20 border border-amber-500/40">
-            ◆
-          </div>
-          <div>
-            <h2 className="font-bold text-lg text-amber-400">NOVA</h2>
-            <p className="text-sm text-gray-400">Ton guide · Toujours à tes côtés</p>
+        <div className="bg-gradient-to-r from-amber-500/10 to-transparent px-6 py-4 border-b border-amber-500/10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-amber-500/15 border border-amber-500/30">
+              <span className="text-xl text-amber-400">◆</span>
+            </div>
+            <div>
+              <h2 className="font-orbitron text-base font-bold text-amber-400 tracking-wide">NOVA</h2>
+              <p className="text-[10px] text-gray-500 font-mono">Intelligence de guidage · v2.0</p>
+            </div>
           </div>
         </div>
-        <p className="text-gray-300 text-sm leading-relaxed mb-4">
-          Je suis ton guide dans SynthCrew. <strong className="text-amber-200">Clique sur un agent</strong> pour voir son rôle (Data, Analyse, Coms, Code…) et ce qu’il apporte à tes workflows. Passe par le <strong className="text-cyan-300">Tableau de bord</strong> pour lancer des missions et suivre l’équipage.
-        </p>
-        <p className="text-gray-500 text-xs mb-6">
-          Projet pro & éducatif : la colonie reflète l’état réel de tes missions et de tes agents.
-        </p>
-        <div className="flex flex-wrap gap-2">
+
+        <div className="px-6 py-5 space-y-4">
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <span className="text-amber-500 text-sm mt-0.5">▸</span>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                <strong className="text-amber-200">Clique sur un agent</strong> pour voir son rôle (Data, Analyse, Coms, Code...) et ses capacités.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <span className="text-cyan-500 text-sm mt-0.5">▸</span>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Accède au <strong className="text-cyan-300">Tableau de bord</strong> pour lancer des missions et observer la progression en temps réel.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <span className="text-purple-500 text-sm mt-0.5">▸</span>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Chaque mission réussie <strong className="text-purple-300">débloque des zones</strong> et fait évoluer l'équipage.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white/3 rounded-lg px-3 py-2 border border-white/5">
+            <p className="text-[10px] text-gray-500 font-mono leading-relaxed">
+              SynthCrew est un projet éducatif : la colonie reflète l'état réel de tes missions et agents IA.
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 border-t border-white/5 flex flex-wrap gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-white/20 text-gray-400 hover:bg-white/5 text-sm"
+            className="px-4 py-2 rounded-lg border border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20 text-xs font-mono transition-colors"
           >
-            Continuer l’exploration
+            Explorer
           </button>
           <a
             href="#/classic"
-            className="px-4 py-2 rounded-lg bg-amber-500 text-black font-medium text-sm inline-block hover:bg-amber-400"
+            className="px-4 py-2 rounded-lg bg-amber-500/90 text-black font-bold text-xs font-mono inline-block hover:bg-amber-400 transition-colors"
           >
-            Ouvrir le Village
+            Dashboard
           </a>
           <a
             href="#/classic/ops"
-            className="px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-400 text-sm inline-block hover:bg-cyan-500/10"
+            className="px-4 py-2 rounded-lg border border-cyan-500/30 text-cyan-400 text-xs font-mono inline-block hover:bg-cyan-500/10 transition-colors"
           >
-            Aller à l’Atelier
+            Ops Room
           </a>
         </div>
       </div>

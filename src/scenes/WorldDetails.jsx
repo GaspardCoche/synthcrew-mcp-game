@@ -1,7 +1,5 @@
-/**
- * Détails monde : chemins entre zones, balises, panneaux.
- * Les chemins et balises apparaissent quand la zone cible a level >= 1.
- */
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 
@@ -30,20 +28,9 @@ function PathSegment({ from, to, color, steps = 14 }) {
     const len = Math.hypot(x1 - x0, z1 - z0) || 1;
     const angle = Math.atan2(z1 - z0, x1 - x0);
     segments.push(
-      <mesh
-        key={i}
-        position={[mx, y, mz]}
-        rotation={[0, -angle, 0]}
-        receiveShadow
-      >
+      <mesh key={i} position={[mx, y, mz]} rotation={[0, -angle, 0]} receiveShadow>
         <boxGeometry args={[len + 0.5, 0.04, 0.8]} />
-        <meshStandardMaterial
-          color="#0a0a12"
-          emissive={color}
-          emissiveIntensity={0.06}
-          roughness={0.9}
-          metalness={0.05}
-        />
+        <meshStandardMaterial color="#0a0a12" emissive={color} emissiveIntensity={0.08} roughness={0.9} metalness={0.05} />
       </mesh>
     );
   }
@@ -61,20 +48,9 @@ function PathPylon({ pos, color }) {
       </mesh>
       <mesh position={[0, 0.7, 0]}>
         <sphereGeometry args={[0.08, 8, 8]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.8}
-          roughness={0.2}
-        />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.2} />
       </mesh>
-      <pointLight
-        position={[0, 0.7, 0]}
-        color={color}
-        intensity={0.15}
-        distance={6}
-        decay={2}
-      />
+      <pointLight position={[0, 0.7, 0]} color={color} intensity={0.15} distance={6} decay={2} />
     </group>
   );
 }
@@ -90,12 +66,7 @@ function SignPost({ pos, color }) {
       </mesh>
       <mesh position={[0, 1.4, 0.25]} rotation={[0, 0, Math.PI / 2]}>
         <boxGeometry args={[0.5, 0.02, 0.25]} />
-        <meshStandardMaterial
-          color="#0d0d12"
-          emissive={color}
-          emissiveIntensity={0.25}
-          roughness={0.8}
-        />
+        <meshStandardMaterial color="#0d0d12" emissive={color} emissiveIntensity={0.25} roughness={0.8} />
       </mesh>
     </group>
   );
@@ -112,6 +83,59 @@ function Crate({ pos, scale = 1 }) {
   );
 }
 
+function EnergyBeam({ from, to, color }) {
+  const ref = useRef();
+  const mx = (from[0] + to[0]) / 2;
+  const mz = (from[2] + to[2]) / 2;
+  const midY = Math.max(getTerrainHeightAt(mx, mz), getTerrainHeightAt(from[0], from[2]), getTerrainHeightAt(to[0], to[2]));
+  const beamHeight = midY + 4;
+  const dx = to[0] - from[0];
+  const dz = to[2] - from[2];
+  const dist = Math.hypot(dx, dz);
+  const angle = Math.atan2(dz, dx);
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    ref.current.material.opacity = 0.06 + Math.sin(state.clock.elapsedTime * 1.5) * 0.03;
+  });
+
+  return (
+    <mesh
+      ref={ref}
+      position={[mx, beamHeight, mz]}
+      rotation={[0, -angle, 0]}
+    >
+      <boxGeometry args={[dist, 0.02, 0.15]} />
+      <meshBasicMaterial color={color} transparent opacity={0.08} />
+    </mesh>
+  );
+}
+
+function LockedZoneMarker({ pos, color }) {
+  const ref = useRef();
+  const [x, , z] = pos;
+  const y = getTerrainHeightAt(x, z);
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.3;
+    ref.current.position.y = y + 1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.3;
+  });
+
+  return (
+    <group position={[x, y, z]}>
+      <mesh ref={ref}>
+        <octahedronGeometry args={[0.3, 0]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.3} transparent opacity={0.25} wireframe />
+      </mesh>
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.8, 1.2, 6]} />
+        <meshBasicMaterial color={color} transparent opacity={0.08} />
+      </mesh>
+    </group>
+  );
+}
+
 export default function WorldDetails() {
   const getZoneLevel = useWorldStore((s) => s.getZoneLevel);
 
@@ -119,31 +143,35 @@ export default function WorldDetails() {
     <group>
       {ZONES.map((zone) => {
         const level = getZoneLevel(zone.key);
-        if (level < 1) return null;
         const from = HUB;
         const to = zone.center;
         const dx = to[0] - from[0];
         const dz = to[2] - from[2];
         const dist = Math.hypot(dx, dz);
+
+        if (level < 1) {
+          return (
+            <group key={zone.key}>
+              <LockedZoneMarker pos={to} color={zone.color} />
+            </group>
+          );
+        }
+
         const pylonCount = Math.max(2, Math.floor(dist / 8));
         const pylons = [];
         for (let i = 1; i < pylonCount; i++) {
           const t = i / pylonCount;
-          pylons.push([
-            from[0] + dx * t,
-            from[2] + dz * t,
-          ]);
+          pylons.push([from[0] + dx * t, from[2] + dz * t]);
         }
+
         return (
           <group key={zone.key}>
             <PathSegment from={from} to={to} color={zone.color} steps={Math.max(12, Math.floor(dist / 2.5))} />
+            <EnergyBeam from={from} to={to} color={zone.color} />
             {pylons.map(([px, pz], i) => (
               <PathPylon key={i} pos={[px, 0, pz]} color={zone.color} />
             ))}
-            <SignPost
-              pos={[to[0] * 0.4, 0, to[2] * 0.4]}
-              color={zone.color}
-            />
+            <SignPost pos={[to[0] * 0.4, 0, to[2] * 0.4]} color={zone.color} />
             {[0.3, 0.55, 0.8].map((t, i) => {
               const cx = from[0] + dx * t + (i - 1) * 1.2;
               const cz = from[2] + dz * t + (i % 2) * 0.6;

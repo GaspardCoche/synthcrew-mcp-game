@@ -229,6 +229,38 @@ body {
   0%   { transform: scale(1);   opacity: 0.6; }
   100% { transform: scale(2.4); opacity: 0;   }
 }
+@keyframes fall {
+  0%   { transform: translateY(-10%); }
+  100% { transform: translateY(110%); }
+}
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+}
+@keyframes scanline-move {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(100vh); }
+}
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(0,240,255,0.01) 50%);
+  background-size: 100% 4px;
+  animation: scanline-move 8s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Fade in ───────────────────────────────────── */
+.animate-fade-in {
+  animation: fadeSlideIn 0.4s ease-out forwards;
+}
 
 /* ── Section title ──────────────────────────────── */
 .section-title {

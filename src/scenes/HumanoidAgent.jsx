@@ -2,9 +2,9 @@
  * Agent 3D vivant — modèle GLTF + IA de patrouille par zone.
  * Quand l'agent a des erreurs (worldStore), visuel "malade" : halo rouge, ralenti, particules.
  */
-import { useRef, Suspense, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useGLTF, Text, Billboard } from "@react-three/drei";
+import { useRef, useState, Suspense, useMemo } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useGLTF, Text, Billboard, Html } from "@react-three/drei";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 import { agentCollidersRef } from "../lib/agentColliders";
@@ -133,7 +133,6 @@ function SelectionRing({ color }) {
   );
 }
 
-// Badge statut flottant au-dessus de l'agent
 function StatusBadge({ status, color }) {
   const labels = { active: "● MISSION", queued: "◎ ATTENTE", idle: "◌ VEILLE", sleeping: "○ SOMMEIL", error: "✕ ERREUR" };
   const label  = labels[status] || "◌ VEILLE";
@@ -146,12 +145,45 @@ function StatusBadge({ status, color }) {
   );
 }
 
+const AGENT_GREETINGS = {
+  SENTINEL:  "Je surveille les flux de données. Besoin d'une analyse ?",
+  CIPHER:    "Patterns détectés. Je peux déchiffrer tes données.",
+  ARCHIVIST: "Toute la mémoire du système est ici. Que cherches-tu ?",
+  HERALD:    "Canaux de communication ouverts. Prêt à transmettre.",
+  PHANTOM:   "En mode furtif. Je gère les opérations sensibles.",
+  FORGE:     "L'atelier est prêt. On construit quelque chose ?",
+};
+
+function ProximityBubble({ agentName, color }) {
+  const greeting = AGENT_GREETINGS[agentName] || "...";
+  return (
+    <Html position={[0, 3.5, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
+      <div
+        className="px-3 py-2 rounded-lg max-w-[180px] text-center animate-fade-in"
+        style={{
+          background: "rgba(8,10,18,0.92)",
+          border: `1px solid ${color}33`,
+          borderLeft: `2px solid ${color}88`,
+          boxShadow: `0 4px 20px rgba(0,0,0,0.5), 0 0 15px ${color}15`,
+        }}
+      >
+        <p className="text-[10px] font-jetbrains text-gray-300 leading-relaxed">{greeting}</p>
+        <p className="text-[8px] font-mono mt-1 opacity-50" style={{ color }}>Clique pour interagir</p>
+      </div>
+    </Html>
+  );
+}
+
+const PROXIMITY_THRESHOLD = 8;
+
 export default function HumanoidAgent({ agent, onClick, selected }) {
   const groupRef = useRef();
+  const [isNear, setIsNear] = useState(false);
   const color    = AGENT_COLORS[agent.name] || agent.color || "#888";
   const modelPath = AGENT_MODELS[agent.name];
   const home = agent.position || [0, 0, 0];
   const sick = useWorldStore((s) => s.isAgentSick(agent.name));
+  const { camera } = useThree();
 
   const phase = useMemo(() => {
     const id = parseInt(agent.id ?? "0") || 0;
@@ -185,6 +217,12 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
       const targetY = Math.atan2(vx, vz);
       g.rotation.y += (targetY - g.rotation.y) * 0.08;
     }
+
+    const dx = camera.position.x - nx;
+    const dz = camera.position.z - nz;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    const near = dist < PROXIMITY_THRESHOLD;
+    if (near !== isNear) setIsNear(near);
   });
 
   return (
@@ -197,10 +235,8 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
     >
       {sick && <SickRing />}
       {sick && <SickParticles />}
-      {/* Halo de sélection */}
       {selected && <SelectionRing color={color} />}
 
-      {/* Modèle */}
       {modelPath ? (
         <Suspense fallback={<FallbackAgent color={color} selected={selected} sick={sick} />}>
           <GltfAgent modelPath={modelPath} color={color} selected={selected} sick={sick} />
@@ -209,18 +245,17 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
         <FallbackAgent color={color} selected={selected} sick={sick} />
       )}
 
-      {/* Lumière colorée (dim si malade) */}
       <pointLight color={sick ? "#ef4444" : color} intensity={selected ? 1.2 : sick ? 0.25 : 0.45} distance={5} decay={2} position={[0, 1.2, 0]} />
 
-      {/* Badge statut (rouge si malade) */}
       <StatusBadge status={agent.status} color={sick ? "#ef4444" : color} />
 
-      {/* Nom */}
       <Billboard position={[0, 2.2, 0]}>
         <Text fontSize={0.17} color={color} anchorX="center" outlineWidth={0.015} outlineColor="#000000" fontWeight="bold">
           {agent.name}
         </Text>
       </Billboard>
+
+      {isNear && !selected && <ProximityBubble agentName={agent.name} color={color} />}
     </group>
   );
 }

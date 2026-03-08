@@ -75,14 +75,14 @@ Mission Planner (IA) décompose en :
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    FRONTEND (Client)                     │
-│  Next.js 14 + React + Tailwind + Framer Motion          │
-│  WebSocket (Socket.io) pour le temps réel               │
-│  Three.js pour les animations 3D du vaisseau (optionnel)│
+│  React 18 + Vite + Tailwind + Three.js (R3F)            │
+│  WebSocket natif pour le temps réel                     │
+│  Monde 3D immersif (@react-three/fiber + drei)          │
 └──────────────────────┬──────────────────────────────────┘
                        │ HTTPS + WSS
 ┌──────────────────────▼──────────────────────────────────┐
 │                  API GATEWAY (Orchestrateur)              │
-│  Node.js + Fastify (ou Hono)                             │
+│  Node.js + Hono                                          │
 │  Auth : Clerk / Auth0                                    │
 │  Rate Limiting + Usage Metering                          │
 └──────────────────────┬──────────────────────────────────┘
