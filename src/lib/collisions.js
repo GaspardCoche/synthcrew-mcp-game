@@ -64,6 +64,20 @@ export const WORLD_COLLIDERS = [
   { x: 6,    z: -8,   r: 0.8 },
   { x: 0,    z: -2,   r: 0.8 },
   { x: 0,    z: -14,  r: 0.8 },
+  // ── Bâtiments GLTF arrière-plan ──────────────────────
+  { x: -55,  z: -12,  r: 4.0 },
+  { x: 52,   z: -48,  r: 4.0 },
+  { x: 0,    z: -82,  r: 5.0 },
+  { x: -60,  z: -55,  r: 4.5 },
+  // ── Rochers GLTF ─────────────────────────────────────
+  { x: -20,  z: -20,  r: 2.0 },
+  { x: 14,   z: -20,  r: 1.8 },
+  { x: 5,    z: -38,  r: 2.2 },
+  // ── Arbres épais ─────────────────────────────────────
+  { x: -3,   z: -9,   r: 1.2 },
+  { x: 5,    z: -10,  r: 1.0 },
+  { x: -12,  z: -42,  r: 1.2 },
+  { x: 22,   z: -48,  r: 1.2 },
 ];
 
 /** Teste si une position (x, z) entre en collision. dynamicCircles = [{ x, z, r }] (ex: agents). */

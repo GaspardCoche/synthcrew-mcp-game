@@ -36,3 +36,19 @@ export async function createMission(payload) {
   if (!r.ok) throw new Error("Création mission échouée");
   return r.json();
 }
+
+export async function getServices() {
+  const r = await fetch(`${BASE}/api/services`);
+  if (!r.ok) return { services: {}, tools: [] };
+  return r.json();
+}
+
+export async function executeMission(prompt, title) {
+  const r = await fetch(`${BASE}/api/mission/execute`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, title }),
+  });
+  if (!r.ok) throw new Error(`Exécution échouée: ${r.status}`);
+  return r.json();
+}

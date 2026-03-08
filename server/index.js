@@ -48,19 +48,19 @@ function saveData(data) {
 
 const data = loadData();
 
-if (!data.agents || data.agents.length === 0) {
+if (!data.agents || data.agents.length === 0 || data.agents.some((a) => a.name === "CONDUCTOR")) {
   data.agents = [
-    { id: "a_0", name: "CONDUCTOR", role: "orchestrator", avatar: "🎯", status: "idle", color: "#eab308", level: 99, missions: 0, successRate: 100, personality: "Orchestrateur. Je comprends ton besoin, je questionne pour être précis, et je propose l'équipe d'agents adaptée. Je sers de mémoire aux autres agents." },
-    { id: "a_1", name: "SENTINEL", role: "data_ops", avatar: "🛡️", status: "idle", color: "#00f0ff", level: 12, missions: 147, successRate: 96, personality: "Agent Data Ops. Je récupère et structure les données." },
-    { id: "a_2", name: "CIPHER", role: "analyst", avatar: "🔮", status: "idle", color: "#a855f7", level: 8, missions: 89, successRate: 94, personality: "Analyste. J'identifie tendances et patterns." },
-    { id: "a_3", name: "ARCHIVIST", role: "writer", avatar: "📜", status: "idle", color: "#f59e0b", level: 15, missions: 203, successRate: 98, personality: "Rédacteur. Je produis rapports et doc." },
-    { id: "a_4", name: "HERALD", role: "communicator", avatar: "📡", status: "idle", color: "#22c55e", level: 6, missions: 56, successRate: 91, personality: "Communicant. J'envoie résumés et notifications." },
-    { id: "a_5", name: "PHANTOM", role: "scraper", avatar: "👻", status: "idle", color: "#ef4444", level: 10, missions: 112, successRate: 88, personality: "Scraper. Je collecte des infos sur le web." },
-    { id: "a_6", name: "FORGE", role: "developer", avatar: "⚒️", status: "idle", color: "#ec4899", level: 19, missions: 267, successRate: 97, personality: "Développeur. J'exécute des tâches code et revues." },
+    { id: "a_0", name: "NEXUS", role: "orchestrator", avatar: "🎯", status: "idle", color: "#ff6b35", level: 99, missions: 0, successRate: 100, mcpIds: ["sequential-thinking", "memory"], personality: "Orchestrateur central. Je décompose les missions en DAG, coordonne l'équipe et sers de mémoire collective." },
+    { id: "a_1", name: "DATAFLOW", role: "data_ops", avatar: "📊", status: "idle", color: "#6c5ce7", level: 12, missions: 0, successRate: 96, mcpIds: ["github", "postgres", "filesystem"], personality: "Data Ops. Je récupère et structure les données depuis toutes les sources." },
+    { id: "a_2", name: "PRISME", role: "analyst", avatar: "🔬", status: "idle", color: "#74b9ff", level: 8, missions: 0, successRate: 94, mcpIds: ["sequential-thinking", "brave-search"], personality: "Analyste. J'identifie tendances, patterns et insights dans les données." },
+    { id: "a_3", name: "SCRIBE", role: "writer", avatar: "✍️", status: "idle", color: "#ffd93d", level: 15, missions: 0, successRate: 98, mcpIds: ["notion", "google-workspace", "filesystem"], personality: "Rédacteur. Je produis rapports, docs et synthèses structurées." },
+    { id: "a_4", name: "SIGNAL", role: "communicator", avatar: "📡", status: "idle", color: "#00b894", level: 6, missions: 0, successRate: 91, mcpIds: ["slack", "gmail"], personality: "Communicant. J'envoie résumés et notifications sur tous les canaux." },
+    { id: "a_5", name: "SPIDER", role: "scraper", avatar: "🕸️", status: "idle", color: "#ff6b6b", level: 10, missions: 0, successRate: 88, mcpIds: ["brave-search", "firecrawl", "playwright"], personality: "Scraper. Je collecte des infos sur le web et fais de la veille." },
+    { id: "a_6", name: "CODEFORGE", role: "developer", avatar: "⚒️", status: "idle", color: "#fd79a8", level: 19, missions: 0, successRate: 97, mcpIds: ["github", "docker", "sentry"], personality: "Développeur. Je gère le code, les PRs, les revues et les déploiements." },
   ];
   saveData(data);
 } else if (!data.agents.some((a) => a.role === "orchestrator")) {
-  data.agents.unshift({ id: "a_0", name: "CONDUCTOR", role: "orchestrator", avatar: "🎯", status: "idle", color: "#eab308", level: 99, missions: 0, successRate: 100, personality: "Orchestrateur. Je comprends ton besoin et propose l'équipe adaptée. Je sers de mémoire aux autres agents." });
+  data.agents.unshift({ id: "a_0", name: "NEXUS", role: "orchestrator", avatar: "🎯", status: "idle", color: "#ff6b35", level: 99, missions: 0, successRate: 100, mcpIds: ["sequential-thinking", "memory"], personality: "Orchestrateur central. Je décompose les missions en DAG et coordonne l'équipe." });
   saveData(data);
 }
 if (!data.missionTemplates || data.missionTemplates.length === 0) {
@@ -194,7 +194,34 @@ app.get("/api/achievements", (c) => c.json(data.achievements || []));
 app.get("/api/achievements/definitions", (c) => c.json(ACHIEVEMENTS_DEF));
 app.get("/api/mission-templates", (c) => c.json(data.missionTemplates || []));
 
-app.get("/api/health", (c) => c.json({ ok: true, version: "1.0", static: SERVE_STATIC }));
+app.get("/api/health", (c) => c.json({ ok: true, version: "2.0", static: SERVE_STATIC }));
+
+// Real mission execution
+app.post("/api/mission/execute", async (c) => {
+  try {
+    const { prompt, title } = await c.req.json();
+    if (!prompt) return c.json({ error: "Le prompt est requis" }, 400);
+    const mission = {
+      id: `m_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      status: "pending",
+      title: title || prompt.slice(0, 80),
+      prompt,
+    };
+    (data.missions = data.missions || []).unshift(mission);
+    if (data.missions.length > 500) data.missions.pop();
+    saveData(data);
+    broadcast({ type: "missions", payload: data.missions });
+    broadcast({ type: "mission_log", payload: { event: "mission_queued", mission } });
+    return c.json({ ok: true, mission: { id: mission.id, title: mission.title, status: "pending" } });
+  } catch (e) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// Service configuration status
+import { getConfiguredServices, getAvailableTools } from "./lib/tools.js";
+app.get("/api/services", (c) => c.json({ services: getConfiguredServices(), tools: getAvailableTools() }));
 
 // API CLI (Claude Code CLI / Cursor)
 app.post("/api/cli/task", async (c) => {

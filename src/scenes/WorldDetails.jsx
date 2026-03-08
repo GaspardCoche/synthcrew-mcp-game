@@ -24,7 +24,7 @@ function PathSegment({ from, to, color, steps = 14 }) {
     const z1 = from[2] + (to[2] - from[2]) * t1;
     const mx = (x0 + x1) / 2;
     const mz = (z0 + z1) / 2;
-    const y = getTerrainHeightAt(mx, mz) + 0.02;
+    const y = getTerrainHeightAt(mx, mz) + 0.08;
     const len = Math.hypot(x1 - x0, z1 - z0) || 1;
     const angle = Math.atan2(z1 - z0, x1 - x0);
     segments.push(

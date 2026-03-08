@@ -1,6 +1,6 @@
 /**
- * Mission Planner simulé : décompose une requête en DAG de tâches et associe les agents.
- * En production, ce serait un appel Claude API avec un system prompt structuré.
+ * Mission runner — sends missions to the server for real execution.
+ * Falls back to client-side simulation if the server is unreachable.
  */
 import { useStore } from "../store/useStore";
 
@@ -22,24 +22,18 @@ function inferRoleFromPrompt(prompt) {
 }
 
 function simpleDecompose(prompt) {
-  // Découpage heuristique : 1 à 3 tâches selon les verbes / virgules
-  const parts = prompt.split(/[,.]/).map((s) => s.trim()).filter(Boolean);
+  const parts = prompt.split(/[,;.]/).map((s) => s.trim()).filter((s) => s.length > 3);
   if (parts.length <= 1) {
     return [{ id: "t1", label: parts[0] || prompt.slice(0, 60), agent_role: inferRoleFromPrompt(prompt), depends_on: [] }];
   }
-  const tasks = parts.slice(0, 4).map((label, i) => ({
+  return parts.slice(0, 6).map((label, i) => ({
     id: `t${i + 1}`,
-    label: label.slice(0, 50),
+    label: label.slice(0, 80),
     agent_role: inferRoleFromPrompt(label),
     depends_on: i === 0 ? [] : [`t${i}`],
   }));
-  return tasks;
 }
 
-/**
- * Génère un DAG (tasks + connections) et associe un agent du store à chaque tâche.
- * Si suggestedRoles est fourni (mémoire orchestrateur), on privilégie ces rôles pour l’assignation.
- */
 export function planMission(prompt, opts = {}) {
   const { suggestedRoles = [] } = opts;
   const tasks = simpleDecompose(prompt);
@@ -55,11 +49,9 @@ export function planMission(prompt, opts = {}) {
       agents[0];
     return {
       ...t,
-      agentId: agent.id,
-      agentName: agent.name,
+      agentId: agent?.id,
+      agentName: agent?.name,
       status: "queued",
-      x: 20 + (tasks.indexOf(t) % 2) * 40,
-      y: 25 + Math.floor(tasks.indexOf(t) / 2) * 30,
     };
   });
   const connections = tasksWithAgent.slice(1).map((t, i) => ({ from: tasksWithAgent[i].id, to: t.id }));
@@ -70,28 +62,38 @@ export function planMission(prompt, opts = {}) {
   };
 }
 
-const DELAY_MS = 800;
-
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+/**
+ * Send mission to server for real execution.
+ * Returns the queued mission. Results stream via WebSocket.
+ */
+export async function executeMissionOnServer(prompt, title) {
+  const res = await fetch("/api/mission/execute", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, title }),
+  });
+  if (!res.ok) throw new Error(`Server error ${res.status}`);
+  return res.json();
 }
 
 /**
- * Exécute le DAG en séquence, met à jour les statuts et le log.
+ * Fallback client-side execution (simulation).
  */
 export async function runMission(dag, { appendLog, setAgentStatus, updateCurrentDagTask }) {
   for (let i = 0; i < dag.tasks.length; i++) {
     const task = dag.tasks[i];
     updateCurrentDagTask?.(task.id, "active");
     setAgentStatus?.(task.agentId, "active");
-
     appendLog({ agent: task.agentName, action: `Démarrage : ${task.label}...`, type: "thinking" });
-    await sleep(DELAY_MS);
+    await sleep(600);
     appendLog({ agent: task.agentName, action: `[MCP] Exécution outil pour "${task.label}"`, type: "tool_call" });
-    await sleep(DELAY_MS);
+    await sleep(600);
     appendLog({ agent: task.agentName, action: `Terminé : ${task.label} ✓`, type: "output" });
-
     updateCurrentDagTask?.(task.id, "done");
     setAgentStatus?.(task.agentId, "idle");
   }
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
 }

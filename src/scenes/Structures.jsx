@@ -109,16 +109,22 @@ function ZoneHub() {
     <group>
       <Box pos={[0, 0, -8]} size={[8, 0.4, 8]} color="#151224" emissive="#1e1840" emissiveIntensity={0.2} damage={damage} />
       <Box pos={[0, 0, -8]} size={[3.5, 0.8, 3.5]} color="#1a1530" emissive="#241e48" emissiveIntensity={0.25} damage={damage} />
-      {[[-3.5,-4.5],[-3.5,-11.5],[3.5,-4.5],[3.5,-11.5]].map(([px, pz], i) => (
-        <group key={i} position={[px, getTerrainHeightAt(px, pz), pz]}>
-          <Cylinder pos={[px, 0, pz]} r={0.18} h={3.2} color="#1a1530" emissive="#ff6b35" emissiveIntensity={0.35} damage={damage} />
-          <mesh position={[px, getTerrainHeightAt(px, pz) + 3.5, pz]}>
-            <sphereGeometry args={[0.22, 12, 12]} />
-            <meshStandardMaterial color="#ff6b35" emissive="#ff6b35" emissiveIntensity={1.5 * (1 - damage)} />
-          </mesh>
-          <pointLight position={[px, getTerrainHeightAt(px, pz) + 3.5, pz]} color="#ff6b35" intensity={0.8 * (1 - damage * 0.8)} distance={12} decay={2} />
-        </group>
-      ))}
+      {[[-3.5,-4.5],[-3.5,-11.5],[3.5,-4.5],[3.5,-11.5]].map(([px, pz], i) => {
+        const baseY = getTerrainHeightAt(px, pz);
+        return (
+          <group key={i} position={[px, baseY, pz]}>
+            <mesh position={[0, 1.6, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.18, 0.2, 3.2, 12]} />
+              <meshStandardMaterial color="#1a1530" emissive="#ff6b35" emissiveIntensity={0.35 * (1 - damage * 0.7)} roughness={0.65} metalness={0.25} />
+            </mesh>
+            <mesh position={[0, 3.5, 0]}>
+              <sphereGeometry args={[0.22, 12, 12]} />
+              <meshStandardMaterial color="#ff6b35" emissive="#ff6b35" emissiveIntensity={1.5 * (1 - damage)} />
+            </mesh>
+            <pointLight position={[0, 3.5, 0]} color="#ff6b35" intensity={0.8 * (1 - damage * 0.8)} distance={12} decay={2} />
+          </group>
+        );
+      })}
       {[[-6,-8],[6,-8],[0,-2],[0,-14]].map(([px, pz], i) => <Pylon key={i} pos={[px, 0, pz]} color="#ff6b35" damage={damage} />)}
     </group>
   );

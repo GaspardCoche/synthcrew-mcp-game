@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense } from "react";
+import { useMemo, Suspense, useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 import { getTerrainHeightAt } from "./Terrain";
 
@@ -21,6 +21,24 @@ function seededRandom(seed) {
   };
 }
 
+const ZONE_CENTERS = [
+  { x: 0, z: -8, r: 14 },
+  { x: -35, z: -28, r: 12 },
+  { x: 32, z: -35, r: 12 },
+  { x: -28, z: -52, r: 10 },
+  { x: 42, z: -18, r: 10 },
+  { x: 18, z: -58, r: 8 },
+  { x: -15, z: -62, r: 10 },
+];
+
+function isInZone(x, z) {
+  return ZONE_CENTERS.some((zc) => {
+    const dx = x - zc.x;
+    const dz = z - zc.z;
+    return dx * dx + dz * dz < zc.r * zc.r;
+  });
+}
+
 function generatePlacements() {
   const rng = seededRandom(42);
   const items = [];
@@ -37,6 +55,7 @@ function generatePlacements() {
   treePositions.forEach(([x, z], i) => {
     const jx = x + (rng() - 0.5) * 6;
     const jz = z + (rng() - 0.5) * 6;
+    if (isInZone(jx, jz)) return;
     const scale = 0.4 + rng() * 0.3;
     const rotY = rng() * Math.PI * 2;
     const modelKey = i % 4 === 0 ? "maple" : i % 3 === 0 ? "dead" : i % 2 === 0 ? "birch3" : "birch1";
@@ -54,6 +73,7 @@ function generatePlacements() {
   bushPositions.forEach(([x, z]) => {
     const jx = x + (rng() - 0.5) * 4;
     const jz = z + (rng() - 0.5) * 4;
+    if (isInZone(jx, jz)) return;
     const scale = 0.5 + rng() * 0.4;
     const rotY = rng() * Math.PI * 2;
     items.push({ model: rng() > 0.5 ? "bush" : "bushLg", x: jx, z: jz, scale, rotY });
@@ -64,7 +84,7 @@ function generatePlacements() {
     const radius = 15 + rng() * 50;
     const x = Math.cos(angle) * radius;
     const z = -35 + Math.sin(angle) * radius;
-    if (Math.abs(x) < 12 && Math.abs(z + 8) < 12) continue;
+    if (isInZone(x, z)) continue;
     items.push({ model: rng() > 0.5 ? "flower" : "grass", x, z, scale: 0.6 + rng() * 0.4, rotY: rng() * Math.PI * 2 });
   }
 
@@ -73,7 +93,16 @@ function generatePlacements() {
 
 function NatureModel({ modelPath, position, scale, rotY }) {
   const { scene } = useGLTF(modelPath);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
+  const cloned = useMemo(() => {
+    const c = scene.clone(true);
+    c.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return c;
+  }, [scene]);
 
   return (
     <primitive
@@ -89,23 +118,24 @@ export default function NatureDecor() {
   const placements = useMemo(() => generatePlacements(), []);
 
   return (
-    <group>
-      {placements.map((p, i) => {
-        const modelPath = MODELS[p.model];
-        if (!modelPath) return null;
-        const y = getTerrainHeightAt(p.x, p.z);
-        return (
-          <Suspense key={i} fallback={null}>
+    <Suspense fallback={null}>
+      <group>
+        {placements.map((p, i) => {
+          const modelPath = MODELS[p.model];
+          if (!modelPath) return null;
+          const y = getTerrainHeightAt(p.x, p.z);
+          return (
             <NatureModel
+              key={i}
               modelPath={modelPath}
               position={[p.x, y, p.z]}
               scale={p.scale}
               rotY={p.rotY}
             />
-          </Suspense>
-        );
-      })}
-    </group>
+          );
+        })}
+      </group>
+    </Suspense>
   );
 }
 
