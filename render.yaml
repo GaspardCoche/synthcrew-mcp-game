@@ -9,7 +9,7 @@ services:
     plan: free
     branch: main
 
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
 
