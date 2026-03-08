@@ -104,10 +104,10 @@ export default function SkyBox() {
     <>
       <mesh>
         <sphereGeometry args={[240, 24, 12]} />
-        <meshBasicMaterial color="#040210" side={THREE.BackSide} />
+        <meshBasicMaterial color="#0a0c18" side={THREE.BackSide} />
       </mesh>
 
-      <StarLayer count={500} radius={210} size={0.5} color="#cce8ff" speed={0.00008} seed={0} />
+      <StarLayer count={500} radius={210} size={0.6} color="#ddeeff" speed={0.00008} seed={0} />
 
       <NebulaCloud position={[-60, 90, -190]} color="#4a1f8a" scale={60} opacity={0.07} />
       <NebulaCloud position={[80, 100, -200]} color="#0d3a6e" scale={70} opacity={0.06} />
