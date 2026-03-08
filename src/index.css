@@ -402,6 +402,45 @@ body {
   color: #6b7280;
 }
 
+/* ── HUD Buttons ───────────────────────────────────────────── */
+.synth-btn-ghost {
+  font-family: "JetBrains Mono", monospace;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+  background: rgba(8, 12, 21, 0.6);
+  backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.synth-btn-ghost:hover {
+  border-color: rgba(0, 245, 255, 0.2);
+  color: #e2e8f0;
+  background: rgba(0, 245, 255, 0.06);
+}
+.synth-btn-primary {
+  font-family: "JetBrains Mono", monospace;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 107, 53, 0.4);
+  color: #ff6b35;
+  background: rgba(255, 107, 53, 0.08);
+  backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  font-weight: 600;
+}
+.synth-btn-primary:hover {
+  background: rgba(255, 107, 53, 0.18);
+  border-color: rgba(255, 107, 53, 0.6);
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.15);
+}
+
 /* ── SynthCrew Legacy Classes ───────────────────────────────── */
 .synth-panel {
   background: linear-gradient(160deg, rgba(12,16,32,0.97), rgba(8,12,21,0.99));
@@ -622,5 +661,7 @@ body {
 .animate-slide-right { animation: slideInRight 0.3s ease-out forwards; }
 .animate-slide-left { animation: slideInLeft 0.3s ease-out forwards; }
 .animate-fade-in { animation: fadeSlideIn 0.4s ease-out forwards; }
+.animate-slide-up { animation: slideUp 0.2s ease-out forwards; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .animate-level-up { animation: level-up-flash 0.8s ease-in-out; }
 .animate-neon-flicker { animation: neon-flicker 4s linear infinite; }

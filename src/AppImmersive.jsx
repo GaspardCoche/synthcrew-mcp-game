@@ -1,7 +1,5 @@
 import { Suspense, useState, useEffect, useCallback, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
 import { KeyboardControls, Preload } from "@react-three/drei";
 import { buildKeyboardMap } from "./store/controlsStore";
 import { useControlsStore } from "./store/controlsStore";
@@ -119,29 +117,34 @@ export default function AppImmersive() {
 
   return (
     <div className="fixed inset-0 bg-[#0c0a12]">
+      {/* CSS vignette — zero GPU cost */}
+      <div className="pointer-events-none fixed inset-0 z-[15]" style={{ boxShadow: "inset 0 0 120px 40px rgba(0,0,0,0.65)" }} />
+
       <KeyboardControls map={keyboardMap}>
-      <div className="absolute top-4 left-4 z-20 pointer-events-none flex flex-col gap-1">
-        <h1 className="synth-title-text text-sm font-black tracking-widest">SYNTHCREW</h1>
-        <p className="text-[10px] text-gray-500 font-jetbrains">Open-World AI Agent Orchestration Platform</p>
-        <p className="text-[10px] text-gray-600 font-jetbrains mt-0.5">WASD · Clique pour verrouiller · <span className="text-cyan-600">` Terminal CLI</span></p>
-        <BuildId className="sm:inline mt-1" />
-      </div>
-      <div className="absolute top-[165px] right-4 z-20 flex flex-col gap-1.5 items-end pointer-events-auto">
-        <a href="#/classic" className="font-jetbrains text-[9px] text-gray-500 hover:text-synth-primary transition-colors px-2 py-1 rounded border border-transparent hover:border-synth-primary/20">
-          Pont
-        </a>
-        <button type="button" onClick={() => { setShowCLI((v) => !v); }} className={`font-jetbrains text-[9px] px-2.5 py-1 rounded border transition-colors ${showCLI ? "border-cyan-400/50 text-cyan-400 bg-cyan-400/10" : "border-cyan-500/20 text-cyan-600 hover:text-cyan-400 hover:bg-cyan-400/5"}`}>
-          Terminal `
-        </button>
-        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-synth-primary/30 text-synth-primary hover:bg-synth-primary/10 transition-colors">
-          Mission
-        </button>
-        <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-white/15 text-gray-500 hover:text-white transition-colors">
-          {viewMode === "3d" ? "Carte" : "3D"}
-        </button>
-        <button type="button" onClick={() => setShowSettings(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-white/10 text-gray-600 hover:text-gray-400 transition-colors">
-          Cfg
-        </button>
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none">
+        <div className="flex items-start justify-between px-4 pt-3">
+          <div className="flex flex-col gap-0.5">
+            <h1 className="synth-title-text text-sm font-black tracking-widest">SYNTHCREW</h1>
+            <p className="text-[9px] text-gray-500 font-jetbrains">AI Agent Orchestration</p>
+            <BuildId className="mt-0.5" />
+          </div>
+          <div className="flex items-center gap-1.5 pointer-events-auto">
+            <a href="#/classic" className="synth-btn-ghost text-[9px]">Dashboard</a>
+            <button type="button" onClick={() => setShowCLI((v) => !v)} className={`synth-btn-ghost text-[9px] ${showCLI ? "!border-cyan-400/50 !text-cyan-400 !bg-cyan-400/10" : ""}`}>
+              Terminal
+            </button>
+            <button type="button" onClick={() => setShowQuickLaunch(true)} className="synth-btn-primary text-[9px]">
+              + Mission
+            </button>
+            <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="synth-btn-ghost text-[9px]">
+              {viewMode === "3d" ? "Carte" : "3D"}
+            </button>
+            <button type="button" onClick={() => setShowSettings(true)} className="synth-btn-ghost text-[9px]">
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       <Crosshair visible={pointerLocked} />
@@ -192,10 +195,6 @@ export default function AppImmersive() {
             onUnlock={() => setPointerLocked(false)}
             enabled={true}
           />
-          <EffectComposer multisampling={0}>
-            <Bloom intensity={0.3} luminanceThreshold={0.3} luminanceSmoothing={0.9} mipmapBlur />
-            <Vignette offset={0.3} darkness={0.5} blendFunction={BlendFunction.NORMAL} />
-          </EffectComposer>
           <Preload all />
         </Canvas>
       </Suspense>

@@ -6,7 +6,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useStore } from "../store/useStore";
 import { useWorldStore } from "../store/worldStore";
-import { motion, AnimatePresence } from "framer-motion";
 
 const VERSION = "SynthCrew CLI v3.0 — Powered by Claude";
 
@@ -484,13 +483,8 @@ export default function CLITerminal({ open, onClose }) {
   if (!open) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 30, scale: 0.97 }}
-        transition={{ duration: 0.18, ease: "easeOut" }}
-        className="fixed inset-x-4 bottom-4 top-auto z-50 max-h-[55vh] md:inset-x-auto md:left-4 md:right-4 lg:left-8 lg:right-8 xl:left-16 xl:right-16"
+      <div
+        className="fixed inset-x-4 bottom-4 top-auto z-50 max-h-[55vh] md:inset-x-auto md:left-4 md:right-4 lg:left-8 lg:right-8 xl:left-16 xl:right-16 animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col h-full rounded-xl border border-cyan-500/25 bg-black/92 backdrop-blur-xl shadow-2xl shadow-cyan-900/20 overflow-hidden">
@@ -543,7 +537,6 @@ export default function CLITerminal({ open, onClose }) {
             )}
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 }
