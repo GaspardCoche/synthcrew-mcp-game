@@ -17,7 +17,10 @@ const API_BASE = "";
 
 export function useSynthCrewSync() {
   const wsRef = useRef(null);
-  const { setAgents, setMissions, appendLog, setCurrentMissionDag } = useStore();
+  const {
+    setAgents, setMissions, appendLog, setCurrentMissionDag,
+    setWsConnected, setMissionProgress, setPendingAchievement,
+  } = useStore();
   const emit = useEventStore((s) => s.emit);
   const worldMissionCompleted = useWorldStore((s) => s.missionCompleted);
   const worldMissionFailed = useWorldStore((s) => s.missionFailed);
@@ -51,6 +54,7 @@ export function useSynthCrewSync() {
 
       ws.onopen = () => {
         retryCount = 0;
+        setWsConnected(true);
         emit(EVENT_TYPES.CONNECTION, "Connecté au serveur SynthCrew");
       };
 
@@ -102,12 +106,21 @@ export function useSynthCrewSync() {
               emit(EVENT_TYPES.TOOL_CALLED, `${p.tool || "outil"} appelé`, { agentName: p.agentName });
             }
           }
+
+          if (msg.type === "mission_progress" && msg.payload) {
+            setMissionProgress(msg.payload);
+          }
+
+          if (msg.type === "achievement" && msg.payload) {
+            setPendingAchievement(msg.payload);
+            emit(EVENT_TYPES.MISSION_COMPLETED, `Achievement : ${msg.payload.name || msg.payload.title || "Unlocked!"}`);
+          }
         } catch (_) {}
       };
 
       ws.onclose = () => {
         wsRef.current = null;
-        // Reconnexion exponentielle (max 30s)
+        setWsConnected(false);
         const delay = Math.min(1000 * 2 ** retryCount, 30000);
         retryCount++;
         retryTimer = setTimeout(connect, delay);

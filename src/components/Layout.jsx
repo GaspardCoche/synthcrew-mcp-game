@@ -67,13 +67,13 @@ export default function Layout() {
   const { unreadCount, markAllRead } = useEventStore();
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
+    const t = setInterval(() => setTime(new Date()), 10000);
     return () => clearInterval(t);
   }, []);
 
   const activeAgents = agents.filter((a) => a.status === "active").length;
   const totalMissions = agents.reduce((sum, a) => sum + (a.missions || 0), 0);
-  const isConnected = true; // WebSocket status placeholder
+  const isConnected = useStore((s) => s.wsConnected);
 
   const currentTab = TABS.find(
     (tab) =>

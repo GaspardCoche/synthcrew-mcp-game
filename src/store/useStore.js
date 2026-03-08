@@ -85,6 +85,19 @@ export const useStore = create(
         })),
       removeAutomation: (id) => set((s) => ({ automations: s.automations.filter((x) => x.id !== id) })),
 
+      // WebSocket connection status
+      wsConnected: false,
+      setWsConnected: (v) => set({ wsConnected: v }),
+
+      // Mission progress (from server)
+      missionProgress: null,
+      setMissionProgress: (p) => set({ missionProgress: p }),
+
+      // Achievement queue
+      pendingAchievement: null,
+      setPendingAchievement: (a) => set({ pendingAchievement: a }),
+      clearPendingAchievement: () => set({ pendingAchievement: null }),
+
       // Helpers
       getPlanLimit: (key) => PLAN_LIMITS[get().plan]?.[key] ?? PLAN_LIMITS.explorer[key],
       canAddAgent: () => get().agents.length < get().getPlanLimit("agents"),
