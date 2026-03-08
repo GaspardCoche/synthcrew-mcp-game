@@ -11,12 +11,7 @@ import ClearAgentColliders from "./ClearAgentColliders";
 import SkyBox from "./SkyBox";
 
 const NatureDecor = lazy(() => import("./NatureDecor"));
-const DataFlowParticles = lazy(() => import("./DataFlowParticles"));
-const CityDistricts = lazy(() => import("./CityDistricts"));
-const SpecialEffects = lazy(() => import("./SpecialEffects"));
-const GroundDetails = lazy(() => import("./GroundDetails"));
 const WorldDetails = lazy(() => import("./WorldDetails"));
-const ZoneShaderEffects = lazy(() => import("./ZoneShaderEffects"));
 
 const AGENT_COLORS = {
   NEXUS: "#ff6b35",
@@ -64,15 +59,15 @@ export default function World({
   return (
     <>
       <color attach="background" args={[fogColor]} />
-      <fogExp2 attach="fog" args={[fogColor, 0.008]} />
+      <fogExp2 attach="fog" args={[fogColor, 0.005]} />
 
       <SkyBox />
-      <Environment preset="night" environmentIntensity={0.35} environmentRotation={[0, Math.PI / 4, 0]} />
+      <Environment preset="night" environmentIntensity={0.4} environmentRotation={[0, Math.PI / 4, 0]} />
 
-      <ambientLight intensity={0.2} color="#1a1530" />
+      <ambientLight intensity={0.35} color="#1a1530" />
       <directionalLight
         position={[100, 80, 60]}
-        intensity={0.9}
+        intensity={1.0}
         color="#ffe8d0"
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -83,14 +78,9 @@ export default function World({
         shadow-camera-bottom={-60}
         shadow-bias={-0.0002}
       />
-      <directionalLight position={[-50, 30, -30]} intensity={0.12} color="#6080ff" />
+      <directionalLight position={[-50, 30, -30]} intensity={0.15} color="#6080ff" />
 
-      <pointLight position={[0, 8, -8]}    color="#ff6b35" intensity={0.15} distance={40} decay={2} />
-      <pointLight position={[-35, 5, -26]} color="#6c5ce7" intensity={0.12} distance={35} decay={2} />
-      <pointLight position={[30, 5, -34]}  color="#74b9ff" intensity={0.10} distance={35} decay={2} />
-
-      <Sparkles count={80} scale={[100, 25, 100]} color="#4ecdc4" size={1.2} opacity={0.18} />
-      <Sparkles count={50} scale={[80, 18, 80]}   color="#6c5ce7" size={0.8} opacity={0.14} />
+      <Sparkles count={60} scale={[100, 20, 100]} color="#4ecdc4" size={1.0} opacity={0.12} />
 
       <Terrain />
       <Structures />
@@ -108,15 +98,9 @@ export default function World({
         />
       ))}
 
-      {/* Decorative layers — lazy loaded, non-blocking */}
       <Suspense fallback={null}>
         <NatureDecor />
         <WorldDetails />
-        <DataFlowParticles />
-        <CityDistricts />
-        <GroundDetails />
-        <SpecialEffects />
-        <ZoneShaderEffects />
       </Suspense>
     </>
   );

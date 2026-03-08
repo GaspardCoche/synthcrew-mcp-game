@@ -40,12 +40,12 @@ export default function Armory() {
           <p className="text-2xl font-bold text-synth-primary">{connected.length}</p>
           <p className="text-[10px] text-gray-500 font-mono">MCPs connectés</p>
         </div>
-        <div className="rounded-xl border border-synth-teal/20 bg-synth-teal/5 p-3 text-center">
-          <p className="text-2xl font-bold text-synth-teal">{mcps.length}</p>
+        <div className="rounded-xl border border-synth-cyan/20 bg-synth-cyan/5 p-3 text-center">
+          <p className="text-2xl font-bold text-synth-cyan">{mcps.length}</p>
           <p className="text-[10px] text-gray-500 font-mono">Disponibles</p>
         </div>
-        <div className="rounded-xl border border-synth-indigo/20 bg-synth-indigo/5 p-3 text-center">
-          <p className="text-2xl font-bold text-synth-indigo">{connected.reduce((s, m) => s + (m.tools?.length || 0), 0)}</p>
+        <div className="rounded-xl border border-synth-cyan/20 bg-synth-cyan/5 p-3 text-center">
+          <p className="text-2xl font-bold text-synth-cyan">{connected.reduce((s, m) => s + (m.tools?.length || 0), 0)}</p>
           <p className="text-[10px] text-gray-500 font-mono">Tools actifs</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/3 p-3 text-center">
@@ -99,7 +99,7 @@ export default function Armory() {
               key={m.id}
               className={`rounded-xl border p-4 transition-all hover:shadow-lg ${
                 m.connected
-                  ? "border-synth-emerald/25 bg-synth-emerald/5"
+                  ? "border-synth-green/25 bg-synth-green/5"
                   : "border-white/8 bg-white/2"
               }`}
             >
@@ -146,13 +146,13 @@ export default function Armory() {
                   onClick={() => toggleMcp(m.id)}
                   className={`text-[10px] px-3 py-1 rounded-lg font-mono font-semibold transition-colors ${
                     m.connected
-                      ? "bg-synth-emerald/15 text-synth-emerald border border-synth-emerald/30 hover:bg-synth-emerald/25"
+                      ? "bg-synth-green/15 text-synth-green border border-synth-green/30 hover:bg-synth-green/25"
                       : "bg-white/5 text-gray-500 border border-white/10 hover:text-gray-300 hover:border-white/20"
                   }`}
                 >
                   {m.connected ? "Connecté" : "Connecter"}
                 </button>
-                <span className={`w-2 h-2 rounded-full ${m.connected ? "bg-synth-emerald shadow-[0_0_6px_#00b894]" : "bg-gray-700"}`} />
+                <span className={`w-2 h-2 rounded-full ${m.connected ? "bg-synth-green shadow-[0_0_6px_#00b894]" : "bg-gray-700"}`} />
               </div>
             </div>
           );
@@ -160,8 +160,8 @@ export default function Armory() {
       </div>
 
       {/* Marketplace Sources */}
-      <div className="rounded-xl border border-synth-indigo/20 bg-synth-indigo/5 p-4">
-        <h4 className="font-orbitron text-[10px] font-bold text-synth-indigo tracking-wide mb-3">MARKETPLACES MCP — Découvrir plus d'outils</h4>
+      <div className="rounded-xl border border-synth-cyan/20 bg-synth-cyan/5 p-4">
+        <h4 className="font-orbitron text-[10px] font-bold text-synth-cyan tracking-wide mb-3">MARKETPLACES MCP — Découvrir plus d'outils</h4>
         <p className="text-[11px] text-gray-400 mb-3">
           L'écosystème MCP compte plus de <strong className="text-gray-300">7 000 serveurs</strong>. Explore ces registres pour trouver des MCPs spécialisés.
         </p>
@@ -172,11 +172,11 @@ export default function Armory() {
               href={src.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-synth-indigo/15 bg-black/20 p-3 hover:border-synth-indigo/30 transition-colors group"
+              className="rounded-lg border border-synth-cyan/15 bg-black/20 p-3 hover:border-synth-cyan/30 transition-colors group"
             >
-              <div className="font-semibold text-xs text-gray-300 group-hover:text-synth-indigo transition-colors">{src.name}</div>
+              <div className="font-semibold text-xs text-gray-300 group-hover:text-synth-cyan transition-colors">{src.name}</div>
               <div className="text-[9px] text-gray-600 mt-0.5">{src.desc}</div>
-              <div className="text-[10px] text-synth-indigo/70 font-mono mt-1">{src.count}</div>
+              <div className="text-[10px] text-synth-cyan/70 font-mono mt-1">{src.count}</div>
             </a>
           ))}
         </div>

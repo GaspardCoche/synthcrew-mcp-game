@@ -4,27 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Cyberpunk Color Variables ──────────────────────────────── */
+/* ── Color Variables (5-color palette) ─────────────────────── */
 :root {
-  --neon-cyan: #00f5ff;
-  --neon-orange: #ff6b35;
-  --neon-purple: #a855f7;
-  --neon-green: #00ff88;
-  --neon-red: #ff2d55;
-  --neon-gold: #ffd93d;
-  --neon-pink: #ff006e;
-  --bg-deep: #020408;
+  --primary: #ff6b35;
+  --accent: #00f5ff;
+  --success: #00ff88;
+  --warning: #ffd93d;
+  --error: #ff2d55;
+  --bg-deep: #050810;
   --bg-panel: #080c15;
   --bg-raised: #0d1424;
-  --bg-elevated: #111827;
-  --border-subtle: rgba(0, 245, 255, 0.06);
-  --border-active: rgba(0, 245, 255, 0.3);
-  --border-orange: rgba(255, 107, 53, 0.2);
-  --border-purple: rgba(168, 85, 247, 0.2);
   --text-dim: #4b5563;
   --text-muted: #6b7280;
   --text-secondary: #9ca3af;
   --text-primary: #e2e8f0;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-active: rgba(0, 245, 255, 0.2);
 }
 
 * {
@@ -95,31 +90,31 @@ body {
 .glitch::before {
   animation: glitch-top 3.5s infinite linear;
   clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
-  color: var(--neon-cyan);
+  color: var(--accent);
   opacity: 0;
 }
 .glitch::after {
   animation: glitch-bottom 4.2s infinite linear;
   clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-  color: var(--neon-orange);
+  color: var(--primary);
   opacity: 0;
 }
 
 /* ── Neon Glow Classes ──────────────────────────────────────── */
 .glow-cyan {
-  color: var(--neon-cyan);
+  color: var(--accent);
   text-shadow: 0 0 10px rgba(0, 245, 255, 0.6), 0 0 30px rgba(0, 245, 255, 0.2);
 }
 .glow-orange {
-  color: var(--neon-orange);
+  color: var(--primary);
   text-shadow: 0 0 10px rgba(255, 107, 53, 0.6), 0 0 30px rgba(255, 107, 53, 0.2);
 }
 .glow-purple {
-  color: var(--neon-purple);
+  color: var(--accent);
   text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168, 85, 247, 0.2);
 }
 .glow-green {
-  color: var(--neon-green);
+  color: var(--success);
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 30px rgba(0, 255, 136, 0.2);
 }
 .glow-primary {
@@ -154,7 +149,7 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
   opacity: 0.4;
 }
 
@@ -172,7 +167,7 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
   opacity: 0.5;
 }
 
@@ -190,7 +185,7 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
   opacity: 0.5;
 }
 
@@ -204,7 +199,7 @@ body {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(var(--angle, 0deg), var(--neon-cyan), var(--neon-purple), var(--neon-orange), var(--neon-cyan));
+  background: linear-gradient(var(--angle, 0deg), var(--accent), var(--accent), var(--primary), var(--accent));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -216,7 +211,7 @@ body {
 .term-text {
   font-family: "JetBrains Mono", monospace;
   font-size: 11px;
-  color: var(--neon-green);
+  color: var(--success);
   line-height: 1.6;
 }
 .term-text-dim {
@@ -226,7 +221,7 @@ body {
 }
 .term-prompt::before {
   content: "> ";
-  color: var(--neon-cyan);
+  color: var(--accent);
   opacity: 0.7;
 }
 
@@ -473,7 +468,7 @@ body {
   position: relative;
 }
 .synth-nav-item.active {
-  border-left-color: var(--neon-orange);
+  border-left-color: var(--primary);
   background: rgba(255, 107, 53, 0.07);
   color: #ff6b35;
 }

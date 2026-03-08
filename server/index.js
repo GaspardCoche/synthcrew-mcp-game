@@ -179,6 +179,83 @@ app.patch("/api/agents/:id", async (c) => {
   return c.json(updated);
 });
 
+// ─── Agent direct chat ───────────────────────────────────────────────────────
+app.post("/api/agents/:id/chat", async (c) => {
+  const id = c.req.param("id");
+  const agent = getAgent(id) || getAgents().find((a) => a.name === id || a.id === id);
+  if (!agent) return c.json({ error: "Agent not found" }, 404);
+
+  const { message } = await c.req.json();
+  if (!message?.trim()) return c.json({ error: "Message requis" }, 400);
+
+  const ROLE_RESPONSES = {
+    orchestrator: [
+      (m) => `J'ai analysé ta demande. Voici mon plan : je vais décomposer "${m.slice(0, 40)}..." en sous-tâches et assigner les meilleurs agents.`,
+      () => "Je coordonne l'équipe. Les agents compétents ont été notifiés.",
+      (m) => `Mission reçue. Je recommande de commencer par une phase d'analyse avant d'exécuter "${m.slice(0, 40)}...".`,
+    ],
+    data_ops: [
+      (m) => `Je lance la collecte de données pour "${m.slice(0, 40)}...". Pipeline ETL en préparation.`,
+      () => "Données récupérées et structurées. Le dataset est prêt pour l'analyse.",
+      (m) => `Je vais extraire les métriques pertinentes de "${m.slice(0, 40)}..." via les sources disponibles.`,
+    ],
+    analyst: [
+      (m) => `Analyse en cours de "${m.slice(0, 40)}...". Je détecte déjà plusieurs patterns intéressants.`,
+      () => "Rapport d'analyse généré. Les insights clés sont identifiés avec les tendances.",
+      (m) => `J'ai trouvé 3 tendances majeures en lien avec "${m.slice(0, 40)}...". Veux-tu le rapport complet ?`,
+    ],
+    writer: [
+      (m) => `Je rédige le contenu pour "${m.slice(0, 40)}...". Le plan de rédaction est structuré.`,
+      () => "Document rédigé et structuré. Prêt pour la review.",
+      (m) => `Synthèse en cours pour "${m.slice(0, 40)}...". Format adapté à la cible.`,
+    ],
+    communicator: [
+      (m) => `Message préparé concernant "${m.slice(0, 40)}...". Prêt à envoyer aux destinataires.`,
+      () => "Notification envoyée à l'équipe. Confirmation de réception en attente.",
+      (m) => `Je prépare la communication pour "${m.slice(0, 40)}...". Canal et format optimisés.`,
+    ],
+    scraper: [
+      (m) => `Scan web lancé pour "${m.slice(0, 40)}...". Extraction des données en cours.`,
+      () => "Données web collectées et nettoyées. Sources vérifiées.",
+      (m) => `Je crawle les sources pertinentes pour "${m.slice(0, 40)}...". Résultats structurés bientôt disponibles.`,
+    ],
+    developer: [
+      (m) => `Je travaille sur "${m.slice(0, 40)}...". Code review et implémentation en cours.`,
+      () => "Code poussé, tests passés. PR prête pour review.",
+      (m) => `Analyse technique de "${m.slice(0, 40)}...". Je prépare la solution optimale.`,
+    ],
+  };
+
+  const responses = ROLE_RESPONSES[agent.role] || ROLE_RESPONSES.analyst;
+  const reply = responses[Math.floor(Math.random() * responses.length)](message);
+
+  addMissionEvent(null, agent.name, "agent_chat", message, { reply });
+  broadcast({
+    type: "agent_chat",
+    payload: { agentId: agent.id, agentName: agent.name, message, reply, timestamp: new Date().toISOString() },
+  });
+
+  if (CLAUDE_KEY) {
+    try {
+      const { default: Anthropic } = await import("@anthropic-ai/sdk");
+      const client = new Anthropic({ apiKey: CLAUDE_KEY });
+      const systemPrompt = `Tu es ${agent.name}, un agent IA avec le rôle "${agent.role}". ${agent.personality || ""} Réponds de manière concise, utile et en restant dans ton rôle. 2-3 phrases max.`;
+      const completion = await client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        system: systemPrompt,
+        messages: [{ role: "user", content: message }],
+      });
+      const claudeReply = completion.content[0]?.text || reply;
+      return c.json({ agent: agent.name, reply: claudeReply, engine: "claude" });
+    } catch (e) {
+      console.error("[Chat] Claude error, falling back:", e.message);
+    }
+  }
+
+  return c.json({ agent: agent.name, reply, engine: "simulation" });
+});
+
 // ─── Missions ─────────────────────────────────────────────────────────────────
 app.get("/api/missions", (c) => {
   const limit = Number(c.req.query("limit") || 100);

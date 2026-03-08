@@ -166,7 +166,7 @@ export default function Integrations() {
           <button
             type="button"
             onClick={() => copy(curlExample, "curl")}
-            className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg bg-synth-purple/10 border border-synth-purple/30 text-synth-purple hover:bg-synth-purple/20"
+            className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg bg-synth-cyan/10 border border-synth-cyan/30 text-synth-cyan hover:bg-synth-cyan/20"
           >
             {copied === "curl" ? "Copié" : "Copier curl"}
           </button>

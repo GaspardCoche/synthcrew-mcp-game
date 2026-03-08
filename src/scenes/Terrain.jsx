@@ -1,17 +1,13 @@
-/**
- * Terrain procédural — carte 260×260, relief dramatique, texture multi-zone.
- */
 import { useMemo } from "react";
 import * as THREE from "three";
 import { fbm } from "../lib/noise";
 
 export const TERRAIN_SIZE = 260;
-const SEGMENTS    = 180;
+const SEGMENTS    = 120;
 const HEIGHT_SCALE = 6.5;
 const NOISE_SCALE  = 0.032;
 const SEED         = 42;
 
-// Zones plates autour des quartiers agents
 const FLAT_ZONES = [
   { x: 0,    z: 0,    r: 18, flatY: 0.05 },
   { x: -35,  z: 28,   r: 14, flatY: 0.3  },
@@ -67,33 +63,29 @@ function createGroundTexture() {
   const ctx = canvas.getContext("2d");
 
   const base = ctx.createLinearGradient(0, 0, size, size);
-  base.addColorStop(0,    "#090810");
-  base.addColorStop(0.5,  "#130f22");
-  base.addColorStop(1,    "#090810");
+  base.addColorStop(0,    "#0a0a14");
+  base.addColorStop(0.5,  "#111020");
+  base.addColorStop(1,    "#0a0a14");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, size, size);
 
-  ctx.strokeStyle = "rgba(0, 240, 255, 0.055)";
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= size; i += 48) {
-    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
-  }
-  ctx.strokeStyle = "rgba(168, 85, 247, 0.025)";
+  // Subtle panel lines (sci-fi floor plating)
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.025)";
   ctx.lineWidth = 0.5;
-  for (let i = 0; i <= size; i += 16) {
+  for (let i = 0; i <= size; i += 64) {
     ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
   }
 
+  // Soft zone glow patches
   const patches = [
-    { x: 0.5,  y: 0.5,  r: 0.18, color: "rgba(0,240,255,0.06)"  },
-    { x: 0.2,  y: 0.4,  r: 0.12, color: "rgba(0,240,255,0.05)"  },
-    { x: 0.8,  y: 0.4,  r: 0.11, color: "rgba(168,85,247,0.07)" },
-    { x: 0.2,  y: 0.7,  r: 0.11, color: "rgba(245,158,11,0.05)" },
-    { x: 0.85, y: 0.6,  r: 0.10, color: "rgba(34,197,94,0.06)"  },
-    { x: 0.7,  y: 0.75, r: 0.10, color: "rgba(239,68,68,0.05)"  },
-    { x: 0.35, y: 0.78, r: 0.12, color: "rgba(236,72,153,0.06)" },
+    { x: 0.5,  y: 0.5,  r: 0.15, color: "rgba(255,107,53,0.04)" },
+    { x: 0.2,  y: 0.4,  r: 0.10, color: "rgba(0,245,255,0.03)"  },
+    { x: 0.8,  y: 0.4,  r: 0.10, color: "rgba(0,245,255,0.03)"  },
+    { x: 0.2,  y: 0.7,  r: 0.10, color: "rgba(255,217,61,0.03)" },
+    { x: 0.85, y: 0.6,  r: 0.09, color: "rgba(0,255,136,0.03)"  },
+    { x: 0.7,  y: 0.75, r: 0.09, color: "rgba(0,245,255,0.02)"  },
+    { x: 0.35, y: 0.78, r: 0.10, color: "rgba(255,107,53,0.02)" },
   ];
   for (const p of patches) {
     const grd = ctx.createRadialGradient(p.x*size, p.y*size, 0, p.x*size, p.y*size, p.r*size);
@@ -103,19 +95,20 @@ function createGroundTexture() {
     ctx.fillRect(0, 0, size, size);
   }
 
+  // Slight noise grain
   const imgData = ctx.getImageData(0, 0, size, size);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
-    const n = (Math.sin(i * 0.01) * 0.5 + 0.5) * 4;
+    const n = (Math.random() - 0.5) * 3;
     data[i]     = Math.max(0, Math.min(255, data[i] + n));
-    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + n * 0.5));
-    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + n * 0.3));
+    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + n));
+    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + n));
   }
   ctx.putImageData(imgData, 0, 0);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(10, 10);
+  tex.repeat.set(6, 6);
   return tex;
 }
 
@@ -141,7 +134,7 @@ export default function Terrain() {
   const texture  = useMemo(createGroundTexture, []);
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} geometry={geometry} receiveShadow>
-      <meshStandardMaterial map={texture} color="#14111e" roughness={0.94} metalness={0.04} envMapIntensity={0.3} />
+      <meshStandardMaterial map={texture} color="#12101c" roughness={0.92} metalness={0.06} envMapIntensity={0.4} />
     </mesh>
   );
 }
