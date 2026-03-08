@@ -5,11 +5,16 @@ import { BlendFunction } from "postprocessing";
 import { KeyboardControls, Preload } from "@react-three/drei";
 import { buildKeyboardMap } from "./store/controlsStore";
 import { useControlsStore } from "./store/controlsStore";
+import { useStore } from "./store/useStore";
+import { useSynthCrewSync } from "./hooks/useSynthCrewSync";
+import { useWorldStore } from "./store/worldStore";
 import World from "./scenes/World";
 import FirstPersonController from "./components/FirstPersonController";
 import AgentOverlay from "./components/AgentOverlay";
 import GuideOverlay from "./components/GuideOverlay";
 import ProgressionHUD from "./components/ProgressionHUD";
+import GameHUD from "./components/GameHUD";
+import WorldLiveIndicator from "./components/WorldLiveIndicator";
 import AchievementToast from "./components/AchievementToast";
 import QuickLaunchModal from "./components/QuickLaunchModal";
 import OnboardingOverlay from "./components/OnboardingOverlay";
@@ -17,6 +22,7 @@ import ControlsHelp from "./components/ControlsHelp";
 import SettingsModal from "./components/SettingsModal";
 import VueCarte from "./components/VueCarte";
 import { hasDoneOnboarding } from "./lib/onboarding";
+import { BuildId } from "./components/BuildId";
 
 const API_BASE = "";
 
@@ -34,6 +40,8 @@ function Loader() {
 const GUIDE_BUBBLE_DELAY_MS = 5500;
 
 export default function AppImmersive() {
+  useSynthCrewSync();
+  const storeAgents = useStore((s) => s.agents);
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [guideSelected, setGuideSelected] = useState(false);
@@ -54,10 +62,18 @@ export default function AppImmersive() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/agents`)
-      .then((r) => r.json())
-      .then(setAgents)
-      .catch(() => setAgents([]));
+    if (storeAgents && storeAgents.length > 0) setAgents(storeAgents);
+    else {
+      fetch(`${API_BASE}/api/agents`)
+        .then((r) => r.json())
+        .then(setAgents)
+        .catch(() => setAgents([]));
+    }
+  }, [storeAgents]);
+
+  useEffect(() => {
+    const t = setInterval(() => useWorldStore.getState().tickRecovery(), 2000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
@@ -84,35 +100,41 @@ export default function AppImmersive() {
   return (
     <div className="fixed inset-0 bg-[#0c0a12]">
       <KeyboardControls map={keyboardMap}>
-      <div className="absolute top-4 left-4 z-20 pointer-events-none">
-        <h1 className="font-mono text-sm font-bold text-cyan-400/90 tracking-widest">SYNTHCREW</h1>
-        <p className="text-[10px] text-gray-500 mt-0.5">WASD ou Flèches · Clique pour verrouiller la souris et regarder · Échap pour libérer</p>
+      <div className="absolute top-4 left-4 z-20 pointer-events-none flex flex-col gap-1">
+        <h1 className="synth-title-text text-sm font-black tracking-widest">SYNTHCREW</h1>
+        <p className="text-[10px] text-gray-500 font-jetbrains">Plateforme éducative — Gamifier l’orchestration d’agents IA</p>
+        <p className="text-[10px] text-gray-600 font-jetbrains mt-0.5">WASD · Clique pour verrouiller · Échap pour libérer</p>
+        <BuildId className="sm:inline mt-1" />
       </div>
       <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 items-end pointer-events-auto">
-        <a href="#/classic" className="font-mono text-[10px] text-gray-500 hover:text-cyan-400 transition-colors">
+        <a href="#/classic" className="font-jetbrains text-[10px] text-gray-500 hover:text-synth-copper transition-colors">
           Tableau de bord →
         </a>
-        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-mono text-[10px] px-3 py-1.5 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+        <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-synth-copper/40 text-synth-copper hover:bg-synth-copper-bg">
           Lancer une mission
         </button>
-        <button type="button" onClick={() => setShowControlsHelp(true)} className="font-mono text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white">
+        <button type="button" onClick={() => setShowControlsHelp(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white">
           Raccourcis
         </button>
-        <button type="button" onClick={() => setShowSettings(true)} className="font-mono text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white" title="Réglages">
+        <button type="button" onClick={() => setShowSettings(true)} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white" title="Réglages">
           Réglages
         </button>
-        <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-mono text-[10px] px-3 py-1.5 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
+        <button type="button" onClick={() => setViewMode((m) => (m === "3d" ? "2d" : "3d"))} className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg border border-synth-copper/30 text-synth-copper hover:bg-synth-copper-bg">
           {viewMode === "3d" ? "Vue carte" : "Vue 3D"}
         </button>
       </div>
 
-      <ProgressionHUD onAchievement={setAchievementToast} />
+      <div className="absolute bottom-4 left-4 z-20 flex items-center gap-3 pointer-events-none">
+        <ProgressionHUD onAchievement={setAchievementToast} />
+        <WorldLiveIndicator />
+      </div>
+      <GameHUD agents={agents} />
 
       {showGuideBubble && !pointerLocked && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-fade-in pointer-events-none">
-          <div className="rounded-xl border border-amber-500/30 bg-black/70 backdrop-blur px-4 py-3 shadow-xl max-w-xs text-center">
-            <p className="text-xs text-amber-200/95">
-              Tu es perdu ? Clique sur <span className="font-semibold text-amber-300">NOVA</span> (orbe doré) ou sur un agent. Ou ouvre la <span className="font-semibold text-amber-300">Vue carte</span> pour naviguer.
+          <div className="synth-panel px-4 py-3 max-w-xs text-center">
+            <p className="text-xs text-gray-200">
+              Clique sur <span className="font-semibold text-synth-copper">NOVA</span> (orbe) ou un agent · ou ouvre la <span className="font-semibold text-synth-copper">Vue carte</span>.
             </p>
           </div>
         </div>
@@ -151,8 +173,8 @@ export default function AppImmersive() {
 
       {!pointerLocked && viewMode === "3d" && (
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="rounded-2xl border border-cyan-500/40 bg-black/60 backdrop-blur px-6 py-4 font-jetbrains text-sm text-cyan-200/95 shadow-xl">
-            Clique sur la scène pour te déplacer · <span className="text-amber-300">WASD ou Flèches</span> pour avancer · Glisse la souris pour regarder
+          <div className="synth-panel px-6 py-4 font-jetbrains text-sm text-gray-200">
+            Clique sur la scène · <span className="text-synth-copper">WASD</span> pour avancer · Souris pour regarder
           </div>
         </div>
       )}

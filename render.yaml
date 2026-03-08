@@ -1,16 +1,18 @@
-# Render — SynthCrew (Web Service)
+# Render Blueprint — SynthCrew (1 service = API + WebSocket + frontend)
 # https://render.com/docs/blueprint-spec
+# Render déploie le code de la branche indiquée. Pousser (git push) sur cette branche avant de déployer.
 services:
   - type: web
     name: synthcrew
     runtime: node
     region: frankfurt
     plan: free
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm run start
+    branch: main
+
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     healthCheckPath: /api/health
+
     envVars:
-      - key: PORT
-        value: 3001
       - key: NODE_ENV
         value: production

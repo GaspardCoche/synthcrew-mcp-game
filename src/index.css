@@ -10,11 +10,60 @@
 
 body {
   margin: 0;
-  background: #06070c;
+  background: #080a10;
   font-family: "JetBrains Mono", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #e5e7eb;
+  color: #e2e6eb;
+}
+
+/* ── SynthCrew identité : Colonie (cuivre + teal) ───────────────────────── */
+.synth-panel {
+  background: linear-gradient(160deg, rgba(12,14,22,0.97), rgba(8,10,16,0.99));
+  border: 1px solid rgba(201,162,39,0.12);
+  border-left: 3px solid rgba(201,162,39,0.5);
+  border-radius: 0 10px 10px 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+.synth-panel-neutral {
+  background: rgba(12,14,22,0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+}
+.synth-header-bar {
+  background: linear-gradient(180deg, rgba(10,12,18,0.98), rgba(8,10,16,0.98));
+  border-bottom: 1px solid rgba(201,162,39,0.15);
+  box-shadow: 0 1px 0 rgba(201,162,39,0.06);
+}
+.synth-nav-item {
+  border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+}
+.synth-nav-item.active {
+  border-left-color: #c9a227;
+  background: rgba(201,162,39,0.06);
+  color: #c9a227;
+}
+.synth-logo-accent {
+  background: linear-gradient(135deg, #c9a227, #00e5cc);
+  color: #080a10;
+  font-weight: 900;
+}
+.synth-title-text {
+  font-family: "Orbitron", monospace;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  background: linear-gradient(90deg, #c9a227, #00e5cc, #c9a227);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.synth-grid-bg {
+  background-image:
+    linear-gradient(rgba(201,162,39,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,162,39,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* ── Scrollbar ──────────────────────────────────── */

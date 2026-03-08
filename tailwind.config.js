@@ -9,13 +9,17 @@ export default {
       },
       colors: {
         synth: {
-          bg: "#06070c",
-          surface: "#0d0f18",
+          bg: "#080a10",
+          "bg-deep": "#05060a",
+          surface: "#0c0e16",
           panel: "rgba(255,255,255,0.02)",
           border: "rgba(255,255,255,0.06)",
           "border-bright": "rgba(255,255,255,0.12)",
-          cyan: "#00f0ff",
-          "cyan-dim": "rgba(0,240,255,0.12)",
+          copper: "#c9a227",
+          "copper-dim": "rgba(201,162,39,0.15)",
+          "copper-bg": "rgba(201,162,39,0.06)",
+          cyan: "#00e5cc",
+          "cyan-dim": "rgba(0,229,204,0.12)",
           purple: "#a855f7",
           "purple-dim": "rgba(168,85,247,0.12)",
           green: "#22c55e",
@@ -29,6 +33,10 @@ export default {
           "quest-border": "rgba(212,165,116,0.2)",
           lore: "#8b9dc3",
         },
+      },
+      boxShadow: {
+        "copper-glow": "0 0 20px rgba(201,162,39,0.2)",
+        "copper-sm": "0 0 8px rgba(201,162,39,0.15)",
       },
       animation: {
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",

@@ -19,10 +19,10 @@ export default function GuideOverlay({ onClose }) {
           </div>
         </div>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
-          Je suis là pour t’aider à ne pas te perdre. <strong className="text-amber-200">Clique sur un agent</strong> pour découvrir son rôle et ce qu’il peut faire pour toi. Tu peux aussi aller au <strong className="text-cyan-300">Tableau de bord</strong> pour lancer une mission ou gérer ton équipage.
+          Je suis ton guide dans SynthCrew. <strong className="text-amber-200">Clique sur un agent</strong> pour voir son rôle (Data, Analyse, Coms, Code…) et ce qu’il apporte à tes workflows. Passe par le <strong className="text-cyan-300">Tableau de bord</strong> pour lancer des missions et suivre l’équipage.
         </p>
         <p className="text-gray-500 text-xs mb-6">
-          Quand tu ne sais pas par où commencer, reviens ici : clique sur mon orbe doré dans le monde.
+          Projet pro & éducatif : la colonie reflète l’état réel de tes missions et de tes agents.
         </p>
         <div className="flex flex-wrap gap-2">
           <button

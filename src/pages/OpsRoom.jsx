@@ -76,7 +76,7 @@ export default function OpsRoom() {
 
   return (
     <div className="space-y-6">
-      <div className="font-orbitron text-xs font-bold text-gray-400 tracking-wide">ATELIER — Missions & exécution en direct</div>
+      <div className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">ATELIER — Missions & exécution en direct</div>
 
       {showBriefing && (
         <OrchestratorBriefing
@@ -95,9 +95,9 @@ export default function OpsRoom() {
       {!showBriefing && (
         <>
       {selectedTeamAgents.length > 0 && (
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="synth-panel p-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-orbitron text-[10px] font-bold text-amber-400 tracking-wide">ÉQUIPE CHOISIE</span>
+            <span className="font-orbitron text-[10px] font-bold text-synth-copper tracking-wide">ÉQUIPE CHOISIE</span>
             {selectedTeamAgents.map((a) => (
               <div key={a.id} className="flex items-center gap-1.5">
                 <AgentAvatar agent={a} size="sm" />
@@ -108,20 +108,20 @@ export default function OpsRoom() {
           <button
             type="button"
             onClick={() => setShowBriefing(true)}
-            className="font-jetbrains text-[10px] text-amber-400 hover:text-amber-300"
+            className="font-jetbrains text-[10px] text-synth-copper hover:text-synth-cyan"
           >
             Changer l'équipe
           </button>
         </div>
       )}
       {/* Mission input — plan-then-execute (agentic) */}
-      <div className="rounded-xl border border-synth-cyan/20 bg-synth-panel p-3 space-y-2">
+        <div className="synth-panel p-3 space-y-2">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <span className="font-jetbrains text-[10px] text-gray-500">CONDUCTOR a mémorisé ton brief. Tu peux modifier la mission ci-dessous.</span>
           <button
             type="button"
             onClick={() => setShowBriefing(true)}
-            className="font-jetbrains text-[10px] text-amber-400 hover:text-amber-300"
+            className="font-jetbrains text-[10px] text-synth-copper hover:text-synth-cyan"
           >
             Refaire le brief
           </button>
@@ -134,7 +134,7 @@ export default function OpsRoom() {
                 key={t.id}
                 type="button"
                 onClick={() => setPrompt(t.prompt)}
-                className="font-jetbrains text-[10px] px-2 py-1.5 rounded-lg border border-white/15 text-gray-400 hover:border-synth-cyan/40 hover:text-synth-cyan"
+                className="font-jetbrains text-[10px] px-2 py-1.5 rounded-lg border border-white/15 text-gray-400 hover:border-synth-copper/40 hover:text-synth-copper"
               >
                 {t.name}
               </button>
@@ -142,7 +142,7 @@ export default function OpsRoom() {
           </div>
         )}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <span className="font-orbitron text-xs font-bold text-synth-cyan tracking-wide px-0 sm:px-3 py-1 sm:py-0">MISSION ›</span>
+          <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide px-0 sm:px-3 py-1 sm:py-0">MISSION ›</span>
           <input
             type="text"
             value={prompt}
@@ -155,14 +155,14 @@ export default function OpsRoom() {
             <button
               onClick={handlePlan}
               disabled={!prompt.trim()}
-              className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg border border-synth-cyan/40 text-synth-cyan hover:bg-synth-cyan/10 disabled:opacity-50"
+              className="font-orbitron text-xs font-bold px-4 py-2 rounded-lg border border-synth-copper/40 text-synth-copper hover:bg-synth-copper-bg disabled:opacity-50"
             >
               Planifier
             </button>
             <button
               onClick={handleLaunch}
               disabled={running || (!plannedDag && !prompt.trim())}
-              className="font-orbitron text-xs font-bold px-5 py-2 rounded-lg bg-gradient-to-r from-synth-cyan to-blue-500 text-black disabled:opacity-50 disabled:cursor-not-allowed"
+              className="font-orbitron text-xs font-bold px-5 py-2 rounded-lg bg-gradient-to-r from-synth-copper to-synth-cyan text-synth-bg-deep disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {running ? "EXÉCUTION…" : "Lancer l'exécution ▶"}
             </button>
@@ -172,9 +172,9 @@ export default function OpsRoom() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* DAG */}
-        <div className="rounded-xl border border-synth-border bg-synth-panel overflow-hidden">
-          <div className="px-4 py-3 border-b border-synth-border flex justify-between items-center">
-            <span className="font-orbitron text-xs font-bold text-synth-cyan tracking-wide">GRAPHE DE MISSION</span>
+        <div className="synth-panel overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/5 flex justify-between items-center">
+            <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">GRAPHE DE MISSION</span>
             {currentMissionDag && (
               <span className="font-jetbrains text-[10px] text-gray-400">
                 {currentMissionDag.tasks.filter((t) => t.status === "done").length}/{currentMissionDag.tasks.length} tâches

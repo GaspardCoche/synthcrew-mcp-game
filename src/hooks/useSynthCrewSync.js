@@ -1,10 +1,11 @@
 /**
  * Sync du store Zustand avec le serveur : API au mount + WebSocket en temps réel.
- * Émet des événements dans l'event bus pour les notifications visuelles.
+ * Émet des événements dans l'event bus et met à jour le monde virtuel (worldStore).
  */
 import { useEffect, useRef } from "react";
 import { useStore } from "../store/useStore";
 import { useEventStore, EVENT_TYPES } from "../store/eventStore";
+import { useWorldStore } from "../store/worldStore";
 
 const WS_URL = (() => {
   if (typeof window === "undefined") return "";
@@ -18,6 +19,10 @@ export function useSynthCrewSync() {
   const wsRef = useRef(null);
   const { setAgents, setMissions, appendLog, setCurrentMissionDag } = useStore();
   const emit = useEventStore((s) => s.emit);
+  const worldMissionCompleted = useWorldStore((s) => s.missionCompleted);
+  const worldMissionFailed = useWorldStore((s) => s.missionFailed);
+  const worldAgentStatus = useWorldStore((s) => s.agentStatusChange);
+  const hydrateFromStats = useWorldStore((s) => s.hydrateFromStats);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/agents`)
@@ -28,7 +33,11 @@ export function useSynthCrewSync() {
       .then((r) => r.json())
       .then(setMissions)
       .catch(() => {});
-  }, [setAgents, setMissions]);
+    fetch(`${API_BASE}/api/stats`)
+      .then((r) => r.json())
+      .then(hydrateFromStats)
+      .catch(() => {});
+  }, [setAgents, setMissions, hydrateFromStats]);
 
   useEffect(() => {
     if (!WS_URL) return;
@@ -57,6 +66,10 @@ export function useSynthCrewSync() {
             setMissions(msg.payload || []);
           }
 
+          if (msg.type === "stats" && msg.payload) {
+            hydrateFromStats(msg.payload);
+          }
+
           if (msg.type === "mission_log" && msg.payload) {
             const p = msg.payload;
 
@@ -71,12 +84,18 @@ export function useSynthCrewSync() {
 
             if (p.event === "mission_completed") {
               setCurrentMissionDag(null);
+              worldMissionCompleted({ agentName: p.mission?.agentName });
               emit(EVENT_TYPES.MISSION_COMPLETED, p.mission?.title || "Mission terminée avec succès");
             }
 
             if (p.event === "mission_failed") {
               setCurrentMissionDag(null);
+              worldMissionFailed({ agentName: p.mission?.agentName, error: p.error });
               emit(EVENT_TYPES.MISSION_FAILED, p.error || "Mission échouée");
+            }
+
+            if (p.event === "agent_status" && p.agentName) {
+              worldAgentStatus(p.agentName, p.status);
             }
 
             if (p.event === "tool_called") {

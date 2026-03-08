@@ -135,6 +135,13 @@ export default function SettingsModal({ onClose }) {
             </label>
           </div>
         </section>
+
+        <section className="pt-4 border-t border-white/10">
+          <h4 className="font-jetbrains text-xs font-semibold text-gray-400 mb-2">À propos</h4>
+          <p className="font-jetbrains text-[11px] text-gray-500 leading-relaxed">
+            SynthCrew est une <strong className="text-gray-400">plateforme éducative</strong> qui gamifie l’orchestration d’agents IA : missions = workflows, équipage = rôles (Data, Analyse, Coms, Code). La colonie 3D reflète l’état réel de tes missions et sert de support pour apprendre et piloter tes agents.
+          </p>
+        </section>
       </div>
     </div>
   );

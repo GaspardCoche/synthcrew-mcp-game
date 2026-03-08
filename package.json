@@ -9,7 +9,10 @@
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "start:safe": "node server/tryPort.js",
+    "render:validate": "render blueprints validate",
+    "deploy:render": "render deploys create ${RENDER_SERVICE_ID} --wait --output text"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.0",
@@ -35,5 +38,8 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.0"
+  },
+  "overrides": {
+    "three-mesh-bvh": "^0.8.0"
   }
 }

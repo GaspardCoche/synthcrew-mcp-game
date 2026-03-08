@@ -237,6 +237,15 @@ app.post("/api/cli/task", async (c) => {
 
 // SPA static (production: serve frontend from same server)
 const MIMES = { ".html": "text/html", ".js": "application/javascript", ".css": "text/css", ".json": "application/json", ".ico": "image/x-icon", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+function staticHeaders(path, ext) {
+  const isHtml = ext === ".html" || path === "/" || path === "";
+  const isHashedAsset = path.startsWith("/assets/");
+  const headers = { "Content-Type": MIMES[ext] || "application/octet-stream" };
+  if (isHtml) headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+  else if (isHashedAsset) headers["Cache-Control"] = "public, max-age=31536000, immutable";
+  else headers["Cache-Control"] = "public, max-age=3600";
+  return headers;
+}
 app.get("*", (c) => {
   const p = c.req.path;
   if (p.startsWith("/api") || p.startsWith("/ws")) return c.notFound();
@@ -246,11 +255,11 @@ app.get("*", (c) => {
   if (existsSync(filePath) && statSync(filePath).isFile()) {
     const ext = path.slice(path.lastIndexOf(".")) || ".html";
     return new Response(readFileSync(filePath), {
-      headers: { "Content-Type": MIMES[ext] || "application/octet-stream" },
+      headers: staticHeaders(path, ext),
     });
   }
   return new Response(readFileSync(join(DIST_DIR, "index.html")), {
-    headers: { "Content-Type": "text/html" },
+    headers: staticHeaders("/index.html", ".html"),
   });
 });
 
@@ -283,5 +292,17 @@ setInterval(() => {
   });
 }, WORKER_INTERVAL_MS);
 
-const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log(`SynthCrew API http://localhost:${PORT} | WS ws://localhost:${PORT}/ws`));
+const PORT = Number(process.env.PORT) || 3001;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`SynthCrew API http://localhost:${PORT} | WS ws://localhost:${PORT}/ws`);
+});
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`[SynthCrew] Le port ${PORT} est déjà utilisé.`);
+    console.error("  → Arrête l'autre processus (ex: un autre npm start ou dev:server), ou lance avec :");
+    console.error(`     PORT=${PORT + 1} npm start`);
+    process.exit(1);
+  }
+  throw err;
+});

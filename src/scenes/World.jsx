@@ -1,9 +1,14 @@
 import { useMemo } from "react";
 import { Sparkles, Environment, Sky } from "@react-three/drei";
-import Terrain, { getTerrainHeightAt, TERRAIN_SIZE } from "./Terrain";
+import Terrain from "./Terrain";
 import Structures from "./Structures";
+import WorldDetails from "./WorldDetails";
 import GuideAgent from "./GuideAgent";
 import HumanoidAgent from "./HumanoidAgent";
+import WorldIndicators from "./WorldIndicators";
+import { useWorldStore } from "../store/worldStore";
+import { getAgentHome, getAgentPatrolRadius } from "../lib/agentZones";
+import ClearAgentColliders from "./ClearAgentColliders";
 
 const AGENT_COLORS = {
   CONDUCTOR: "#eab308",
@@ -15,11 +20,6 @@ const AGENT_COLORS = {
   FORGE: "#ec4899",
 };
 
-function placeOnTerrain([x, , z]) {
-  const y = getTerrainHeightAt(x, z) + 0.15;
-  return [x, y, z];
-}
-
 export default function World({
   agents = [],
   onSelectAgent,
@@ -27,33 +27,43 @@ export default function World({
   onGuideClick,
   guideSelected,
 }) {
-  const defaultPositions = useMemo(() => {
-    const raw = [[-12, 0, -8], [10, 0, -10], [-5, 0, -14], [14, 0, -6], [-18, 0, -4], [4, 0, -18], [0, 0, -5]];
-    return raw.map(([x, , z]) => placeOnTerrain([x, 0, z]));
-  }, []);
+  const agentsWithPositions = useMemo(() => {
+    if (agents.length === 0) {
+      const names = ["SENTINEL", "CIPHER", "ARCHIVIST", "HERALD", "PHANTOM", "FORGE"];
+      return names.map((name, i) => ({
+        id: String(i + 1),
+        name,
+        position: getAgentHome(name, 0),
+        patrolRadius: getAgentPatrolRadius(name),
+        color: AGENT_COLORS[name],
+      }));
+    }
+    return agents.map((a, i) => {
+      const sameNameIndex = agents.slice(0, i).filter((b) => b.name === a.name).length;
+      return {
+        ...a,
+        position: getAgentHome(a.name ?? "CONDUCTOR", sameNameIndex),
+        patrolRadius: getAgentPatrolRadius(a.name ?? "CONDUCTOR"),
+      };
+    });
+  }, [agents]);
 
-  const agentsWithPositions =
-    agents.length > 0
-      ? agents.map((a, i) => ({ ...a, position: defaultPositions[i % defaultPositions.length] }))
-      : defaultPositions.slice(0, 6).map((pos, i) => ({
-          id: String(i + 1),
-          name: ["SENTINEL", "CIPHER", "ARCHIVIST", "HERALD", "PHANTOM", "FORGE"][i],
-          position: pos,
-          color: Object.values(AGENT_COLORS)[i + 1],
-        }));
+  const recentErrors = useWorldStore((s) => s.recentErrorsCount);
+  const fogColor = recentErrors > 0 ? "#140a0c" : "#0c0a12";
+  const skyTurbidity = recentErrors > 0 ? 12 : 8;
 
   return (
     <>
-      <color attach="background" args={["#0c0a12"]} />
-      <fog attach="fog" args={["#0c0a12", 25, 95]} />
+      <color attach="background" args={[fogColor]} />
+      <fog attach="fog" args={[fogColor, 25, 95]} />
 
       <Sky
         distance={1200}
         inclination={0.6}
         azimuth={0.25}
-        turbidity={8}
+        turbidity={skyTurbidity}
         rayleigh={0.4}
-        mieCoefficient={0.005}
+        mieCoefficient={recentErrors > 0 ? 0.015 : 0.005}
         sunPosition={[80, 50, 60]}
       />
       <Environment preset="sunset" environmentIntensity={0.5} environmentRotation={[0, Math.PI / 6, 0]} />
@@ -79,9 +89,13 @@ export default function World({
       <Sparkles count={200} scale={[80, 20, 80]} color="#00f0ff" size={1} opacity={0.28} />
       <Sparkles count={120} scale={[60, 15, 60]} color="#a855f7" size={0.7} opacity={0.2} />
       <Sparkles count={80} scale={[50, 12, 50]} color="#fbbf24" size={0.5} opacity={0.15} />
+      <Sparkles count={150} scale={[90, 8, 90]} color="#6b7280" size={0.4} opacity={0.12} />
 
       <Terrain />
       <Structures />
+      <WorldDetails />
+      <WorldIndicators />
+      <ClearAgentColliders />
 
       <GuideAgent onClick={onGuideClick} selected={guideSelected} />
 

@@ -91,35 +91,34 @@ export default function Bridge() {
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      <div className="flex gap-4 font-jetbrains text-xs text-gray-500 mb-2">
+      <div className="flex gap-4 font-jetbrains text-xs text-gray-500 mb-4">
         <span className="text-synth-cyan">⚡ {activeCount} actifs</span>
         <span>◈ {totalMissions} missions</span>
-        <span className="text-synth-green">● Système OK</span>
-        <span className="ml-auto tracking-wider">{time.toLocaleTimeString("fr-FR", { hour12: false })}</span>
+        <span className="text-synth-green">● OK</span>
+        <span className="ml-auto text-synth-copper tracking-wider">{time.toLocaleTimeString("fr-FR", { hour12: false })}</span>
       </div>
 
       <Link
         to="/classic/ops"
-        className="block mb-6 rounded-xl border border-synth-cyan/20 bg-white/[0.02] p-1 flex items-center gap-2"
+        className="synth-panel block mb-6 p-4 flex items-center gap-3 hover:border-synth-copper/30 transition-colors"
       >
-        <span className="font-orbitron text-xs font-bold text-synth-cyan tracking-wide px-3">MISSION ›</span>
-        <span className="flex-1 font-jetbrains text-sm text-gray-400 py-3">Lancer une mission depuis l&apos;Atelier...</span>
-        <span className="font-orbitron text-xs font-bold bg-gradient-to-r from-synth-cyan to-blue-500 text-black px-4 py-2 rounded-lg">ATELIER →</span>
+        <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">MISSION ›</span>
+        <span className="flex-1 font-jetbrains text-sm text-gray-400">Lancer une mission depuis l&apos;Atelier...</span>
+        <span className="font-orbitron text-xs font-bold bg-gradient-to-r from-synth-copper to-synth-cyan text-synth-bg-deep px-4 py-2 rounded-lg">ATELIER →</span>
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Mission active + Live log */}
         <div className="space-y-5">
-          <div className="rounded-xl border border-synth-border bg-synth-panel overflow-hidden">
-            <div className="px-4 py-3 border-b border-synth-border flex justify-between items-center">
+          <div className="synth-panel overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/5 flex justify-between items-center">
               <div>
-                <div className="font-orbitron text-xs font-bold text-synth-cyan tracking-wide">MISSION ACTIVE</div>
+                <div className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">MISSION ACTIVE</div>
                 <div className="font-jetbrains text-[10px] text-gray-500 mt-0.5">
                   {currentMissionDag?.title || "Aucune mission en cours"}
                 </div>
               </div>
               {currentMissionDag && (
-                <span className="font-jetbrains text-[10px] px-2 py-1 rounded bg-synth-cyan/10 border border-synth-cyan/20 text-synth-cyan">
+                <span className="font-jetbrains text-[10px] px-2 py-1 rounded bg-synth-copper-bg border border-synth-copper/30 text-synth-copper">
                   {currentMissionDag.tasks.filter((t) => t.status === "done").length}/{currentMissionDag.tasks.length}
                 </span>
               )}
@@ -128,8 +127,8 @@ export default function Bridge() {
               <div className="p-6 text-center">
                 <p className="font-jetbrains text-sm text-gray-500 mb-3">Aucune mission en cours</p>
                 <p className="font-jetbrains text-[11px] text-gray-600 mb-4">Lance une mission depuis l’Atelier ou envoie-en une via la CLI.</p>
-                <Link to="/classic/ops" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-synth-cyan/10 border border-synth-cyan/30 text-synth-cyan inline-block mr-2">Atelier</Link>
-                <Link to="/classic/integrations" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-white/5 border border-synth-border text-gray-400 hover:text-white inline-block">Connecter la CLI</Link>
+                <Link to="/classic/ops" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-synth-copper-bg border border-synth-copper/40 text-synth-copper inline-block mr-2">Atelier</Link>
+                <Link to="/classic/integrations" className="font-jetbrains text-xs px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white inline-block">Connecter la CLI</Link>
               </div>
             )}
             {currentMissionDag && (
@@ -193,9 +192,9 @@ export default function Bridge() {
             )}
           </div>
 
-          <div className="rounded-xl border border-synth-border bg-synth-panel overflow-hidden h-72 flex flex-col">
-            <div className="px-4 py-3 border-b border-synth-border flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-synth-green animate-pulse" />
+          <div className="synth-panel overflow-hidden h-72 flex flex-col">
+            <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-synth-green animate-pulse" />
               <span className="font-orbitron text-xs font-bold text-synth-green tracking-wide">LIVE FEED</span>
             </div>
             <div className="flex-1 overflow-y-auto p-3 font-jetbrains text-[11px]">
@@ -225,15 +224,14 @@ export default function Bridge() {
           </div>
         </div>
 
-        {/* Équipage */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-orbitron text-xs font-bold text-gray-400 tracking-wide">
+            <span className="font-orbitron text-xs font-bold text-synth-copper tracking-wide">
               ÉQUIPAGE ({agents.length}/{getPlanLimit("agents")})
             </span>
             <Link
               to="/classic/quarters"
-              className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg bg-synth-purple/10 border border-synth-purple/30 text-synth-purple"
+              className="font-jetbrains text-[10px] px-3 py-1.5 rounded-lg bg-synth-copper-bg border border-synth-copper/40 text-synth-copper"
             >
               + Recruter
             </Link>
@@ -252,15 +250,14 @@ export default function Bridge() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
         {[
           { label: "MISSIONS / 24H", value: String(missions?.length ?? 0), color: "text-synth-cyan", sub: "ce mois" },
           { label: "TAUX SUCCÈS", value: "95%", color: "text-synth-green", sub: "moyenne" },
-          { label: "MCPs CONNECTÉS", value: String(connectedMcps), color: "text-synth-amber", sub: "tools actifs" },
+          { label: "MCPs CONNECTÉS", value: String(connectedMcps), color: "text-synth-copper", sub: "tools actifs" },
           { label: "PLAN", value: "Explorer", color: "text-gray-400", sub: "3 agents max" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-synth-border bg-synth-panel p-4">
+          <div key={stat.label} className="synth-panel-neutral p-4">
             <div className="font-jetbrains text-[9px] text-gray-500 tracking-wide mb-1">{stat.label}</div>
             <div className={`font-orbitron text-xl font-black ${stat.color}`}>{stat.value}</div>
             <div className="font-jetbrains text-[10px] text-gray-600 mt-1">{stat.sub}</div>
