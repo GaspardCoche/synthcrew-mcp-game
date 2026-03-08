@@ -6,6 +6,7 @@
 import { Suspense, useRef, useMemo } from "react";
 import { useGLTF, Text, Billboard } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
@@ -79,11 +80,11 @@ function ZoneFloor({ cx, cz, radius, color, name, locked }) {
   const ref = useRef();
   const y = getTerrainHeightAt(cx, cz) + 0.03;
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       ref.current.material.emissiveIntensity = locked ? 0.04 : 0.08 + 0.04 * Math.sin(clock.elapsedTime * 1.5);
     }
-  });
+  }, 15);
 
   return (
     <group>
@@ -121,9 +122,9 @@ function LockIndicator({ cx, cz, color }) {
   const ref = useRef();
   const y = getTerrainHeightAt(cx, cz);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.rotation.y = clock.elapsedTime * 0.3;
-  });
+  }, 15);
 
   return (
     <group position={[cx, y + 1.5, cz]} ref={ref}>
@@ -176,7 +177,7 @@ function HolographicTable({ x, z, color }) {
   const ringRef = useRef();
   const y = getTerrainHeightAt(x, z);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     const t = clock.elapsedTime;
     if (displayRef.current) {
       displayRef.current.material.emissiveIntensity = 0.6 + 0.4 * Math.sin(t * 2);
@@ -185,7 +186,7 @@ function HolographicTable({ x, z, color }) {
     if (ringRef.current) {
       ringRef.current.rotation.y = t * 0.8;
     }
-  });
+  }, 24);
 
   return (
     <group position={[x, y, z]}>
@@ -284,11 +285,11 @@ function ZoneHub() {
 function ServerRack({ x, z, h = 3, color, damage = 0 }) {
   const y = getTerrainHeightAt(x, z);
   const ledRef = useRef();
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ledRef.current) {
       ledRef.current.material.emissiveIntensity = damage > 0.5 ? 0 : 0.5 + 0.4 * Math.sin(clock.elapsedTime * 5 + x);
     }
-  });
+  }, 20);
   return (
     <group position={[x, y, z]}>
       {/* Rack body */}
@@ -372,12 +373,12 @@ function ZoneData() {
 function Telescope({ x, z, color, damage = 0 }) {
   const dishRef = useRef();
   const y = getTerrainHeightAt(x, z);
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (dishRef.current) {
       dishRef.current.rotation.x = -Math.PI / 4 + Math.sin(clock.elapsedTime * 0.2) * 0.1;
       dishRef.current.rotation.y = clock.elapsedTime * 0.08;
     }
-  });
+  }, 15);
   return (
     <group position={[x, y, z]}>
       {/* Base */}
@@ -461,11 +462,11 @@ function ZoneAnalysis() {
 function DataShelf({ x, z, color, damage = 0, rows = 4, cols = 3 }) {
   const y = getTerrainHeightAt(x, z);
   const slotRef = useRef([]);
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     slotRef.current.forEach((m, i) => {
       if (m) m.material.emissiveIntensity = (0.3 + 0.25 * Math.sin(clock.elapsedTime * 2 + i * 1.1)) * (1 - damage * 0.8);
     });
-  });
+  }, 20);
   return (
     <group position={[x, y, z]}>
       {/* Frame */}
@@ -542,11 +543,11 @@ function ZoneArchive() {
 function SatelliteDish({ x, z, color, damage = 0, size = 1, rotSpeed = 0.15, tiltAngle = -0.6 }) {
   const dishRef = useRef();
   const y = getTerrainHeightAt(x, z);
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (dishRef.current) {
       dishRef.current.rotation.y = clock.elapsedTime * rotSpeed;
     }
-  });
+  }, 15);
   return (
     <group position={[x, y, z]}>
       {/* Mast */}
@@ -616,9 +617,9 @@ function ZoneComms() {
 // ─────────────────────────────────────────────────────────────────────────────
 function WebStrand({ from, to, color, damage = 0 }) {
   const ref = useRef();
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.material.opacity = (0.4 + 0.2 * Math.sin(clock.elapsedTime * 1.5 + from[0])) * (1 - damage * 0.7);
-  });
+  }, 15);
   const pts = [new THREE.Vector3(...from), new THREE.Vector3(...to)];
   const geo = useMemo(() => new THREE.BufferGeometry().setFromPoints(pts), []);
   return (
@@ -705,14 +706,14 @@ function ZonePhantom() {
 // ─────────────────────────────────────────────────────────────────────────────
 function Gear({ x, z, y, radius, teeth = 12, color, damage = 0, speed = 0.5, axis = "y" }) {
   const ref = useRef();
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       const angle = clock.elapsedTime * speed;
       if (axis === "y") ref.current.rotation.y = angle;
       else if (axis === "x") ref.current.rotation.x = angle;
       else ref.current.rotation.z = angle;
     }
-  });
+  }, 24);
 
   const geo = useMemo(() => {
     const shape = new THREE.Shape();

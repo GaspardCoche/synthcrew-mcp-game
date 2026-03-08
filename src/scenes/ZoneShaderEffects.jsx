@@ -3,7 +3,7 @@
  * Holographic data screens, neon grid floors, plasma cores, data stream panels.
  */
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
 import {
@@ -43,7 +43,7 @@ function DataStreamPanel({ position, color, rotation = [0, 0, 0], width = 0.8, h
 
 function PlasmaCore({ position, radius = 0.3, colorA, colorB, colorC }) {
   const ref = useRef();
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       ref.current.rotation.y = clock.elapsedTime * 0.5;
       ref.current.rotation.x = Math.sin(clock.elapsedTime * 0.3) * 0.2;
@@ -69,7 +69,7 @@ function NeonFloor({ position, size = 8, color }) {
 
 function FloatingDataRing({ position, color, radius = 2.5 }) {
   const ref = useRef();
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       ref.current.rotation.y = clock.elapsedTime * 0.4;
       ref.current.rotation.z = Math.sin(clock.elapsedTime * 0.5) * 0.08;

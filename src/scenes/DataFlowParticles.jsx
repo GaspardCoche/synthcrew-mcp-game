@@ -4,7 +4,7 @@
  * Utilise des instanced meshes pour la performance.
  */
 import { useRef, useMemo, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 import { useStore } from "../store/useStore";
 import { getAgentHome } from "../lib/agentZones";
@@ -56,7 +56,7 @@ function AgentFlow({ fromName, toName, color, active }) {
     return mid;
   }, [from, to]);
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!meshRef.current || !active) {
       // Hide all when inactive
       if (meshRef.current) {
@@ -129,7 +129,7 @@ function AmbientDataParticles({ count = 80 }) {
     [count]
   );
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.elapsedTime;
     particles.forEach((p, i) => {
@@ -177,7 +177,7 @@ function MissionBeam({ agents: agentList, missionColor = "#ff6b35" }) {
     return new THREE.BufferGeometry().setFromPoints(pts);
   }, [curve]);
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.material.opacity = 0.15 + Math.sin(state.clock.elapsedTime * 4) * 0.1;
   });

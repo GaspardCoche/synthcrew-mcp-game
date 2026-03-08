@@ -4,7 +4,7 @@
  * DataStreamMaterial, TerrainMaterial.
  */
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ export function HolographicMaterial({ color = "#00e5ff", opacity = 0.7, children
     uOpacity: { value: opacity },
   }), [color, opacity]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.uniforms.uTime.value = clock.elapsedTime;
   });
 
@@ -116,7 +116,7 @@ export function NeonGridMaterial({ color = "#0ff", gridSize = 12.0, lineWidth = 
     uPulse:     { value: pulse },
   }), [color, gridSize, lineWidth, pulse]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.uniforms.uTime.value = clock.elapsedTime;
   });
 
@@ -186,7 +186,7 @@ export function PlasmaMaterial({ colorA = "#6c5ce7", colorB = "#ff6b6b", colorC 
     uColorC: { value: new THREE.Color(colorC) },
   }), [colorA, colorB, colorC]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.uniforms.uTime.value = clock.elapsedTime;
   });
 
@@ -253,7 +253,7 @@ export function DataStreamMaterial({ color = "#00ff88", speed = 0.4, density = 1
     uDensity: { value: density },
   }), [color, speed, density]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.uniforms.uTime.value = clock.elapsedTime;
   });
 
@@ -341,7 +341,7 @@ export function TerrainZoneMaterial({ ...props }) {
     uTime: { value: 0 },
   }), []);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) ref.current.uniforms.uTime.value = clock.elapsedTime;
   });
 

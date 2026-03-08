@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, Suspense, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Text, Billboard, Html } from "@react-three/drei";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 import { agentCollidersRef } from "../lib/agentColliders";
@@ -41,10 +42,10 @@ const HIT_BOX_HEIGHT = 3;
 
 function FallbackAgent({ color, selected, sick }) {
   const ref = useRef();
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.rotation.y = state.clock.elapsedTime * (sick ? 0.15 : 0.4);
-  });
+  }, 20);
   const dim = sick ? 0.5 : 1;
   const mat = <meshStandardMaterial color={color} emissive={color} emissiveIntensity={(selected ? 0.7 : 0.3) * dim} roughness={sick ? 0.6 : 0.3} metalness={0.6} />;
   return (
@@ -64,13 +65,13 @@ function GltfAgent({ modelPath, color, selected, sick }) {
   const clone = useMemo(() => scene.clone(), [scene]);
   const groupRef = useRef();
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
     const breathe = Math.sin(t * 1.5) * 0.0003;
     groupRef.current.scale.set(0.013 + breathe, 0.013 + breathe * 0.5, 0.013 + breathe);
     groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.02;
-  });
+  }, 20);
 
   return (
     <group ref={groupRef} scale={[0.013, 0.013, 0.013]}>
@@ -82,10 +83,10 @@ function GltfAgent({ modelPath, color, selected, sick }) {
 
 function SickRing() {
   const ref = useRef();
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.rotation.z = state.clock.elapsedTime * 0.8;
-  });
+  }, 15);
   return (
     <group position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh ref={ref}>
@@ -99,7 +100,7 @@ function SickRing() {
 function SickParticles() {
   const ref = useRef();
   const offsets = useMemo(() => Array.from({ length: 5 }, () => [Math.random() * Math.PI * 2, Math.random() * 0.6 + 0.5]), []);
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     ref.current.children.forEach((c, i) => {
@@ -123,11 +124,11 @@ function SickParticles() {
 
 function SelectionRing({ color }) {
   const ref = useRef();
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.rotation.z = state.clock.elapsedTime * 1.2;
     ref.current.material.opacity = 0.5 + Math.sin(state.clock.elapsedTime * 3) * 0.2;
-  });
+  }, 24);
   return (
     <group position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh ref={ref}>
@@ -192,14 +193,14 @@ const AGENT_WORKSTATIONS = {
 function WorkstationTerminal({ color, active }) {
   const ref = useRef();
   const screenRef = useRef();
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     if (ref.current) ref.current.rotation.y = Math.sin(t * 0.3) * 0.1;
     if (screenRef.current) {
       screenRef.current.material.opacity = active ? 0.7 + Math.sin(t * 8) * 0.15 : 0.2;
     }
-  });
+  }, 24);
   return (
     <group ref={ref} position={[0, 0, 0.8]}>
       {/* Screen */}

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 
@@ -94,10 +94,10 @@ function EnergyBeam({ from, to, color }) {
   const dist = Math.hypot(dx, dz);
   const angle = Math.atan2(dz, dx);
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.material.opacity = 0.06 + Math.sin(state.clock.elapsedTime * 1.5) * 0.03;
-  });
+  }, 15);
 
   return (
     <mesh
@@ -116,11 +116,11 @@ function LockedZoneMarker({ pos, color }) {
   const [x, , z] = pos;
   const y = getTerrainHeightAt(x, z);
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     ref.current.rotation.y = state.clock.elapsedTime * 0.3;
     ref.current.position.y = y + 1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.3;
-  });
+  }, 15);
 
   return (
     <group position={[x, y, z]}>

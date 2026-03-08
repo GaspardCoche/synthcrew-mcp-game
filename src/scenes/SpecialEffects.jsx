@@ -5,6 +5,7 @@
  */
 import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import { Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
@@ -83,7 +84,7 @@ export function HologramProjector({ position = [0, 0, 0], color = "#00e5ff", lab
   const coneRef = useRef();
   const discRef = useRef();
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     const t = clock.elapsedTime;
     if (ringRef.current) {
       ringRef.current.rotation.y = t * 1.2;
@@ -95,7 +96,7 @@ export function HologramProjector({ position = [0, 0, 0], color = "#00e5ff", lab
     if (discRef.current) {
       discRef.current.material.opacity = 0.2 + 0.15 * Math.sin(t * 3);
     }
-  });
+  }, 24);
 
   const [px, py, pz] = position;
 
@@ -144,7 +145,7 @@ export function HologramProjector({ position = [0, 0, 0], color = "#00e5ff", lab
 export function EnergyField({ position = [0, 0, 0], radius = 12, color = "#4ecdc4", active = false }) {
   const ref = useRef();
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (!ref.current) return;
     const t = clock.elapsedTime;
     const base = active ? 0.08 : 0.02;
@@ -153,7 +154,7 @@ export function EnergyField({ position = [0, 0, 0], radius = 12, color = "#4ecdc
     // Pulse scale when active
     const s = active ? 1 + 0.02 * Math.sin(t * 3) : 1;
     ref.current.scale.setScalar(s);
-  });
+  }, 20);
 
   return (
     <mesh ref={ref} position={position}>
@@ -178,7 +179,7 @@ export function MissionBeam({ position = [0, 0, 0], color = "#fff", active = fal
   const beamRef = useRef();
   const glowRef = useRef();
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (!beamRef.current || !glowRef.current) return;
     const t = clock.elapsedTime;
     const alpha = active ? 0.15 + 0.1 * Math.sin(t * 4) : 0;
@@ -186,7 +187,7 @@ export function MissionBeam({ position = [0, 0, 0], color = "#fff", active = fal
     glowRef.current.material.opacity = active ? 0.35 + 0.2 * Math.sin(t * 3 + 1) : 0;
     // Slow rotation
     if (glowRef.current) glowRef.current.rotation.y = t * 0.5;
-  });
+  }, 24);
 
   if (!active) return null;
 

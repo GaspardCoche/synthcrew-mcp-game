@@ -4,7 +4,7 @@
  * Optimisé : instances, frustum culling, matériaux partagés.
  */
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 import { getTerrainHeightAt } from "./Terrain";
 
@@ -58,11 +58,11 @@ function DataCable({ from, to, color = "#6c5ce7", opacity = 0.3 }) {
   const geo = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
   const ref = useRef();
 
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (ref.current) {
       ref.current.material.opacity = opacity * (0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.3);
     }
-  });
+  }, 20);
 
   return (
     <line ref={ref} geometry={geo}>
@@ -74,13 +74,13 @@ function DataCable({ from, to, color = "#6c5ce7", opacity = 0.3 }) {
 function Hologram({ x, z, h = 2, color = "#4ecdc4", symbol = "◆" }) {
   const ref = useRef();
   const y = getTerrainHeightAt(x, z);
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     ref.current.rotation.y = t * 0.8;
     ref.current.position.y = y + h + Math.sin(t * 1.5) * 0.1;
     ref.current.material.opacity = 0.4 + Math.sin(t * 3) * 0.15;
-  });
+  }, 24);
   return (
     <group position={[x, y, z]}>
       {/* Base projector */}
@@ -106,11 +106,11 @@ function Hologram({ x, z, h = 2, color = "#4ecdc4", symbol = "◆" }) {
 function SatelliteDish({ x, z, angle = 0 }) {
   const y = getTerrainHeightAt(x, z);
   const ref = useRef();
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (ref.current) {
       ref.current.rotation.y = angle + Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
     }
-  });
+  }, 15);
   return (
     <group position={[x, y, z]} ref={ref}>
       <mesh position={[0, 1.5, 0]}>
@@ -128,11 +128,11 @@ function SatelliteDish({ x, z, angle = 0 }) {
 function EnergyPylon({ x, z, color = "#ff6b35", height = 5 }) {
   const ref = useRef();
   const y = getTerrainHeightAt(x, z);
-  useFrame((state) => {
+  useThrottledFrame((state) => {
     if (ref.current) {
       ref.current.material.emissiveIntensity = 0.8 + Math.sin(state.clock.elapsedTime * 4 + x) * 0.4;
     }
-  });
+  }, 20);
   return (
     <group position={[x, y, z]}>
       <mesh position={[0, height / 2, 0]} castShadow>

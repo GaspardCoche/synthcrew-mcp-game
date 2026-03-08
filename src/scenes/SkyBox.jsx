@@ -4,7 +4,7 @@
  * occasional shooting stars.
  */
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useThrottledFrame } from "../lib/useThrottledFrame";
 import * as THREE from "three";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -35,13 +35,13 @@ function StarLayer({ count = 800, radius = 180, size = 1.2, color = "#ffffff", s
     return { positions, geometry: geo };
   }, [count, radius, seed]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       // Slow drift — parallax relative to camera tilt
       ref.current.rotation.y = clock.elapsedTime * speed;
       ref.current.rotation.x = clock.elapsedTime * speed * 0.4;
     }
-  });
+  }, 15);
 
   return (
     <points ref={ref} geometry={geometry}>
@@ -71,11 +71,11 @@ function NebulaCloud({ position, color, scale = 30, opacity = 0.12 }) {
     return new THREE.CanvasTexture(canvas);
   }, []);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       ref.current.material.opacity = opacity * (0.7 + 0.3 * Math.sin(clock.elapsedTime * 0.3 + position[0]));
     }
-  });
+  }, 10);
 
   return (
     <sprite ref={ref} position={position} scale={[scale, scale * 0.6, 1]}>
@@ -120,7 +120,7 @@ function DistantPlanet({ position = [80, 55, -200], radius = 22, colorA = "#1a0a
     return new THREE.CanvasTexture(canvas);
   }, [colorA, colorB]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     const t = clock.elapsedTime;
     if (planetRef.current) {
       planetRef.current.rotation.y = t * 0.02;
@@ -128,7 +128,7 @@ function DistantPlanet({ position = [80, 55, -200], radius = 22, colorA = "#1a0a
     if (ringRef.current) {
       ringRef.current.rotation.z = t * 0.008;
     }
-  });
+  }, 15);
 
   return (
     <group position={position}>
@@ -187,11 +187,11 @@ function AuroraLayer({ position, rotation, colorA, colorB, width = 300, height =
     uColorB: { value: new THREE.Color(colorB) },
   }), [colorA, colorB]);
 
-  useFrame(({ clock }) => {
+  useThrottledFrame(({ clock }) => {
     if (ref.current) {
       ref.current.uniforms.uTime.value = clock.elapsedTime * speed;
     }
-  });
+  }, 20);
 
   return (
     <mesh position={position} rotation={rotation}>
@@ -218,7 +218,7 @@ function ShootingStar() {
   const trailRef = useRef();
   const stateRef = useRef({ phase: "wait", timer: 0, start: new THREE.Vector3(), dir: new THREE.Vector3(), progress: 0 });
 
-  useFrame((_, delta) => {
+  useThrottledFrame((_, delta) => {
     const s = stateRef.current;
     s.timer += delta;
 
@@ -254,7 +254,7 @@ function ShootingStar() {
         if (trailRef.current) trailRef.current.material.opacity = 0;
       }
     }
-  });
+  }, 30);
 
   const trailGeo = useMemo(() => {
     const pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(-3, 0.5, 0)];
