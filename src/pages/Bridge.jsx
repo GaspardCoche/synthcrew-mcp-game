@@ -552,20 +552,62 @@ function QuickAction({ to, icon, label, sub, color, pulse }) {
   );
 }
 
+// ── Quick Mission Input ──────────────────────────────────────
+function QuickMissionInput() {
+  const [prompt, setPrompt] = useState("");
+  const [sending, setSending] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  const launch = async () => {
+    const text = prompt.trim();
+    if (!text || sending) return;
+    setSending(true);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/mission/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text, title: text.slice(0, 80) }),
+      });
+      const data = await res.json();
+      if (data.error) setFeedback({ ok: false, msg: data.error });
+      else { setFeedback({ ok: true, msg: data.message || "Mission lancée" }); setPrompt(""); }
+    } catch { setFeedback({ ok: false, msg: "Serveur inaccessible" }); }
+    finally { setSending(false); }
+  };
+
+  return (
+    <div className="cyber-panel p-3">
+      <div className="flex gap-2">
+        <input
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && launch()}
+          placeholder="Décris une mission pour l'équipage..."
+          disabled={sending}
+          className="flex-1 bg-black/30 border border-white/8 rounded-lg px-3 py-2 text-[11px] text-gray-200 font-mono placeholder-gray-700 outline-none focus:border-synth-primary/30 transition-colors"
+        />
+        <button
+          onClick={launch}
+          disabled={!prompt.trim() || sending}
+          className="synth-btn-primary text-[10px] disabled:opacity-40 whitespace-nowrap"
+        >
+          {sending ? "..." : "Lancer"}
+        </button>
+      </div>
+      {feedback && (
+        <p className={`text-[9px] font-mono mt-1.5 ${feedback.ok ? "text-emerald-400" : "text-red-400"}`}>
+          {feedback.msg}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── Main Bridge Page ─────────────────────────────────────────
 export default function Bridge() {
-  const [time, setTime] = useState(new Date());
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const [uptimeSeconds, setUptimeSeconds] = useState(0);
-  const { agents, missionLog, currentMissionDag, mcps, getPlanLimit, missions } = useStore();
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setTime(new Date());
-      setUptimeSeconds((s) => s + 1);
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
+  const { agents, missionLog, currentMissionDag, mcps, missions } = useStore();
 
   const activeCount = agents.filter((a) => a.status === "active").length;
   const totalMissions = agents.reduce((s, a) => s + (a.missions || 0), 0);
@@ -573,13 +615,11 @@ export default function Bridge() {
   const totalTools = connectedMcps.reduce((s, m) => s + (m.tools?.length || 0), 0);
   const avgSuccess = Math.round(agents.reduce((s, a) => s + (a.successRate || 0), 0) / Math.max(agents.length, 1));
 
-  const uptimeHours = Math.floor(uptimeSeconds / 3600);
-  const uptimeMins = Math.floor((uptimeSeconds % 3600) / 60);
-  const uptimeSecs = uptimeSeconds % 60;
-  const uptimeStr = `${String(uptimeHours).padStart(2, "0")}:${String(uptimeMins).padStart(2, "0")}:${String(uptimeSecs).padStart(2, "0")}`;
-
   return (
     <div className="space-y-4 max-w-[1400px] relative">
+
+      {/* ── Quick Mission ──────────────────────────────────── */}
+      <QuickMissionInput />
 
       {/* ── Top Status Bar ─────────────────────────────────── */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -607,14 +647,6 @@ export default function Bridge() {
           <span style={{ color: "#374151" }}>
             MISSIONS: <span style={{ color: "#ff6b35" }}>{totalMissions}</span>
           </span>
-          <span style={{ color: "#374151" }}>|</span>
-          <span style={{ color: "#374151" }}>
-            UPTIME: <span style={{ color: "#a855f7" }}>{uptimeStr}</span>
-          </span>
-        </div>
-
-        <div className="ml-auto font-mono text-sm font-bold" style={{ color: "#00f5ff", textShadow: "0 0 12px rgba(0,245,255,0.4)" }}>
-          {time.toLocaleTimeString("en-US", { hour12: false })}
         </div>
       </div>
 
@@ -642,7 +674,7 @@ export default function Bridge() {
           icon="⬡"
         />
         <MetricCard
-          label="Success Rate"
+          label="Avg Success"
           value={avgSuccess}
           unit="%"
           sub="Fleet average"

@@ -315,7 +315,15 @@ app.post("/api/mission/execute", async (c) => {
     broadcast({ type: "missions",    payload: getMissions() });
     broadcast({ type: "mission_log", payload: { event: "mission_queued", mission } });
 
-    return c.json({ ok: true, mission: { id: mission.id, title: mission.title, status: "pending" } });
+    const engine = CLAUDE_KEY ? "claude" : "mock";
+    return c.json({
+      ok: true,
+      engine,
+      message: engine === "claude"
+        ? `Mission "${mission.title}" en file — exécution Claude en cours. Suivez la progression en temps réel via WebSocket.`
+        : `Mission "${mission.title}" en file — exécution simulée (ajoutez ANTHROPIC_API_KEY pour Claude).`,
+      mission: { id: mission.id, title: mission.title, status: "pending" },
+    });
   } catch (e) {
     return c.json({ error: e.message }, 500);
   }
@@ -752,7 +760,7 @@ setInterval(async () => {
   if (!pending) return;
   _workerRunning = true;
   try {
-    const useClaude = CLAUDE_KEY && pending.source === "cli";
+    const useClaude = !!CLAUDE_KEY;
     if (useClaude) {
       updateMissionStatus(pending.id, "running", { startedAt: new Date().toISOString() });
       broadcast({ type: "mission_log", payload: { event: "mission_started", mission: getMission(pending.id) } });
