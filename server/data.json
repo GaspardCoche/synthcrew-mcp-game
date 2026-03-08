@@ -2,90 +2,130 @@
   "agents": [
     {
       "id": "a_0",
-      "name": "CONDUCTOR",
+      "name": "NEXUS",
       "role": "orchestrator",
       "avatar": "🎯",
       "status": "idle",
-      "color": "#eab308",
+      "color": "#ff6b35",
       "level": 99,
       "missions": 0,
       "successRate": 100,
-      "personality": "Orchestrateur. Je comprends ton besoin et propose l'équipe adaptée. Je sers de mémoire aux autres agents."
+      "mcpIds": [
+        "sequential-thinking",
+        "memory"
+      ],
+      "personality": "Orchestrateur central. Je décompose les missions en DAG, coordonne l'équipe et sers de mémoire collective."
     },
     {
       "id": "a_1",
-      "name": "SENTINEL",
+      "name": "DATAFLOW",
       "role": "data_ops",
-      "avatar": "🛡️",
+      "avatar": "📊",
       "status": "idle",
-      "color": "#00f0ff",
+      "color": "#6c5ce7",
       "level": 12,
-      "missions": 147,
+      "missions": 0,
       "successRate": 96,
-      "personality": "Agent Data Ops. Je récupère et structure les données."
+      "mcpIds": [
+        "github",
+        "postgres",
+        "filesystem"
+      ],
+      "personality": "Data Ops. Je récupère et structure les données depuis toutes les sources."
     },
     {
       "id": "a_2",
-      "name": "CIPHER",
+      "name": "PRISME",
       "role": "analyst",
-      "avatar": "🔮",
+      "avatar": "🔬",
       "status": "idle",
-      "color": "#a855f7",
+      "color": "#74b9ff",
       "level": 8,
-      "missions": 89,
+      "missions": 0,
       "successRate": 94,
-      "personality": "Analyste. J'identifie tendances et patterns."
+      "mcpIds": [
+        "sequential-thinking",
+        "brave-search"
+      ],
+      "personality": "Analyste. J'identifie tendances, patterns et insights dans les données."
     },
     {
       "id": "a_3",
-      "name": "ARCHIVIST",
+      "name": "SCRIBE",
       "role": "writer",
-      "avatar": "📜",
+      "avatar": "✍️",
       "status": "idle",
-      "color": "#f59e0b",
+      "color": "#ffd93d",
       "level": 15,
-      "missions": 203,
+      "missions": 0,
       "successRate": 98,
-      "personality": "Rédacteur. Je produis rapports et doc."
+      "mcpIds": [
+        "notion",
+        "google-workspace",
+        "filesystem"
+      ],
+      "personality": "Rédacteur. Je produis rapports, docs et synthèses structurées."
     },
     {
       "id": "a_4",
-      "name": "HERALD",
+      "name": "SIGNAL",
       "role": "communicator",
       "avatar": "📡",
       "status": "idle",
-      "color": "#22c55e",
+      "color": "#00b894",
       "level": 6,
-      "missions": 56,
+      "missions": 0,
       "successRate": 91,
-      "personality": "Communicant. J'envoie résumés et notifications."
+      "mcpIds": [
+        "slack",
+        "gmail"
+      ],
+      "personality": "Communicant. J'envoie résumés et notifications sur tous les canaux."
     },
     {
       "id": "a_5",
-      "name": "PHANTOM",
+      "name": "SPIDER",
       "role": "scraper",
-      "avatar": "👻",
+      "avatar": "🕸️",
       "status": "idle",
-      "color": "#ef4444",
+      "color": "#ff6b6b",
       "level": 10,
-      "missions": 112,
+      "missions": 0,
       "successRate": 88,
-      "personality": "Scraper. Je collecte des infos sur le web."
+      "mcpIds": [
+        "brave-search",
+        "firecrawl",
+        "playwright"
+      ],
+      "personality": "Scraper. Je collecte des infos sur le web et fais de la veille."
     },
     {
       "id": "a_6",
-      "name": "FORGE",
+      "name": "CODEFORGE",
       "role": "developer",
       "avatar": "⚒️",
       "status": "idle",
-      "color": "#ec4899",
+      "color": "#fd79a8",
       "level": 19,
-      "missions": 267,
+      "missions": 0,
       "successRate": 97,
-      "personality": "Développeur. J'exécute des tâches code et revues."
+      "mcpIds": [
+        "github",
+        "docker",
+        "sentry"
+      ],
+      "personality": "Développeur. Je gère le code, les PRs, les revues et les déploiements."
     }
   ],
   "missions": [
+    {
+      "id": "m_1772970158773",
+      "createdAt": "2026-03-08T11:42:38.773Z",
+      "status": "completed",
+      "title": "Analyse les agents et crée un rapport",
+      "prompt": "Analyse les agents et crée un rapport",
+      "source": "cli"
+    },
     {
       "id": "m_1772887116475",
       "createdAt": "2026-03-07T12:38:36.475Z",
@@ -98,16 +138,17 @@
   ],
   "automations": [],
   "stats": {
-    "totalMissions": 1,
-    "streak": 1,
-    "lastMissionDate": "2026-03-07",
-    "xp": 100,
-    "level": 1,
+    "totalMissions": 2,
+    "streak": 2,
+    "lastMissionDate": "2026-03-08",
+    "xp": 200,
+    "level": 2,
     "usedTemplate": true
   },
   "achievements": [
     "first_mission",
-    "full_crew"
+    "full_crew",
+    "template_user"
   ],
   "missionTemplates": [
     {

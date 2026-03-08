@@ -9,11 +9,15 @@ export default defineConfig({
     ),
   },
   build: {
+    chunkSizeWarningLimit: 1400,
     rollupOptions: {
       output: {
         entryFileNames: "assets/[name]-[hash].js",
         chunkFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash][extname]",
+        manualChunks: {
+          "three-vendor": ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "postprocessing"],
+        },
       },
     },
   },

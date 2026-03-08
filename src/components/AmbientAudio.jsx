@@ -1,9 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 
 const TRACKS = [
+  { id: "void", name: "Entering the Void", src: "/audio/tracks/2. Entering the Void (Loop).ogg" },
+  { id: "station", name: "Awakening Station", src: "/audio/tracks/11. Awakening Station (Loop).ogg" },
+  { id: "echoes", name: "Echoes from the Station", src: "/audio/tracks/13. Echoes from the Station (Loop).ogg" },
+  { id: "spacetime", name: "Fractured Space-Time", src: "/audio/tracks/16. Fractured Space-Time (Loop).ogg" },
+  { id: "wormhole", name: "Through the Wormhole", src: "/audio/tracks/18. Through the Wormhole (Loop).ogg" },
+  { id: "unknown", name: "Scanning the Unknown", src: "/audio/tracks/20. Scanning the Unknown (Loop).ogg" },
+  // Fallbacks to built-in ambients
   { id: "outpost", name: "Abandoned Outpost", src: "/audio/ambient-outpost.ogg" },
-  { id: "station", name: "Awakening Station", src: "/audio/ambient-station.ogg" },
-  { id: "echoes", name: "Echoes from Station", src: "/audio/ambient-echoes.ogg" },
 ];
 
 export default function AmbientAudio() {

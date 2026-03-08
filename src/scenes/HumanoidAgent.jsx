@@ -167,6 +167,101 @@ const AGENT_GREETINGS = {
   CODEFORGE: "Atelier code actif. PR, deploy ou review ?",
 };
 
+const AGENT_WORKING_PHRASES = {
+  NEXUS:     ["Décomposition en sous-tâches…", "Coordination équipe…", "Analyse du DAG…", "Synchronisation…"],
+  DATAFLOW:  ["Récupération données…", "Pipeline ETL actif…", "Streaming records…", "Index en cours…"],
+  PRISME:    ["Pattern détecté…", "Corrélation +87%…", "Insights extraits…", "Clustering…"],
+  SCRIBE:    ["Rédaction en cours…", "Structure générée…", "Formatage doc…", "Synthèse prête…"],
+  SIGNAL:    ["Message envoyé…", "Slack notifié…", "Email drafté…", "Notification OK"],
+  SPIDER:    ["Crawl actif…", "Page analysée…", "Données extraites…", "Veille OK…"],
+  CODEFORGE: ["Review PR…", "Tests passés…", "Deploy en cours…", "Merge validé…"],
+};
+
+// Workstation positions — agent goes here when active
+const AGENT_WORKSTATIONS = {
+  NEXUS:     [2,   0, -10],
+  DATAFLOW:  [-37, 0, -28],
+  PRISME:    [32,  0, -36],
+  SCRIBE:    [-30, 0, -52],
+  SIGNAL:    [44,  0, -20],
+  SPIDER:    [20,  0, -58],
+  CODEFORGE: [-17, 0, -64],
+};
+
+// Holographic workstation terminal
+function WorkstationTerminal({ color, active }) {
+  const ref = useRef();
+  const screenRef = useRef();
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    if (ref.current) ref.current.rotation.y = Math.sin(t * 0.3) * 0.1;
+    if (screenRef.current) {
+      screenRef.current.material.opacity = active ? 0.7 + Math.sin(t * 8) * 0.15 : 0.2;
+    }
+  });
+  return (
+    <group ref={ref} position={[0, 0, 0.8]}>
+      {/* Screen */}
+      <mesh position={[0, 1.1, 0]} ref={screenRef}>
+        <planeGeometry args={[0.6, 0.4]} />
+        <meshBasicMaterial color={color} transparent opacity={0.6} side={2} />
+      </mesh>
+      {/* Frame */}
+      <mesh position={[0, 1.1, -0.01]}>
+        <planeGeometry args={[0.65, 0.45]} />
+        <meshBasicMaterial color="#111" transparent opacity={0.9} side={2} />
+      </mesh>
+      {/* Pillar */}
+      <mesh position={[0, 0.55, 0]}>
+        <cylinderGeometry args={[0.04, 0.06, 1.1, 8]} />
+        <meshStandardMaterial color="#1a1a2e" metalness={0.8} roughness={0.2} />
+      </mesh>
+      {/* Base */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.3, 0.05, 12]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={active ? 0.4 : 0.1} metalness={0.6} roughness={0.3} />
+      </mesh>
+      {active && <pointLight position={[0, 1.1, 0.1]} color={color} intensity={0.4} distance={3} decay={2} />}
+    </group>
+  );
+}
+
+// Floating activity indicator (what the agent is doing right now)
+function ActivityBubble({ agentName, status, color }) {
+  const phraseIdx = useRef(0);
+  const [phrase, setPhrase] = useState("");
+  const phrases = AGENT_WORKING_PHRASES[agentName] || ["En cours…"];
+
+  useEffect(() => {
+    if (status !== "active") { setPhrase(""); return; }
+    setPhrase(phrases[0]);
+    const interval = setInterval(() => {
+      phraseIdx.current = (phraseIdx.current + 1) % phrases.length;
+      setPhrase(phrases[phraseIdx.current]);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [status, agentName]);
+
+  if (status !== "active" || !phrase) return null;
+
+  return (
+    <Html position={[0, 4.2, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
+      <div
+        className="px-2 py-1 rounded font-mono text-[9px] whitespace-nowrap animate-pulse"
+        style={{
+          background: "rgba(5,8,15,0.92)",
+          border: `1px solid ${color}60`,
+          color,
+          boxShadow: `0 0 12px ${color}40`,
+        }}
+      >
+        ▶ {phrase}
+      </div>
+    </Html>
+  );
+}
+
 function ProximityBubble({ agentName, agentRole, color }) {
   const greeting = AGENT_GREETINGS[agentName] || "...";
   const roleLabel = AGENT_ROLE_LABELS[agentRole] || "";
@@ -203,6 +298,16 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
     return id * 1.618 * Math.PI;
   }, [agent.id]);
 
+  const isActive = agent.status === "active";
+  const isQueued = agent.status === "queued";
+
+  // Workstation target when active
+  const workstationBase = AGENT_WORKSTATIONS[agent.name];
+  const workstationTarget = useMemo(() => {
+    if (!workstationBase) return null;
+    return [workstationBase[0], getTerrainHeightAt(workstationBase[0], workstationBase[2]) + 0.15, workstationBase[2]];
+  }, [workstationBase]);
+
   const baseCfg = PATROL_CONFIG[agent.status] || PATROL_CONFIG.idle;
   const zoneRadius = agent.patrolRadius ?? 6;
   const cfg = sick
@@ -214,26 +319,56 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
     if (!g) return;
     const t = state.clock.elapsedTime;
 
-    const nx = home[0] + Math.cos(t * cfg.speedX + phase) * cfg.radius;
-    const nz = home[2] + Math.sin(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65;
-    const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 2.4 + phase);
+    let tx, ty, tz;
 
-    g.position.x = nx;
-    g.position.y = ny;
-    g.position.z = nz;
+    if (isActive && workstationTarget) {
+      // Move to workstation when active — smooth lerp
+      tx = workstationTarget[0];
+      tz = workstationTarget[2];
+      ty = workstationTarget[1];
+      // Working bob at workstation
+      ty += Math.sin(t * 4 + phase) * 0.03;
+      // Smooth approach
+      g.position.x += (tx - g.position.x) * 0.04;
+      g.position.y += (ty - g.position.y) * 0.04;
+      g.position.z += (tz - g.position.z) * 0.04;
+      // Face the terminal
+      const targetAngle = Math.atan2(0, 1); // face forward
+      g.rotation.y += (targetAngle - g.rotation.y) * 0.05;
+    } else if (isQueued) {
+      // Move toward home but jitter nervously
+      const nx = home[0] + Math.cos(t * cfg.speedX * 1.5 + phase) * cfg.radius * 0.4;
+      const nz = home[2] + Math.sin(t * cfg.speedZ * 1.5 + phase * 0.7) * cfg.radius * 0.3;
+      const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 3 + phase);
+      g.position.x += (nx - g.position.x) * 0.06;
+      g.position.y += (ny - g.position.y) * 0.06;
+      g.position.z += (nz - g.position.z) * 0.06;
+    } else {
+      // Normal patrol
+      const nx = home[0] + Math.cos(t * cfg.speedX + phase) * cfg.radius;
+      const nz = home[2] + Math.sin(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65;
+      const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 2.4 + phase);
 
-    const key = `${agent.id || agent.name}-${Math.round(home[0])}-${Math.round(home[2])}`;
-    agentCollidersRef.current[key] = { x: nx, z: nz, r: AGENT_COLLIDER_RADIUS };
+      g.position.x = nx;
+      g.position.y = ny;
+      g.position.z = nz;
 
-    const vx = -Math.sin(t * cfg.speedX + phase) * cfg.radius * cfg.speedX;
-    const vz = Math.cos(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65 * cfg.speedZ;
-    if (Math.abs(vx) + Math.abs(vz) > 0.002) {
-      const targetY = Math.atan2(vx, vz);
-      g.rotation.y += (targetY - g.rotation.y) * 0.08;
+      // Face direction of movement
+      const vx = -Math.sin(t * cfg.speedX + phase) * cfg.radius * cfg.speedX;
+      const vz = Math.cos(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65 * cfg.speedZ;
+      if (Math.abs(vx) + Math.abs(vz) > 0.002) {
+        const targetY = Math.atan2(vx, vz);
+        g.rotation.y += (targetY - g.rotation.y) * 0.08;
+      }
     }
 
-    const dx = camera.position.x - nx;
-    const dz = camera.position.z - nz;
+    const currentX = g.position.x;
+    const currentZ = g.position.z;
+    const key = `${agent.id || agent.name}-${Math.round(home[0])}-${Math.round(home[2])}`;
+    agentCollidersRef.current[key] = { x: currentX, z: currentZ, r: AGENT_COLLIDER_RADIUS };
+
+    const dx = camera.position.x - currentX;
+    const dz = camera.position.z - currentZ;
     const dist = Math.sqrt(dx * dx + dz * dz);
     const near = dist < PROXIMITY_THRESHOLD;
     if (near !== isNear) setIsNear(near);
@@ -274,7 +409,7 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
         <FallbackAgent color={color} selected={selected} sick={sick} />
       )}
 
-      <pointLight color={sick ? "#ff6b6b" : color} intensity={selected ? 1.2 : sick ? 0.25 : 0.45} distance={5} decay={2} position={[0, 1.2, 0]} />
+      <pointLight color={sick ? "#ff6b6b" : isActive ? color : color} intensity={selected ? 1.4 : isActive ? 0.9 : sick ? 0.25 : 0.45} distance={isActive ? 8 : 5} decay={2} position={[0, 1.2, 0]} />
 
       <Billboard position={[0, 2.5, 0]}>
         <Text fontSize={0.2} color={color} anchorX="center" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
@@ -283,12 +418,18 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
       </Billboard>
 
       <Billboard position={[0, 2.2, 0]}>
-        <Text fontSize={0.1} color="#9ca3af" anchorX="center" outlineWidth={0.01} outlineColor="#000000">
-          {AGENT_ROLE_LABELS[agent.role] || "Agent"}
+        <Text fontSize={0.1} color={isActive ? "#4ade80" : "#9ca3af"} anchorX="center" outlineWidth={0.01} outlineColor="#000000">
+          {isActive ? "● ACTIVE" : isQueued ? "◌ QUEUED" : (AGENT_ROLE_LABELS[agent.role] || "Agent")}
         </Text>
       </Billboard>
 
-      {isNear && !selected && <ProximityBubble agentName={agent.name} agentRole={agent.role} color={color} />}
+      {/* Workstation terminal visible when active */}
+      {isActive && <WorkstationTerminal color={color} active={isActive} />}
+
+      {/* Real-time activity bubble */}
+      <ActivityBubble agentName={agent.name} status={agent.status} color={color} />
+
+      {isNear && !selected && !isActive && <ProximityBubble agentName={agent.name} agentRole={agent.role} color={color} />}
     </group>
   );
 }

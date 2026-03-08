@@ -26,6 +26,7 @@ import Minimap from "./components/Minimap";
 import AmbientAudio from "./components/AmbientAudio";
 import { hasDoneOnboarding } from "./lib/onboarding";
 import { BuildId } from "./components/BuildId";
+import CLITerminal from "./components/CLITerminal";
 
 const API_BASE = "";
 
@@ -56,6 +57,7 @@ export default function AppImmersive() {
   const [showControlsHelp, setShowControlsHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [viewMode, setViewMode] = useState("3d");
+  const [showCLI, setShowCLI] = useState(false);
 
   const keyBindings = useControlsStore((s) => s.keyBindings);
   const keyboardMap = useMemo(() => buildKeyboardMap(keyBindings), [keyBindings]);
@@ -95,6 +97,21 @@ export default function AppImmersive() {
 
   const closeGuide = useCallback(() => setGuideSelected(false), []);
 
+  // CLI keyboard shortcut: backtick ` or ctrl+`
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.key === "`" || (e.ctrlKey && e.key === "`")) && !showOnboarding) {
+        e.preventDefault();
+        setShowCLI((v) => !v);
+        if (!showCLI && pointerLocked && typeof document !== "undefined") {
+          document.exitPointerLock();
+        }
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showCLI, showOnboarding, pointerLocked]);
+
   const hasOverlay = !!(selectedAgent || guideSelected || showQuickLaunch || showControlsHelp || showSettings || showOnboarding || achievementToast);
   useEffect(() => {
     if (hasOverlay && typeof document !== "undefined") document.exitPointerLock();
@@ -105,14 +122,17 @@ export default function AppImmersive() {
       <KeyboardControls map={keyboardMap}>
       <div className="absolute top-4 left-4 z-20 pointer-events-none flex flex-col gap-1">
         <h1 className="synth-title-text text-sm font-black tracking-widest">SYNTHCREW</h1>
-        <p className="text-[10px] text-gray-500 font-jetbrains">Plateforme éducative — Gamifier l’orchestration d’agents IA</p>
-        <p className="text-[10px] text-gray-600 font-jetbrains mt-0.5">WASD · Clique pour verrouiller · Échap pour libérer</p>
+        <p className="text-[10px] text-gray-500 font-jetbrains">Open-World AI Agent Orchestration Platform</p>
+        <p className="text-[10px] text-gray-600 font-jetbrains mt-0.5">WASD · Clique pour verrouiller · <span className="text-cyan-600">` Terminal CLI</span></p>
         <BuildId className="sm:inline mt-1" />
       </div>
       <div className="absolute top-[165px] right-4 z-20 flex flex-col gap-1.5 items-end pointer-events-auto">
         <a href="#/classic" className="font-jetbrains text-[9px] text-gray-500 hover:text-synth-primary transition-colors px-2 py-1 rounded border border-transparent hover:border-synth-primary/20">
           Pont
         </a>
+        <button type="button" onClick={() => { setShowCLI((v) => !v); }} className={`font-jetbrains text-[9px] px-2.5 py-1 rounded border transition-colors ${showCLI ? "border-cyan-400/50 text-cyan-400 bg-cyan-400/10" : "border-cyan-500/20 text-cyan-600 hover:text-cyan-400 hover:bg-cyan-400/5"}`}>
+          Terminal `
+        </button>
         <button type="button" onClick={() => setShowQuickLaunch(true)} className="font-jetbrains text-[9px] px-2.5 py-1 rounded border border-synth-primary/30 text-synth-primary hover:bg-synth-primary/10 transition-colors">
           Mission
         </button>
@@ -148,9 +168,17 @@ export default function AppImmersive() {
       ) : (
       <Suspense fallback={<Loader />}>
         <Canvas
-          shadows
-          camera={{ position: [0, 2, 18], fov: 55 }}
-          gl={{ antialias: true, alpha: false }}
+          shadows="soft"
+          camera={{ position: [0, 2, 18], fov: 60, near: 0.1, far: 350 }}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: "high-performance",
+            stencil: false,
+            depth: true,
+          }}
+          performance={{ min: 0.5 }}
+          dpr={[1, Math.min(window.devicePixelRatio, 2)]}
         >
           <World
             agents={agents}
@@ -214,6 +242,7 @@ export default function AppImmersive() {
       )}
       </KeyboardControls>
       <AmbientAudio />
+      <CLITerminal open={showCLI} onClose={() => setShowCLI(false)} />
     </div>
   );
 }

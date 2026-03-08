@@ -4,20 +4,405 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Cyberpunk Color Variables ──────────────────────────────── */
+:root {
+  --neon-cyan: #00f5ff;
+  --neon-orange: #ff6b35;
+  --neon-purple: #a855f7;
+  --neon-green: #00ff88;
+  --neon-red: #ff2d55;
+  --neon-gold: #ffd93d;
+  --neon-pink: #ff006e;
+  --bg-deep: #020408;
+  --bg-panel: #080c15;
+  --bg-raised: #0d1424;
+  --bg-elevated: #111827;
+  --border-subtle: rgba(0, 245, 255, 0.06);
+  --border-active: rgba(0, 245, 255, 0.3);
+  --border-orange: rgba(255, 107, 53, 0.2);
+  --border-purple: rgba(168, 85, 247, 0.2);
+  --text-dim: #4b5563;
+  --text-muted: #6b7280;
+  --text-secondary: #9ca3af;
+  --text-primary: #e2e8f0;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #080c15;
+  background: var(--bg-panel);
   font-family: "Exo 2", "JetBrains Mono", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #dfe6e9;
 }
 
-/* ── SynthCrew Identity : Orbital Station ────────────────────── */
+/* ── Scrollbar ──────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 245, 255, 0.1) transparent;
+}
+*::-webkit-scrollbar { width: 3px; height: 3px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(0, 245, 255, 0.12); border-radius: 2px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0, 245, 255, 0.22); }
+
+/* ── Scanline Effect ────────────────────────────────────────── */
+.scanlines {
+  position: relative;
+}
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(0, 245, 255, 0.008) 50%);
+  background-size: 100% 4px;
+  animation: scanline-move 12s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Glitch Text Effect ─────────────────────────────────────── */
+.glitch {
+  position: relative;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.glitch::before {
+  animation: glitch-top 3.5s infinite linear;
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+  color: var(--neon-cyan);
+  opacity: 0;
+}
+.glitch::after {
+  animation: glitch-bottom 4.2s infinite linear;
+  clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+  color: var(--neon-orange);
+  opacity: 0;
+}
+
+/* ── Neon Glow Classes ──────────────────────────────────────── */
+.glow-cyan {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.6), 0 0 30px rgba(0, 245, 255, 0.2);
+}
+.glow-orange {
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.6), 0 0 30px rgba(255, 107, 53, 0.2);
+}
+.glow-purple {
+  color: var(--neon-purple);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168, 85, 247, 0.2);
+}
+.glow-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 30px rgba(0, 255, 136, 0.2);
+}
+.glow-primary {
+  color: #ff6b35;
+  text-shadow: 0 0 12px rgba(255,107,53,0.5);
+}
+.glow-teal {
+  color: #4ecdc4;
+  text-shadow: 0 0 12px rgba(78,205,196,0.5);
+}
+.glow-amber {
+  color: #ffd93d;
+  text-shadow: 0 0 12px rgba(255,217,61,0.4);
+}
+.glow-gold {
+  color: #ffd93d;
+  text-shadow: 0 0 12px rgba(255,217,61,0.4);
+}
+
+/* ── Cyberpunk Panels ───────────────────────────────────────── */
+.cyber-panel {
+  background: linear-gradient(160deg, rgba(13, 20, 36, 0.98), rgba(8, 12, 21, 0.99));
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.cyber-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.4;
+}
+
+.cyber-panel-orange {
+  background: linear-gradient(160deg, rgba(20, 10, 5, 0.98), rgba(8, 12, 21, 0.99));
+  border: 1px solid rgba(255, 107, 53, 0.12);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.cyber-panel-orange::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+  opacity: 0.5;
+}
+
+.cyber-panel-purple {
+  background: linear-gradient(160deg, rgba(15, 8, 28, 0.98), rgba(8, 12, 21, 0.99));
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.cyber-panel-purple::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+  opacity: 0.5;
+}
+
+/* ── Animated Border Gradient ───────────────────────────────── */
+.border-animate {
+  position: relative;
+}
+.border-animate::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(var(--angle, 0deg), var(--neon-cyan), var(--neon-purple), var(--neon-orange), var(--neon-cyan));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-spin 4s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Terminal Text ──────────────────────────────────────────── */
+.term-text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--neon-green);
+  line-height: 1.6;
+}
+.term-text-dim {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: #4b5563;
+}
+.term-prompt::before {
+  content: "> ";
+  color: var(--neon-cyan);
+  opacity: 0.7;
+}
+
+/* ── Agent Card ─────────────────────────────────────────────── */
+.agent-card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.agent-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: linear-gradient(135deg, rgba(0, 245, 255, 0.03), transparent);
+  pointer-events: none;
+}
+.agent-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+.agent-card:hover::after { opacity: 1; }
+
+/* ── RPG Agent Card ─────────────────────────────────────────── */
+.rpg-agent-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+.rpg-agent-card:hover {
+  transform: translateY(-4px) rotateX(2deg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Stat Bar ───────────────────────────────────────────────── */
+.stat-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1.2s ease;
+  position: relative;
+}
+.stat-bar-fill::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 6px;
+  background: white;
+  opacity: 0.5;
+  border-radius: 2px;
+  filter: blur(2px);
+}
+
+/* ── XP Bar ─────────────────────────────────────────────────── */
+.xp-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1s ease;
+}
+
+/* ── Pulsing Status Dot ─────────────────────────────────────── */
+.status-dot-active {
+  position: relative;
+}
+.status-dot-active::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0;
+  animation: dot-ripple 2s ease-out infinite;
+}
+
+/* ── Pipeline / DAG ─────────────────────────────────────────── */
+.pipeline-node {
+  position: relative;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.pipeline-node.active {
+  animation: node-pulse 1.5s ease-in-out infinite;
+}
+.pipeline-arrow {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 20px;
+  max-width: 60px;
+}
+.pipeline-arrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,245,255,0.3), rgba(0,245,255,0.05));
+}
+
+/* ── Mission Log Entry ──────────────────────────────────────── */
+.log-entry {
+  padding: 6px 10px;
+  border-left: 2px solid transparent;
+  font-size: 10px;
+  font-family: "JetBrains Mono", monospace;
+  transition: background 0.15s;
+  border-radius: 0 6px 6px 0;
+}
+.log-entry:hover { background: rgba(255,255,255,0.02); }
+.log-entry.tool_call  { border-color: #ffd93d; }
+.log-entry.output     { border-color: #00ff88; }
+.log-entry.thinking   { border-color: #a855f7; }
+.log-entry.error      { border-color: #ff2d55; }
+.log-entry.system     { border-color: #ff6b35; }
+
+/* ── Class Badge ────────────────────────────────────────────── */
+.class-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(0, 245, 255, 0.05);
+  border: 1px solid rgba(0, 245, 255, 0.1);
+  color: rgba(0, 245, 255, 0.6);
+}
+
+/* ── Section Title ──────────────────────────────────────────── */
+.section-title {
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+/* ── Stat Chip ──────────────────────────────────────────────── */
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-family: "JetBrains Mono", monospace;
+  background: rgba(0, 245, 255, 0.04);
+  border: 1px solid rgba(0, 245, 255, 0.08);
+  color: #6b7280;
+}
+
+/* ── SynthCrew Legacy Classes ───────────────────────────────── */
 .synth-panel {
   background: linear-gradient(160deg, rgba(12,16,32,0.97), rgba(8,12,21,0.99));
   border: 1px solid rgba(255,107,53,0.12);
@@ -30,53 +415,90 @@ body {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
 }
+.glass-panel {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+}
+
+/* ── Navigation ─────────────────────────────────────────────── */
 .synth-header-bar {
-  background: linear-gradient(180deg, rgba(10,14,23,0.98), rgba(8,12,21,0.98));
-  border-bottom: 1px solid rgba(255,107,53,0.15);
-  box-shadow: 0 1px 0 rgba(255,107,53,0.06);
+  background: linear-gradient(180deg, rgba(5, 8, 16, 0.99), rgba(8, 12, 21, 0.98));
+  border-bottom: 1px solid rgba(0, 245, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(0, 245, 255, 0.04), 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 .synth-nav-item {
-  border-left: 3px solid transparent;
-  border-radius: 0 8px 8px 0;
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  position: relative;
 }
 .synth-nav-item.active {
-  border-left-color: #ff6b35;
-  background: rgba(255,107,53,0.06);
+  border-left-color: var(--neon-orange);
+  background: rgba(255, 107, 53, 0.07);
   color: #ff6b35;
 }
+.synth-nav-item.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  background: rgba(255, 107, 53, 0.3);
+  border-radius: 2px;
+}
 .synth-logo-accent {
-  background: linear-gradient(135deg, #ff6b35, #4ecdc4);
+  background: linear-gradient(135deg, #ff6b35, #00f5ff);
   color: #080c15;
   font-weight: 900;
 }
 .synth-title-text {
   font-family: "Orbitron", monospace;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  background: linear-gradient(90deg, #ff6b35, #4ecdc4, #ff6b35);
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  background: linear-gradient(90deg, #ff6b35 0%, #00f5ff 40%, #a855f7 70%, #ff6b35 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: title-shimmer 6s linear infinite;
 }
 .synth-grid-bg {
   background-image:
-    linear-gradient(rgba(255,107,53,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,107,53,0.02) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(0, 245, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-/* ── Scrollbar ──────────────────────────────────── */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.08) transparent;
+/* ── Gradient Text ──────────────────────────────────────────── */
+.gradient-text-synthcrew {
+  background: linear-gradient(90deg, #ff6b35, #00f5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-*::-webkit-scrollbar { width: 4px; height: 4px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+.gradient-text-cyber {
+  background: linear-gradient(90deg, #00f5ff, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-quest {
+  background: linear-gradient(90deg, #d4a574, #ffd93d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-/* ── Quest Panel ────────────────────────────────── */
+/* ── Metric Counter Animation ───────────────────────────────── */
+.metric-counter {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  animation: counter-flicker 8s linear infinite;
+}
+
+/* ── Quest Panel ────────────────────────────────────────────── */
 .quest-panel {
   background: linear-gradient(135deg, rgba(13,17,28,0.9), rgba(6,9,16,0.9));
   border: 1px solid rgba(212,165,116,0.15);
@@ -92,146 +514,93 @@ body {
   pointer-events: none;
 }
 
-/* ── Glass Panel ────────────────────────────────── */
-.glass-panel {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-}
-
-/* ── Glow Text ──────────────────────────────────── */
-.glow-primary {
-  color: #ff6b35;
-  text-shadow: 0 0 12px rgba(255,107,53,0.5);
-}
-.glow-teal {
-  color: #4ecdc4;
-  text-shadow: 0 0 12px rgba(78,205,196,0.5);
-}
-.glow-cyan {
-  color: #4ecdc4;
-  text-shadow: 0 0 12px rgba(78,205,196,0.5);
-}
-.glow-purple {
-  color: #6c5ce7;
-  text-shadow: 0 0 12px rgba(108,92,231,0.5);
-}
-.glow-amber {
-  color: #ffd93d;
-  text-shadow: 0 0 12px rgba(255,217,61,0.4);
-}
-.glow-gold {
-  color: #ffd93d;
-  text-shadow: 0 0 12px rgba(255,217,61,0.4);
-}
-
-/* ── Gradient Text ──────────────────────────────── */
-.gradient-text-synthcrew {
-  background: linear-gradient(90deg, #ff6b35, #4ecdc4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.gradient-text-quest {
-  background: linear-gradient(90deg, #d4a574, #ffd93d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Agent Card ─────────────────────────────────── */
-.agent-card {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.agent-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent);
-  pointer-events: none;
-}
-.agent-card:hover::after { opacity: 1; }
-
-/* ── Class Badge ────────────────────────────────── */
-.class-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #9ca3af;
-}
-
-/* ── Mission Log Entry ──────────────────────────── */
-.log-entry {
-  padding: 8px 12px;
-  border-left: 2px solid transparent;
-  border-radius: 0 8px 8px 0;
-  font-size: 11px;
-  font-family: "JetBrains Mono", monospace;
-  transition: background 0.15s;
-}
-.log-entry:hover { background: rgba(255,255,255,0.02); }
-.log-entry.tool_call  { border-color: #ffd93d; }
-.log-entry.output     { border-color: #00b894; }
-.log-entry.thinking   { border-color: #6c5ce7; }
-.log-entry.error      { border-color: #ff6b6b; }
-
-/* ── XP Bar ─────────────────────────────────────── */
-.xp-bar {
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.06);
-  overflow: hidden;
-}
-.xp-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 1s ease;
-}
-
-/* ── Keyboard shortcut ──────────────────────────── */
+/* ── Keyboard shortcut ──────────────────────────────────────── */
 .kbd {
   display: inline-block;
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #9ca3af;
+  background: rgba(0, 245, 255, 0.05);
+  border: 1px solid rgba(0, 245, 255, 0.12);
+  color: rgba(0, 245, 255, 0.5);
 }
 
-/* ── Animations ─────────────────────────────────── */
+/* ── Status Bar (bottom) ────────────────────────────────────── */
+.status-bar {
+  background: rgba(4, 6, 12, 0.97);
+  border-top: 1px solid rgba(0, 245, 255, 0.06);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  color: #374151;
+}
+
+/* ── Wizard Steps ───────────────────────────────────────────── */
+.wizard-step-indicator {
+  position: relative;
+}
+.wizard-step-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 32px;
+  height: 1px;
+  background: rgba(0, 245, 255, 0.1);
+  transform: translateY(-50%);
+}
+.wizard-step-indicator:last-child::after {
+  display: none;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.3); }
 }
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(16px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-.animate-slide-right {
-  animation: slideInRight 0.3s ease-out forwards;
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scanline-move {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes glitch-top {
+  0%, 90%, 92%, 100% { opacity: 0; transform: translate(0); }
+  91% { opacity: 0.8; transform: translate(-2px, -1px); clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); }
+}
+@keyframes glitch-bottom {
+  0%, 85%, 88%, 100% { opacity: 0; transform: translate(0); }
+  86% { opacity: 0.8; transform: translate(2px, 1px); clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); }
+}
+@keyframes border-spin {
+  to { --angle: 360deg; }
+}
+@keyframes title-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes counter-flicker {
+  0%, 97%, 100% { opacity: 1; }
+  98% { opacity: 0.7; }
+  99% { opacity: 1; }
+}
+@keyframes dot-ripple {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes node-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(0, 245, 255, 0); }
 }
 @keyframes ripple {
   0%   { transform: scale(1);   opacity: 0.6; }
@@ -241,55 +610,17 @@ body {
   0%   { transform: translateY(-10%); }
   100% { transform: translateY(110%); }
 }
-.scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
-  );
-  pointer-events: none;
+@keyframes level-up-flash {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  10%, 90% { opacity: 1; transform: scale(1); }
 }
-@keyframes scanline-move {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(100vh); }
-}
-.scanlines::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(transparent 50%, rgba(78,205,196,0.01) 50%);
-  background-size: 100% 4px;
-  animation: scanline-move 8s linear infinite;
-  pointer-events: none;
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; }
 }
 
-/* ── Fade in ───────────────────────────────────── */
-.animate-fade-in {
-  animation: fadeSlideIn 0.4s ease-out forwards;
-}
-
-/* ── Section title ──────────────────────────────── */
-.section-title {
-  font-family: "Orbitron", monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-
-/* ── Stat chip ──────────────────────────────────── */
-.stat-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-family: "JetBrains Mono", monospace;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #9ca3af;
-}
+.animate-slide-right { animation: slideInRight 0.3s ease-out forwards; }
+.animate-slide-left { animation: slideInLeft 0.3s ease-out forwards; }
+.animate-fade-in { animation: fadeSlideIn 0.4s ease-out forwards; }
+.animate-level-up { animation: level-up-flash 0.8s ease-in-out; }
+.animate-neon-flicker { animation: neon-flicker 4s linear infinite; }

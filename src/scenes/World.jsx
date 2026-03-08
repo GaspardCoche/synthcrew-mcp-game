@@ -10,6 +10,10 @@ import { useWorldStore } from "../store/worldStore";
 import { getAgentHome, getAgentPatrolRadius } from "../lib/agentZones";
 import ClearAgentColliders from "./ClearAgentColliders";
 import NatureDecor from "./NatureDecor";
+import DataFlowParticles from "./DataFlowParticles";
+import CityDistricts from "./CityDistricts";
+import SpecialEffects from "./SpecialEffects";
+import GroundDetails from "./GroundDetails";
 
 const AGENT_COLORS = {
   NEXUS: "#ff6b35",
@@ -58,42 +62,54 @@ export default function World({
   return (
     <>
       <color attach="background" args={[fogColor]} />
-      <fog attach="fog" args={[fogColor, 25, 95]} />
+      {/* Dynamic fog — deeper at night, reddish during errors */}
+      <fog attach="fog" args={[fogColor, 30, 130]} />
+      <fogExp2 attach="fog" args={[fogColor, 0.006]} />
 
       <Sky
-        distance={1200}
-        inclination={0.6}
-        azimuth={0.25}
+        distance={2000}
+        inclination={0.58}
+        azimuth={0.22}
         turbidity={skyTurbidity}
-        rayleigh={0.4}
-        mieCoefficient={recentErrors > 0 ? 0.015 : 0.005}
-        sunPosition={[80, 50, 60]}
+        rayleigh={recentErrors > 0 ? 1.2 : 0.35}
+        mieCoefficient={recentErrors > 0 ? 0.02 : 0.004}
+        mieDirectionalG={0.82}
+        sunPosition={[100, 40, 60]}
       />
-      <Stars radius={200} depth={80} count={4000} factor={3} saturation={0.3} fade speed={0.8} />
-      <Environment preset="sunset" environmentIntensity={0.5} environmentRotation={[0, Math.PI / 6, 0]} />
+      <Stars radius={250} depth={100} count={6000} factor={4} saturation={0.4} fade speed={0.5} />
+      <Environment preset="night" environmentIntensity={0.35} environmentRotation={[0, Math.PI / 4, 0]} />
 
-      <ambientLight intensity={0.22} />
+      {/* Main directional (sun) */}
+      <ambientLight intensity={0.18} color="#1a1530" />
       <directionalLight
-        position={[80, 70, 50]}
-        intensity={1.1}
+        position={[100, 80, 60]}
+        intensity={0.9}
+        color="#ffe8d0"
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={150}
-        shadow-camera-left={-55}
-        shadow-camera-right={55}
-        shadow-camera-top={55}
-        shadow-camera-bottom={-55}
-        shadow-bias={-0.0003}
+        shadow-camera-far={200}
+        shadow-camera-left={-80}
+        shadow-camera-right={80}
+        shadow-camera-top={80}
+        shadow-camera-bottom={-80}
+        shadow-bias={-0.0002}
       />
-      <directionalLight position={[-30, 20, -20]} intensity={0.15} color="#e0e7ff" />
-      <pointLight position={[-15, 4, -10]} color="#f59e0b" intensity={0.08} distance={35} decay={2} />
-      <pointLight position={[18, 4, -8]} color="#4ecdc4" intensity={0.06} distance={35} decay={2} />
-      <pointLight position={[0, 3, -15]} color="#6c5ce7" intensity={0.04} distance={40} decay={2} />
+      {/* Blue moon fill light */}
+      <directionalLight position={[-50, 30, -30]} intensity={0.12} color="#6080ff" />
+      {/* District accent lights */}
+      <pointLight position={[0, 8, -8]}    color="#ff6b35" intensity={0.15} distance={50} decay={2} />
+      <pointLight position={[-35, 5, -26]} color="#6c5ce7" intensity={0.12} distance={45} decay={2} />
+      <pointLight position={[30, 5, -34]}  color="#74b9ff" intensity={0.10} distance={40} decay={2} />
+      <pointLight position={[-28, 5, -50]} color="#ffd93d" intensity={0.10} distance={40} decay={2} />
+      <pointLight position={[42, 5, -18]}  color="#00b894" intensity={0.10} distance={40} decay={2} />
+      <pointLight position={[18, 5, -56]}  color="#ff6b6b" intensity={0.10} distance={40} decay={2} />
+      <pointLight position={[-15, 5, -62]} color="#fd79a8" intensity={0.10} distance={40} decay={2} />
 
-      <Sparkles count={200} scale={[80, 20, 80]} color="#4ecdc4" size={1} opacity={0.28} />
-      <Sparkles count={120} scale={[60, 15, 60]} color="#6c5ce7" size={0.7} opacity={0.2} />
-      <Sparkles count={80} scale={[50, 12, 50]} color="#fbbf24" size={0.5} opacity={0.15} />
-      <Sparkles count={150} scale={[90, 8, 90]} color="#6b7280" size={0.4} opacity={0.12} />
+      {/* Ambient sparkles */}
+      <Sparkles count={150} scale={[100, 25, 100]} color="#4ecdc4" size={1.2} opacity={0.22} />
+      <Sparkles count={100} scale={[80, 18, 80]}   color="#6c5ce7" size={0.8} opacity={0.18} />
+      <Sparkles count={60}  scale={[70, 12, 70]}   color="#fbbf24" size={0.6} opacity={0.12} />
+      <Sparkles count={40}  scale={[120, 5, 120]}  color="#ff6b35" size={0.5} opacity={0.08} />
 
       <Terrain />
       <Structures />
@@ -112,6 +128,11 @@ export default function World({
           selected={selectedAgent?.id === agent.id || selectedAgent?.name === agent.name}
         />
       ))}
+
+      <DataFlowParticles />
+      <CityDistricts />
+      <GroundDetails />
+      <SpecialEffects />
     </>
   );
 }

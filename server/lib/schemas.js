@@ -6,7 +6,7 @@ import { z } from "zod";
 export const cliTaskSchema = z.object({
   prompt: z.string().min(1, "Le prompt est requis"),
   title: z.string().max(200).optional(),
-  source: z.enum(["claude-cli", "cursor", "api", "cron"]).default("api"),
+  source: z.enum(["claude-cli", "cursor", "api", "cron", "cli", "game"]).default("api"),
   autoRun: z.boolean().default(true),
   templateId: z.string().optional(),
 });
