@@ -5,6 +5,7 @@ import { useThrottledFrame } from "../lib/useThrottledFrame";
 import { getTerrainHeightAt } from "./Terrain";
 import { useWorldStore } from "../store/worldStore";
 import { agentCollidersRef } from "../lib/agentColliders";
+import { isBlocked } from "../lib/collisions";
 import { AGENT_ROLE_LABELS } from "../lib/constants";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 
@@ -37,6 +38,23 @@ const PATROL_CONFIG = {
 };
 const SICK_SPEED_MULT = 0.4;
 const AGENT_COLLIDER_RADIUS = 0.7;
+const AGENT_STRUCTURE_RADIUS = 0.5;
+
+function findValidPatrolPos(homeX, homeZ, radius, phase, t, speedX, speedZ, otherAgentCircles) {
+  const baseNx = homeX + Math.cos(t * speedX + phase) * radius;
+  const baseNz = homeZ + Math.sin(t * speedZ + phase * 0.7) * radius * 0.65;
+  if (!isBlocked(baseNx, baseNz, AGENT_STRUCTURE_RADIUS, otherAgentCircles)) {
+    return [baseNx, baseNz];
+  }
+  for (let attempt = 1; attempt <= 8; attempt++) {
+    const angle = (phase + attempt * Math.PI / 4 + t * 0.5) % (Math.PI * 2);
+    const r = radius * (0.3 + 0.7 * (attempt / 8));
+    const nx = homeX + Math.cos(angle) * r;
+    const nz = homeZ + Math.sin(angle * 0.8) * r * 0.65;
+    if (!isBlocked(nx, nz, AGENT_STRUCTURE_RADIUS, otherAgentCircles)) return [nx, nz];
+  }
+  return [homeX, homeZ];
+}
 const PROXIMITY_THRESHOLD = 10;
 const HIT_BOX_RADIUS = 1.2;
 const HIT_BOX_HEIGHT = 3;
@@ -296,26 +314,29 @@ export default function HumanoidAgent({ agent, onClick, selected }) {
       g.position.y += (ty - g.position.y) * 0.04;
       g.position.z += (workstationTarget[2] - g.position.z) * 0.04;
       g.rotation.y += (0 - g.rotation.y) * 0.05;
-    } else if (isQueued) {
-      const nx = home[0] + Math.cos(t * cfg.speedX * 1.5 + phase) * cfg.radius * 0.4;
-      const nz = home[2] + Math.sin(t * cfg.speedZ * 1.5 + phase * 0.7) * cfg.radius * 0.3;
-      const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 3 + phase);
-      g.position.x += (nx - g.position.x) * 0.06;
-      g.position.y += (ny - g.position.y) * 0.06;
-      g.position.z += (nz - g.position.z) * 0.06;
     } else {
-      const nx = home[0] + Math.cos(t * cfg.speedX + phase) * cfg.radius;
-      const nz = home[2] + Math.sin(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65;
-      const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * 2.4 + phase);
-      g.position.x = nx;
-      g.position.y = ny;
-      g.position.z = nz;
+      const others = Object.entries(agentCollidersRef.current)
+        .filter(([k]) => !k.startsWith(`${agent.id || agent.name}-`))
+        .map(([, v]) => v);
+      const [nx, nz] = isQueued
+        ? findValidPatrolPos(home[0], home[2], cfg.radius * 0.4, phase, t * 1.5, cfg.speedX, cfg.speedZ, others)
+        : findValidPatrolPos(home[0], home[2], cfg.radius, phase, t, cfg.speedX, cfg.speedZ, others);
+      const ny = getTerrainHeightAt(nx, nz) + cfg.bobAmp * Math.sin(t * (isQueued ? 3 : 2.4) + phase);
 
-      const vx = -Math.sin(t * cfg.speedX + phase) * cfg.radius * cfg.speedX;
-      const vz = Math.cos(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65 * cfg.speedZ;
-      if (Math.abs(vx) + Math.abs(vz) > 0.002) {
-        const targetY = Math.atan2(vx, vz);
-        g.rotation.y += (targetY - g.rotation.y) * 0.08;
+      if (isQueued) {
+        g.position.x += (nx - g.position.x) * 0.06;
+        g.position.y += (ny - g.position.y) * 0.06;
+        g.position.z += (nz - g.position.z) * 0.06;
+      } else {
+        g.position.x = nx;
+        g.position.y = ny;
+        g.position.z = nz;
+        const vx = -Math.sin(t * cfg.speedX + phase) * cfg.radius * cfg.speedX;
+        const vz = Math.cos(t * cfg.speedZ + phase * 0.7) * cfg.radius * 0.65 * cfg.speedZ;
+        if (Math.abs(vx) + Math.abs(vz) > 0.002) {
+          const targetY = Math.atan2(vx, vz);
+          g.rotation.y += (targetY - g.rotation.y) * 0.08;
+        }
       }
     }
 

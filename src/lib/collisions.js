@@ -5,34 +5,34 @@
 
 export const WORLD_COLLIDERS = [
   // Zone centrale (Hub NEXUS)
-  { x: 0,    z: -8,   r: 3.5 },
+  { x: 0,    z: -8,   r: 2.8 },
 
-  // Zone Data (DATAFLOW, -35, -28)
-  { x: -34,  z: -28,  r: 4.5 },
-  { x: -28,  z: -22,  r: 1.5 },
-  { x: -40,  z: -22,  r: 1.5 },
+  // Zone Data (DATAFLOW)
+  { x: -34,  z: -28,  r: 3.2 },
+  { x: -28,  z: -22,  r: 1.2 },
+  { x: -40,  z: -22,  r: 1.2 },
 
-  // Zone Analyse (PRISME, 32, -35)
-  { x: 32,   z: -35,  r: 3.5 },
-  { x: 38,   z: -28,  r: 1.2 },
-  { x: 26,   z: -28,  r: 1.2 },
+  // Zone Analyse (PRISME)
+  { x: 32,   z: -35,  r: 3.0 },
+  { x: 38,   z: -28,  r: 1.0 },
+  { x: 26,   z: -28,  r: 1.0 },
 
-  // Zone Archive (SCRIBE, -28, -52)
-  { x: -28,  z: -52,  r: 4.0 },
-  { x: -20,  z: -46,  r: 1.2 },
-  { x: -36,  z: -46,  r: 1.2 },
+  // Zone Archive (SCRIBE)
+  { x: -28,  z: -52,  r: 3.2 },
+  { x: -20,  z: -46,  r: 1.0 },
+  { x: -36,  z: -46,  r: 1.0 },
 
-  // Zone Comms (SIGNAL, 42, -18)
-  { x: 42,   z: -18,  r: 3.5 },
-  { x: 48,   z: -12,  r: 2.0 },
+  // Zone Comms (SIGNAL)
+  { x: 42,   z: -18,  r: 3.0 },
+  { x: 48,   z: -12,  r: 1.5 },
 
-  // Zone Rôdeur (SPIDER, 18, -58)
-  { x: 18,   z: -58,  r: 3.0 },
+  // Zone Rôdeur (SPIDER)
+  { x: 18,   z: -58,  r: 2.5 },
 
-  // Zone Forge (CODEFORGE, -15, -62)
-  { x: -15,  z: -62,  r: 4.0 },
-  { x: -8,   z: -56,  r: 1.5 },
-  { x: -22,  z: -56,  r: 1.5 },
+  // Zone Forge (CODEFORGE)
+  { x: -15,  z: -62,  r: 3.2 },
+  { x: -8,   z: -56,  r: 1.2 },
+  { x: -22,  z: -56,  r: 1.2 },
 ];
 
 /** Teste si une position (x, z) entre en collision. dynamicCircles = [{ x, z, r }] (ex: agents). */

@@ -4,12 +4,13 @@
  * DB stored at server/data/synthcrew.db
  */
 import Database from "better-sqlite3";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DB_PATH = join(__dirname, "..", "data", "synthcrew.db");
+const DATA_DIR = join(__dirname, "..", "data");
+const DB_PATH = join(DATA_DIR, "synthcrew.db");
 const DATA_JSON_PATH = join(__dirname, "..", "data.json");
 
 let _db = null;
@@ -107,6 +108,10 @@ CREATE INDEX IF NOT EXISTS idx_missions_createdAt ON missions(createdAt DESC);
 
 export function initDb() {
   if (_db) return _db;
+
+  if (!existsSync(DATA_DIR)) {
+    mkdirSync(DATA_DIR, { recursive: true });
+  }
 
   _db = new Database(DB_PATH);
   _db.exec(SCHEMA);

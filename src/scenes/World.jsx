@@ -59,16 +59,16 @@ export default function World({
   return (
     <>
       <color attach="background" args={[fogColor]} />
-      <fogExp2 attach="fog" args={[fogColor, 0.005]} />
+      <fogExp2 attach="fog" args={[fogColor, 0.003]} />
 
       <SkyBox />
-      <Environment preset="night" environmentIntensity={0.4} environmentRotation={[0, Math.PI / 4, 0]} />
+      <Environment preset="night" environmentIntensity={0.6} environmentRotation={[0, Math.PI / 4, 0]} />
 
-      <ambientLight intensity={0.35} color="#1a1530" />
+      <ambientLight intensity={0.55} color="#2a2540" />
       <directionalLight
-        position={[100, 80, 60]}
-        intensity={1.0}
-        color="#ffe8d0"
+        position={[80, 100, 50]}
+        intensity={1.4}
+        color="#fff5e6"
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-far={150}
@@ -78,9 +78,10 @@ export default function World({
         shadow-camera-bottom={-60}
         shadow-bias={-0.0002}
       />
-      <directionalLight position={[-50, 30, -30]} intensity={0.15} color="#6080ff" />
+      <directionalLight position={[-40, 50, -20]} intensity={0.35} color="#a0c8ff" />
+      <directionalLight position={[20, 30, 40]} intensity={0.25} color="#e8f0ff" />
 
-      <Sparkles count={60} scale={[100, 20, 100]} color="#4ecdc4" size={1.0} opacity={0.12} />
+      <Sparkles count={80} scale={[100, 30, 100]} color="#6ee7e0" size={1.2} opacity={0.2} />
 
       <Terrain />
       <Structures />

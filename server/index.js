@@ -120,9 +120,11 @@ const app = new Hono();
 
 const ALLOWED_ORIGINS = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",").map((s) => s.trim())
-  : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3001", "http://127.0.0.1:3001"];
+  : process.env.NODE_ENV === "production"
+    ? "*"
+    : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3001", "http://127.0.0.1:3001"];
 
-app.use("/*", cors({ origin: ALLOWED_ORIGINS.length ? ALLOWED_ORIGINS : true }));
+app.use("/*", cors({ origin: ALLOWED_ORIGINS }));
 
 // ─── WebSocket broadcast (declared early so routes can use it) ────────────────
 const clients = new Set();
@@ -182,7 +184,8 @@ app.patch("/api/agents/:id", async (c) => {
 // ─── Agent direct chat ───────────────────────────────────────────────────────
 app.post("/api/agents/:id/chat", async (c) => {
   const id = c.req.param("id");
-  const agent = getAgent(id) || getAgents().find((a) => a.name === id || a.id === id);
+  const all = getAgents();
+  const agent = getAgent(id) || all.find((a) => a.name === id || a.id === id || a.id === `a_${id}`);
   if (!agent) return c.json({ error: "Agent not found" }, 404);
 
   const { message } = await c.req.json();
@@ -229,7 +232,6 @@ app.post("/api/agents/:id/chat", async (c) => {
   const responses = ROLE_RESPONSES[agent.role] || ROLE_RESPONSES.analyst;
   const reply = responses[Math.floor(Math.random() * responses.length)](message);
 
-  addMissionEvent(null, agent.name, "agent_chat", message, { reply });
   broadcast({
     type: "agent_chat",
     payload: { agentId: agent.id, agentName: agent.name, message, reply, timestamp: new Date().toISOString() },
